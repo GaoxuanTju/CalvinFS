@@ -675,7 +675,7 @@ void LatencyExperimentAppend() {
   }
 
   void RenameExperiment() {
-    exit(0);
+    
     LOG(ERROR) << "is it here in RenameExperiment()?";//gaoxuan --
     Spin(1);
     metadata_->Init();
