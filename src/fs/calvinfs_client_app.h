@@ -675,7 +675,7 @@ void LatencyExperimentAppend() {
   }
 
   void RenameExperiment() {
-    cout<<"kankanniyoumeiyoucuo"<<endl;//gaoxuan --
+    
     Spin(1);
     metadata_->Init();
     Spin(1);
