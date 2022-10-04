@@ -700,7 +700,7 @@ void LatencyExperimentAppend() {
 
       if (j % 50 == 0) {
         LOG(ERROR) << "[" << machine()->machine_id() << "] "
-                   << "Test progress : " << j / 100 << "/" << 5;
+                   << "Test progress : " << j / 50 << "/" << 5;
       }
     }
 
@@ -710,9 +710,9 @@ void LatencyExperimentAppend() {
     }
 
     // Report.
-    LOG(ERROR) << "rename executing in calvinfs_client_app.h"; //gaoxuan --
+    //gaoxuan --
     LOG(ERROR) << "[" << machine()->machine_id() << "] "
-               << "Renamed " <<  "250 files. Elapsed time: "
+               << "Renamed " <<  "250 files. Elapsed time:rename executing in calvinfs_client_app.h "
                << (GetTime() - start) << " seconds";
   }
 
@@ -749,7 +749,7 @@ void LatencyExperimentAppend() {
 
     // Report.
     LOG(ERROR) << "[" << machine()->machine_id() << "] "
-               << "Renamed " <<  "250 files. Elapsed time: "
+               << "Renamed " <<  "250 files. Elapsed time:may here "
                << (GetTime() - start) << " seconds";
 
     // Write out latency reports.
