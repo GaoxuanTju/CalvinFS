@@ -16,8 +16,7 @@
 #include "fs/metadata_store.h"
 #include "machine/app/app.h"
 #include "machine/machine.h"
-#include <iostream>
-using namespace std;//gaoxuan --used for cout<< 
+
 using std::make_pair;
 class CalvinFSClientApp : public App {
  public:
@@ -676,7 +675,7 @@ void LatencyExperimentAppend() {
   }
 
   void RenameExperiment() {
-    cout<<"running rename?"<<endl;  //gaoxuan --
+    std::cout<<"running rename?";  //gaoxuan --
     Spin(1);
     metadata_->Init();
     Spin(1);
