@@ -782,7 +782,7 @@ void LatencyExperimentAppend() {
     while (capacity_.load() < kMaxCapacity) {
       usleep(10);
     }
-
+    LOG(ERROR) << "is it here in RenameExperiment()?";//gaoxuan --
     // Report.
     LOG(ERROR) << "[" << machine()->machine_id() << "] "
                << "Renamed " <<  "250 files. Elapsed time: "
@@ -840,7 +840,7 @@ void LatencyExperimentRenameFile(int local_percentage) {
     while (capacity_.load() < kMaxCapacity) {
       usleep(10);
     }
-
+    LOG(ERROR) << "is it here in RenameExperiment()?";//gaoxuan --
     // Report.
     LOG(ERROR) << "[" << machine()->machine_id() << "] "
                << "Renamed " <<  "250 files. Elapsed time: "

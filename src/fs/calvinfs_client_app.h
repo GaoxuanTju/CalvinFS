@@ -675,7 +675,7 @@ void LatencyExperimentAppend() {
   }
 
   void RenameExperiment() {
-    
+    LOG(ERROR) << "is it here in RenameExperiment()?";//gaoxuan --
     Spin(1);
     metadata_->Init();
     Spin(1);
@@ -699,8 +699,9 @@ void LatencyExperimentAppend() {
 
 
       if (j % 50 == 0) {
+        LOG(ERROR) << "is it here in RenameExperiment()?";//gaoxuan --
         LOG(ERROR) << "[" << machine()->machine_id() << "] "
-                   << "Test progress : " << j / 50 << "/" << 5;
+                   << "Test progress : " << j / 50 << "/" << 5;//将j/100修改成了j/50,但是没有什么效果
       }
     }
 
@@ -708,7 +709,7 @@ void LatencyExperimentAppend() {
     while (capacity_.load() < kMaxCapacity) {
       usleep(10);
     }
-
+    LOG(ERROR) << "is it here in RenameExperiment()?";//gaoxuan --
     // Report.
     //gaoxuan --
     LOG(ERROR) << "[" << machine()->machine_id() << "] "
@@ -717,6 +718,7 @@ void LatencyExperimentAppend() {
   }
 
   void LatencyExperimentRenameFile() {
+    LOG(ERROR) << "is it here in RenameExperiment()?";//gaoxuan --
     Spin(1);
     metadata_->Init();
     Spin(1);
@@ -746,7 +748,7 @@ void LatencyExperimentAppend() {
     while (capacity_.load() < kMaxCapacity) {
       usleep(10);
     }
-
+    LOG(ERROR) << "is it here in RenameExperiment()?";//gaoxuan --
     // Report.
     LOG(ERROR) << "[" << machine()->machine_id() << "] "
                << "Renamed " <<  "250 files. Elapsed time:may here "
