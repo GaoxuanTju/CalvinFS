@@ -1,0 +1,67 @@
+----------------------This is the CalvinFS codebase.---------------------------
+
+Installation(This is for Ubuntu 14.04, it should be similar with other Linux distribution):
+1. You should install the following softwares:
+   Git
+   make,g++
+   autoconf, libtool,libreadline-dev,libsnappy-dev
+   subversion
+   unzip, tar
+   cmake
+
+
+2. You should install the following external libraries:
+    --- protobuf
+    --- gtest
+    --- glog
+    --- leveldb
+    --- zeromq
+    --- gperftools
+    --- gflags
+
+   I wrote a script(install-ext), so that you can directly run this script to download and compile the libraries.
+
+
+3. After that, you should add the LD_LIBRARY_PATH to the ~/.bashrc, below is my cofig:
+export LD_LIBRARY_PATH=~/CalvinFS/ext/zeromq/src/.libs:~/CalvinFS/ext/protobuf/src/.libs:~/CalvinFS/ext/gtest/mybuild:~/CalvinFS/ext/glog/.libs:~/CalvinFS/ext/leveldb:~/CalvinFS/ext    /gperftools/.libs:~/CalvinFS/ext/gflags/.libs
+
+
+Then run source ~/.bashrc.
+
+
+4. Now you can compile the code:
+Currently there are three source code directories:
+src/ ------- The original CalvinFS source code (Synchronous-by-default)
+src_lowlatency/ --------  The low-latency CalvinFS that uses request chopping algorithm. (consistent-by-default)
+src_remaster/   --------- The low-latency CalvinFS that uses remaster algorithm. (consistent-by-default)
+
+$ cd ~/CalvinFS/src
+$ make -j
+
+Then all the binaries will be created at ~/CalvinFS/bin/
+
+
+5. You can change the config file(calvin.conf) to include all machines in the cluster. Now you can run CalvinFS:
+$ cd ~/CalvinFS
+$ bin/scripts/cluster --command="status"  // Check the status of the cluster
+$ bin/scripts/cluster --command="update"  // Use git to get the latest code, and compile it on each machine 
+$ bin/scripts/cluster --command="put-config" // Send the config file to all the machines in the cluster
+$ bin/scripts/cluster --command="start" --experiment=0  --clients=100 --max_active=1000 --max_running=100 --local_percentage=100
+// Start the CalvinFS cluster, and run experiments. --experiments: specify which experiment you want to run; --clients: How many concurrent clients generated on each meachine; --max_active: max active actions for locking scheduler; --max_running: max running actions for locking scheduler; --local_percentage: percentage of actions that are local replica(only used for low-latency CalvinFS)
+$ bin/scripts/cluster --command="get-data"  // Get experiments result if you enable reporting, it will copy result to the data/ directory. Right now, it is used to get latency results. 
+$ bin/scripts/cluster --command="kill"   // Stop the CalvinFS cluster
+
+Note that: When you finish running one experiment, and want to run another experiment, you should first run command to kill the cluster, and then start the cluster to run another experiment. In default experiment=0, which means when you start CalvinFS experiments,  it will run FillExperiment() experiments. If you want to run other experiments, you can change the parameter. 
+Currently:
+0-----------FillExperiment()
+1-----------ConflictingAppendExperiment()
+2-----------RandomAppendExperiment()
+3-----------CopyExperiment();
+4-----------RenameExperiment();
+5-----------LatencyExperimentReadFile()
+6-----------LatencyExperimentCreateFile()
+7-----------LatencyExperimentAppend()
+8-----------LatencyExperimentMix()
+9-----------LatencyExperimentRenameFile()
+10-----------CrashExperiment()
+
