@@ -685,7 +685,7 @@ void LatencyExperimentAppend() {
 
     double start = GetTime();
 
-    for (int j = 0; j < 250; j++) {
+    for (int j = 0; j < 1; j++) {//gaoxuan --检查一下这里的代码有用没，把j<250改成了j<1
       int a1 = rand() % 1000;
       int a2 = rand() % 1000;
       while (a2 == a1) {
