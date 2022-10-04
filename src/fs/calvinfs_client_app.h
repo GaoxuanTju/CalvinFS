@@ -710,10 +710,10 @@ void LatencyExperimentAppend() {
     }
 
     // Report.
+    LOG(ERROR) << "rename executing in calvinfs_client_app.h"; //gaoxuan --
     LOG(ERROR) << "[" << machine()->machine_id() << "] "
                << "Renamed " <<  "250 files. Elapsed time: "
                << (GetTime() - start) << " seconds";
-    LOG(ERROR) << "rename executing in calvinfs_client_app.h"; //gaoxuan --
   }
 
   void LatencyExperimentRenameFile() {
