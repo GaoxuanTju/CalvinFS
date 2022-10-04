@@ -310,7 +310,7 @@ void MetadataStore::Init() {
   int asize = machine_->config().size();
   int bsize = 1000;
   int csize = 500;
-
+  
   double start = GetTime();
 
   // Update root dir.
@@ -377,6 +377,7 @@ void MetadataStore::Init() {
       }
     }
   }
+  LOG(ERROR) << "is it here in metadata_store.cc";//gaoxuan --
   LOG(ERROR) << "[" << machine_->machine_id() << "] "
              << "MDS::Init() complete. Elapsed time: "
              << GetTime() - start << " seconds";

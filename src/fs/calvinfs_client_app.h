@@ -916,6 +916,7 @@ void LatencyExperimentAppend() {
   }
 
   void BackgroundRenameFile (const Slice& from_path, const Slice& to_path) {
+    LOG(ERROR) << "is it here in BackgroundRenameExperiment()?";//gaoxuan --
     Header* header = new Header();
     header->set_from(machine()->machine_id());
     header->set_to(machine()->machine_id());
