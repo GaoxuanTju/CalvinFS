@@ -675,7 +675,7 @@ void LatencyExperimentAppend() {
   }
 
   void RenameExperiment() {
-    std::cout<<"running rename?";  //gaoxuan --
+    
     Spin(1);
     metadata_->Init();
     Spin(1);
@@ -713,6 +713,7 @@ void LatencyExperimentAppend() {
     LOG(ERROR) << "[" << machine()->machine_id() << "] "
                << "Renamed " <<  "250 files. Elapsed time: "
                << (GetTime() - start) << " seconds";
+    LOG(ERROR) << "rename executing in calvinfs_client_app.h"; //gaoxuan --
   }
 
   void LatencyExperimentRenameFile() {
