@@ -90,8 +90,6 @@ void ClusterManager::GetTempFiles(const string& base) {
 }
 
 void ClusterManager::Update() {
-  // Add logger init *
-  google::InitGoogleLogging(argv[0]);
   // Next, Run "git pull ;make clean;make -j" to get the latest code and compile.
   vector<pthread_t> threads;
   for (map<uint64, MachineInfo>::const_iterator it =
@@ -101,7 +99,7 @@ void ClusterManager::Update() {
     string* ssh_command = new string(
       "ssh " + ssh_key(it->first)  + " "+ ssh_username_ + "@" + it->second.host() +
       " 'cd " + calvin_path_ + "; git pull; cd src; cp Makefile.default Makefile; make clean; make -j'");
-    LOG(ERROR) << ssh_command;    
+    LOG(ERROR) << calvin_path_;    
     pthread_create(
         &threads[threads.size()-1],
         NULL,
