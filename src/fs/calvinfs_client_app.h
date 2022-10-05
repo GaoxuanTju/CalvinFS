@@ -676,7 +676,7 @@ void LatencyExperimentAppend() {
 
   void RenameExperiment() {
     
-    LOG(ERROR) << "is it here in RenameExperiment()?";//gaoxuan --
+    
     Spin(1);
     metadata_->Init();
     Spin(1);
@@ -685,7 +685,7 @@ void LatencyExperimentAppend() {
 
     double start = GetTime();
 
-    for (int j = 0; j < 1; j++) {//gaoxuan --检查一下这里的代码有用没，把j<250改成了j<1
+    for (int j = 0; j < 250; j++) {
       int a1 = rand() % 1000;
       int a2 = rand() % 1000;
       while (a2 == a1) {
@@ -700,9 +700,9 @@ void LatencyExperimentAppend() {
 
 
       if (j % 50 == 0) {
-        LOG(ERROR) << "is it here in RenameExperiment()?";//gaoxuan --
+        
         LOG(ERROR) << "[" << machine()->machine_id() << "] "
-                   << "Test progress : " << j / 50 << "/" << 5;//将j/100修改成了j/50,但是没有什么效果
+                   << "Test progress : " << j / 50 << "/" << 5;//将j/100修改成了j/50,应该是代码有错误
       }
     }
 
@@ -710,16 +710,16 @@ void LatencyExperimentAppend() {
     while (capacity_.load() < kMaxCapacity) {
       usleep(10);
     }
-    LOG(ERROR) << "is it here in RenameExperiment()?";//gaoxuan --
+    
     // Report.
-    //gaoxuan --
+    
     LOG(ERROR) << "[" << machine()->machine_id() << "] "
-               << "Renamed " <<  "250 files. Elapsed time:rename executing in calvinfs_client_app.h "
+               << "Renamed " <<  "250 files. Elapsed time:"
                << (GetTime() - start) << " seconds";
   }
 
   void LatencyExperimentRenameFile() {
-    LOG(ERROR) << "is it here in RenameExperiment()?";//gaoxuan --
+    
     Spin(1);
     metadata_->Init();
     Spin(1);
@@ -749,7 +749,7 @@ void LatencyExperimentAppend() {
     while (capacity_.load() < kMaxCapacity) {
       usleep(10);
     }
-    LOG(ERROR) << "is it here in RenameExperiment()?";//gaoxuan --
+    
     // Report.
     LOG(ERROR) << "[" << machine()->machine_id() << "] "
                << "Renamed " <<  "250 files. Elapsed time:may here "
@@ -917,7 +917,7 @@ void LatencyExperimentAppend() {
   }
 
   void BackgroundRenameFile (const Slice& from_path, const Slice& to_path) {
-    LOG(ERROR) << "is it here in BackgroundRenameExperiment()?";//gaoxuan --
+  
     Header* header = new Header();
     header->set_from(machine()->machine_id());
     header->set_to(machine()->machine_id());

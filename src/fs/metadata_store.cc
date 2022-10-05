@@ -377,9 +377,9 @@ void MetadataStore::Init() {
       }
     }
   }
-  LOG(ERROR) << "is it here in metadata_store.cc";//gaoxuan --
+  
   LOG(ERROR) << "[" << machine_->machine_id() << "] "
-             << "MDS::Init() complete. Elapsed time: is there any change?"//gaoxuan --
+             << "MDS::Init() complete. Elapsed time: "
              << GetTime() - start << " seconds";
 }
 

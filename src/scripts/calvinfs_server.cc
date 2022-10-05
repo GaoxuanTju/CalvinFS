@@ -48,7 +48,7 @@ int main(int argc, char** argv) {
       return 0;
     }
   }
-  LOG(ERROR) << "is it here in calvinfs_server.cc";//gaoxuan --
+ 
   LOG(ERROR) << "Preparing to start CalvinFS node "
              << FLAGS_machine_id << "...";
 
