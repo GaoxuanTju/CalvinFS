@@ -36,7 +36,7 @@ DEFINE_int32(max_running, 100, "max running actions for locking scheduler");
 int main(int argc, char** argv) {
   google::ParseCommandLineFlags(&argc, &argv, true);
   google::InitGoogleLogging(argv[0]);
-
+  LOG(ERROR) << "Execution step1 in calvinfs_server.cc's main()";//gaoxuan --
   // Print Calvin version
   if (FLAGS_calvin_version) {
     // Check whether Calvin have been running

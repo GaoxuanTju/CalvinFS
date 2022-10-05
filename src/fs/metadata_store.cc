@@ -307,6 +307,7 @@ int RandomSize() {
 }
 
 void MetadataStore::Init() {
+  LOG(error)<< "Execution step2 ：in metadata_store.cc's Init";//gaoxuan --
   int asize = machine_->config().size();
   int bsize = 1000;
   int csize = 500;

@@ -676,7 +676,7 @@ void LatencyExperimentAppend() {
 
   void RenameExperiment() {
     
-    
+    LOG(ERROR)<<"Execution step3:incalvinfs_client_app.h's RenameExperiment()";//gaoxuan --
     Spin(1);
     metadata_->Init();
     Spin(1);
@@ -917,7 +917,7 @@ void LatencyExperimentAppend() {
   }
 
   void BackgroundRenameFile (const Slice& from_path, const Slice& to_path) {
-  
+    LOG(ERROR)<< "Execution step 4: in Calvinfs_client_app.h's BackgroundRenameFile()";//gaoxuan -- 
     Header* header = new Header();
     header->set_from(machine()->machine_id());
     header->set_to(machine()->machine_id());
