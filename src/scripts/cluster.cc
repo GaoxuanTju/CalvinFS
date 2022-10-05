@@ -8,14 +8,10 @@
 
 DEFINE_string(command, "status", "cluster command");
 DEFINE_string(config, "calvin.conf", "conf file of Calvin cluster");
-<<<<<<< HEAD
-// DEFINE_string(calvin_path, "/home/ubuntu/CalvinFS",
-//               "path to the main calvin directory");
-DEFINE_string(calvin_path, "/root/CalvinFS",
-=======
+
 DEFINE_string(calvin_path, "/home/CalvinFS",
->>>>>>> cb2d1c5 (13:24)
-              "path to the main calvin directory");
+               "path to the main calvin directory");
+
 DEFINE_string(binary, "calvinfs_server", "Calvin binary executable program");
 DEFINE_string(ssh_key1, "-i ~/Virginia.pem", "ssh_key for the first data center(Virginia)");
 DEFINE_string(ssh_key2, "-i ~/Oregon.pem", "ssh_key for the second data center(Oregon)");
