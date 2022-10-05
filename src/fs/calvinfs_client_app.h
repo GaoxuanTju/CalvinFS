@@ -917,7 +917,7 @@ void LatencyExperimentAppend() {
   }
 
   void BackgroundRenameFile (const Slice& from_path, const Slice& to_path) {
-    LOG(ERROR)<< "Execution step 4: in Calvinfs_client_app.h's BackgroundRenameFile()";//gaoxuan -- 
+    //LOG(ERROR)<< "Execution step 4: in Calvinfs_client_app.h's BackgroundRenameFile()";//gaoxuan -- 
     Header* header = new Header();
     header->set_from(machine()->machine_id());
     header->set_to(machine()->machine_id());
