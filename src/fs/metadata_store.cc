@@ -453,7 +453,7 @@ bool MetadataStore::IsLocal(const string& path) {
             config_->LookupReplica(machine_->machine_id()));
 }
 
-void MetadataStore::GetRWSets(Action* action) {
+void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFile调用了一下
   action->clear_readset();
   action->clear_writeset();
 
@@ -484,9 +484,11 @@ void MetadataStore::GetRWSets(Action* action) {
     action->add_readset(ParentDir(in.to_path()));
     action->add_writeset(ParentDir(in.to_path()));
 
-  } else if (type == MetadataAction::RENAME) {
+  } else if (type == MetadataAction::RENAME) {//gaoxuan --这里会被调用
+  //gaoxuan --先看懂下面这个是什么逻辑
     MetadataAction::RenameInput in;
     in.ParseFromString(action->input());
+    //gaoxuan --最后我觉得就是这里在执行一个rename，不然为啥会涉及父目录呢
     action->add_readset(in.from_path());
     action->add_writeset(in.from_path());
     action->add_readset(ParentDir(in.from_path()));
@@ -530,6 +532,7 @@ void MetadataStore::GetRWSets(Action* action) {
 }
 
 void MetadataStore::Run(Action* action) {
+  LOG(ERROR) << "Run in metadata_store.cc--gaoxuan";//gaoxuan --
   // Prepare by performing all reads.
   ExecutionContext* context;
   if (machine_ == NULL) {

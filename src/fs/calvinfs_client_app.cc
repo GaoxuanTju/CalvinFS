@@ -230,7 +230,7 @@ MessageBuffer* CalvinFSClientApp::CopyFile(const Slice& from_path, const Slice& 
   }
 }
 
-MessageBuffer* CalvinFSClientApp::RenameFile(const Slice& from_path, const Slice& to_path) {
+MessageBuffer* CalvinFSClientApp::RenameFile(const Slice& from_path, const Slice& to_path) {//gaoxuan --这里被调用了，应该这里才是rename的逻辑
   //LOG(ERROR)<<"Is it executed? --calvinfs_client_app.cc's RenameFile()";// gaoxuan --
   uint64 distinct_id = machine()->GetGUID();
   string channel_name = "action-result-" + UInt64ToString(distinct_id);
@@ -239,18 +239,21 @@ MessageBuffer* CalvinFSClientApp::RenameFile(const Slice& from_path, const Slice
 
   Action* a = new Action();
   a->set_client_machine(machine()->machine_id());
-  a->set_client_channel(channel_name);
-  a->set_action_type(MetadataAction::RENAME);
+  a->set_client_channel(channel_name);//gaoxuan --这个channel应该指的是一个行为的数据通路吧
+  a->set_action_type(MetadataAction::RENAME);//gaoxuan --这里确定action类型是RENAME
 
   MetadataAction::RenameInput in;
   in.set_from_path(from_path.data(), from_path.size());
   in.set_to_path(to_path.data(), to_path.size());
   in.SerializeToString(a->mutable_input());
-  metadata_->GetRWSets(a);
-  log_->Append(a);
+
+  //gaoxuan --现在困境就局限在下面这两个调用了，上面应该是没有操作，下面是等待操作完成，所以操作只能是在下面这两个调用中完成
+  metadata_->GetRWSets(a);//gaoxuan --调用了这个函数，也在metadata_store.cc
+  log_->Append(a);//gaoxuan --这块目前看来只是加入到了一个队列里面
 
   MessageBuffer* m = NULL;
-  while (!channel->Pop(&m)) {
+  while (!channel->Pop(&m)) {//gaoxuan --这里就说的是等待操作完成被返回，操作在哪执行了？？？？
+    //gaoxuan --这个地方的逻辑应该是action的这个通路里面没有数据了，代表action完成了呗，所以操作还是在上面完成的
     // Wait for action to complete and be sent back.
     usleep(100);
   }

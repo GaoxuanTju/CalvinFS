@@ -678,7 +678,7 @@ void LatencyExperimentAppend() {
     
     LOG(ERROR)<<"Execution step3:incalvinfs_client_app.h's RenameExperiment()";//gaoxuan --
     Spin(1);
-    metadata_->Init();
+    metadata_->Init();//gaoxuan --这里转去执行metadat_store.cc中的Init()函数去了，对元数据存储进行一个初始化
     Spin(1);
     machine()->GlobalBarrier();
     Spin(1);
@@ -918,15 +918,16 @@ void LatencyExperimentAppend() {
 
   void BackgroundRenameFile (const Slice& from_path, const Slice& to_path) {
     //LOG(ERROR)<< "Execution step 4: in Calvinfs_client_app.h's BackgroundRenameFile()";//gaoxuan -- 
+    //gaoxuan --首先这个Header类是什么不知道，所以下面的注释都是揣测；参数中的两个路径是什么呢？大概是原来的文件名和重命名之后的文件名？
     Header* header = new Header();
     header->set_from(machine()->machine_id());
     header->set_to(machine()->machine_id());
-    header->set_type(Header::RPC);
+    header->set_type(Header::RPC);//gaoxuan --这个RPC应该就是远程过程调用吧，应该调用的就是calvin_client_app.cc中的RenameFile()函数
     header->set_app(name());
-    header->set_rpc("RENAME_FILE");
+    header->set_rpc("RENAME_FILE");//gaoxuan --应该是在这里调用了RenameFile
     header->add_misc_string(from_path.data(), from_path.size());
     header->add_misc_string(to_path.data(), to_path.size());
-    if (reporting_ && rand() % 2 == 0) {
+    if (reporting_ && rand() % 2 == 0) {//这个条件分支是什么也不太清楚什么意思
       header->set_callback_app(name());
       header->set_callback_rpc("CB");
       header->add_misc_string("rename");

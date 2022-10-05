@@ -150,7 +150,7 @@ int main(int argc, char** argv) {
   reinterpret_cast<CalvinFSClientApp*>(m.GetApp("client"))
       ->set_start_time(FLAGS_time);
   reinterpret_cast<CalvinFSClientApp*>(m.GetApp("client"))
-      ->set_experiment(FLAGS_experiment, FLAGS_clients); 
+      ->set_experiment(FLAGS_experiment, FLAGS_clients); //gaoxuan --应该是在这个地方转到调用RenameFileExperiment()的
 
   while (!m.Stopped()) {
     usleep(10000);
