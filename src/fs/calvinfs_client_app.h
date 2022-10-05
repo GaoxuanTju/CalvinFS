@@ -685,7 +685,7 @@ void LatencyExperimentAppend() {
 
     double start = GetTime();
 
-    for (int j = 0; j < 250; j++) {
+    for (int j = 0; j < 2; j++) {//gaoxuan --为了看清流程这里先设置成两次，原来是250次
       int a1 = rand() % 1000;
       int a2 = rand() % 1000;
       while (a2 == a1) {
@@ -917,7 +917,7 @@ void LatencyExperimentAppend() {
   }
 
   void BackgroundRenameFile (const Slice& from_path, const Slice& to_path) {
-   // LOG(ERROR)<< "Execution step 4: in Calvinfs_client_app.h's BackgroundRenameFile()";//gaoxuan -- 
+    LOG(ERROR)<< "Execution step 4: in Calvinfs_client_app.h's BackgroundRenameFile()";//gaoxuan -- 
     Header* header = new Header();
     header->set_from(machine()->machine_id());
     header->set_to(machine()->machine_id());

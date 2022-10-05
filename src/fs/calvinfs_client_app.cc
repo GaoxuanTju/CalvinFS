@@ -231,7 +231,7 @@ MessageBuffer* CalvinFSClientApp::CopyFile(const Slice& from_path, const Slice& 
 }
 
 MessageBuffer* CalvinFSClientApp::RenameFile(const Slice& from_path, const Slice& to_path) {
-  //LOG(ERROR)<<"Is it executed? --calvinfs_client_app.cc's RenameFile()";// gaoxuan --
+  LOG(ERROR)<<"Is it executed? --calvinfs_client_app.cc's RenameFile()";// gaoxuan --
   uint64 distinct_id = machine()->GetGUID();
   string channel_name = "action-result-" + UInt64ToString(distinct_id);
   auto channel = machine()->DataChannel(channel_name);
