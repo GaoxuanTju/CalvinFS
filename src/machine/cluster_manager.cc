@@ -90,6 +90,8 @@ void ClusterManager::GetTempFiles(const string& base) {
 }
 
 void ClusterManager::Update() {
+  // Add logger init *
+  google::InitGoogleLogging(argv[0]);
   // Next, Run "git pull ;make clean;make -j" to get the latest code and compile.
   vector<pthread_t> threads;
   for (map<uint64, MachineInfo>::const_iterator it =
