@@ -96,7 +96,9 @@ void ClusterManager::Update() {
        config_.machines().begin();
        it != config_.machines().end(); ++it) {
     threads.resize(threads.size()+1);
-    LOG(ERROR) << "pull@@@@@@@@@@@@@";
+    LOG(ERROR) << new string(
+      "ssh " + ssh_key(it->first)  + " "+ ssh_username_ + "@" + it->second.host() +
+      " 'cd " + calvin_path_ + "; git pull; cd src; cp Makefile.default Makefile; make clean; make -j'");
     string* ssh_command = new string(
       "ssh " + ssh_key(it->first)  + " "+ ssh_username_ + "@" + it->second.host() +
       " 'cd " + calvin_path_ + "; git pull; cd src; cp Makefile.default Makefile; make clean; make -j'");
