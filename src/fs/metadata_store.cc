@@ -532,6 +532,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
 }
 
 void MetadataStore::Run(Action* action) {
+  //gaoxuan --事实上这里又运行了一个函数
   LOG(ERROR) << "Run in metadata_store.cc--gaoxuan";//gaoxuan --
   // Prepare by performing all reads.
   ExecutionContext* context;
@@ -573,10 +574,11 @@ void MetadataStore::Run(Action* action) {
     out.SerializeToString(action->mutable_output());
 
   } else if (type == MetadataAction::RENAME) {
+    //gaoxuan --肯定这里也执行了
     MetadataAction::RenameInput in;
     MetadataAction::RenameOutput out;
     in.ParseFromString(action->input());
-    Rename_Internal(context, in, &out);
+    Rename_Internal(context, in, &out);//gaoxuan --调用了这个函数,再过去查一下
     out.SerializeToString(action->mutable_output());
 
   } else if (type == MetadataAction::LOOKUP) {
@@ -770,7 +772,7 @@ void MetadataStore::Copy_Internal(
 void MetadataStore::Rename_Internal(
     ExecutionContext* context,
     const MetadataAction::RenameInput& in,
-    MetadataAction::RenameOutput* out) {
+    MetadataAction::RenameOutput* out) {//gaoxuan --这个函数肯定也会被执行
   // Currently only support Copy: (non-recursive: only succeeds for DATA files and EMPTY directory)
   MetadataEntry from_entry;
   if (!context->GetEntry(in.from_path(), &from_entry)) {
