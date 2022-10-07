@@ -453,6 +453,122 @@ bool MetadataStore::IsLocal(const string& path) {
             config_->LookupReplica(machine_->machine_id()));
 }
 
+
+/*gaoxuan --这里是一些碎碎念，想要做的事情
+1 要在GetRWSets函数里面的RENAME部分改写一下，
+  改写成的样子是这个目录，它的父目录，它的所有子目录，都要获取读写集，目的是加锁
+
+  使用的算法呢？应当是一个树的搜索算法，使用深度优先搜索还是广度优先搜索呢？
+  同时这里，代码里面只弄了一个获取父目录的方法，对照着看看是不是能先写一个函数，获取所有子目录，这个应该是不难的，因为CalvinFS元数据的键值存储中
+  值的部分的第三个字段，contents里面是会包含所有的子目录的
+
+2 ok上面的工作做完之后/做的同时，在新的位置先创建一个新的目录树。这个是不是可以在遍历的时候就直接干了呢？
+  就是说我从要修改的部分开始，遍历到一个目录，就获取读写集，同时将这个目录对应元数据拷贝到新位置的目录树下，这不就相当于逻辑上把文件挪到了新的位置上
+3 上面的工作完成之后，新的RENAME之后的结果我们已经获取到了。需要解决残留工作
+  也就是说把原来的元数据删除掉，这里应该从下往上删除，按道理来说应该是从最底层开始，一层一层的删除，这应该是使用广度优先遍历的逆遍历吧？
+OK 上面的就是我当前所需要做的工作啦！
+*/
+
+
+/*gaoxuan --为了对照看起来方便，这是获取父目录对应的逻辑
+string ParentDir(const string& path) {
+  // Root dir is a special case.
+  if (path.empty()) {
+    LOG(FATAL) << "root dir has no parent";
+  }
+  uint32 offset = path.rfind('/');
+  CHECK_NE(string::npos, offset);     // at least 1 slash required
+  CHECK_NE(path.size() - 1, offset);  // filename cannot be empty
+  return string(path, 0, offset);
+}
+
+string FileName(const string& path) {
+  // Root dir is a special case.
+  if (path.empty()) {
+    return path;
+  }
+  uint32 offset = path.rfind('/');
+  CHECK_NE(string::npos, offset);     // at least 1 slash required
+  CHECK_NE(path.size() - 1, offset);  // filename cannot be empty
+  return string(path, offset + 1);
+}
+
+
+
+这个函数是具体的Rename逻辑，所以不管是增加还是删除都要在这个逻辑里，所以前面想的加读写集的时候直接创建这是不太现实的哦
+void MetadataStore::Rename_Internal(
+    ExecutionContext* context,
+    const MetadataAction::RenameInput& in,
+    MetadataAction::RenameOutput* out) {//gaoxuan --这个函数肯定也会被执行
+  // Currently only support Copy: (non-recursive: only succeeds for DATA files and EMPTY directory)
+  MetadataEntry from_entry;
+  if (!context->GetEntry(in.from_path(), &from_entry)) {
+    // File doesn't exist!
+    out->set_success(false);
+    out->add_errors(MetadataAction::FileDoesNotExist);
+    return;
+  }
+
+  string parent_from_path = ParentDir(in.from_path());
+  MetadataEntry parent_from_entry;
+  if (!context->GetEntry(parent_from_path, &parent_from_entry)) {
+    // File doesn't exist!
+    out->set_success(false);
+    out->add_errors(MetadataAction::FileDoesNotExist);
+    return;
+  }
+
+  string parent_to_path = ParentDir(in.to_path());
+  MetadataEntry parent_to_entry;
+  if (!context->GetEntry(parent_to_path, &parent_to_entry)) {
+    // File doesn't exist!
+    out->set_success(false);
+    out->add_errors(MetadataAction::FileDoesNotExist);
+    return;
+  }
+
+  // If file already exists, fail.
+  string to_filename = FileName(in.to_path());
+  for (int i = 0; i < parent_to_entry.dir_contents_size(); i++) {
+    if (parent_to_entry.dir_contents(i) == to_filename) {
+      out->set_success(false);
+      out->add_errors(MetadataAction::FileAlreadyExists);
+      return;
+    }
+  }
+
+  // Update to_parent (add new dir content)
+  parent_to_entry.add_dir_contents(to_filename);
+  context->PutEntry(parent_to_path, parent_to_entry);
+  
+  // Add to_entry
+  MetadataEntry to_entry;
+  to_entry.CopyFrom(from_entry);
+  context->PutEntry(in.to_path(), to_entry);
+
+  // Update from_parent(Find file and remove it from parent directory.)
+  string from_filename = FileName(in.from_path());
+  for (int i = 0; i < parent_from_entry.dir_contents_size(); i++) {
+    if (parent_from_entry.dir_contents(i) == from_filename) {
+      // Remove reference to target file entry from dir contents.
+      parent_from_entry.mutable_dir_contents()
+          ->SwapElements(i, parent_from_entry.dir_contents_size() - 1);
+      parent_from_entry.mutable_dir_contents()->RemoveLast();
+
+      // Write updated parent entry.
+      context->PutEntry(parent_from_path, parent_from_entry);
+      break;
+    }
+  }
+
+  // Erase the from_entry
+  context->DeleteEntry(in.from_path());
+}
+
+
+*/
+//gaoxuan --这里是要修改的第一个地方，需要将要Rename的目录以及其所有子目录都获取读写集
+
 void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFile调用了一下
   action->clear_readset();
   action->clear_writeset();
