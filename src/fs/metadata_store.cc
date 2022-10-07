@@ -533,7 +533,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
 
 void MetadataStore::Run(Action* action) {
   //gaoxuan --事实上这里又运行了一个函数
-  LOG(ERROR) << "Run in metadata_store.cc--gaoxuan";//gaoxuan --
+  //LOG(ERROR) << "Run in metadata_store.cc--gaoxuan";//gaoxuan --这个地方会被schduler执行，在RenameExperiment()中Test progress开始之后
   // Prepare by performing all reads.
   ExecutionContext* context;
   if (machine_ == NULL) {
