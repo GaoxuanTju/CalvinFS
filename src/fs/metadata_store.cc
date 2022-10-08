@@ -678,11 +678,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
     MetadataAction::RenameInput in;
     in.ParseFromString(action->input());
     //gaoxuan --最后我觉得就是这里在执行一个rename，不然为啥会涉及父目录呢
-    //gaoxuan --这部分用来看一下类型信息
-    const type_info &nInfo1 = typeid(in.from_path());
-    LOG(ERROR)<<nInfo.name();
-    
-    //
+  
     action->add_readset(in.from_path());
     action->add_writeset(in.from_path());
     action->add_readset(ParentDir(in.from_path()));
