@@ -595,14 +595,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
     action->add_writeset(ParentDir(in.to_path()));
     //gaoxuan --测试一下能不能行
     map<string, string> reads_gaoxuan;
-    MetadataEntry* entry;
-    entry->Clear();
-    if (reads_gaoxuan.count(in.from_path()) != 0) 
-    {
-          entry->ParseFromString(reads_gaoxuan[in.from_path()]);
-    }
-    //这样就把path的元数据拿过来了！
-    string contents = entry->dir_contents();
+    string contents = reads_gaoxuan[in.from_path()];
     LOG(ERROR)<<contents;
     //这里是终止
   } else if (type == MetadataAction::LOOKUP) {
