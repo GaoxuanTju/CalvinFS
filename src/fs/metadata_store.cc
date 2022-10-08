@@ -458,9 +458,61 @@ bool MetadataStore::IsLocal(const string& path) {
 1 要在GetRWSets函数里面的RENAME部分改写一下，
   改写成的样子是这个目录，它的父目录，它的所有子目录，都要获取读写集，目的是加锁
 
-  使用的算法呢？应当是一个树的搜索算法，使用深度优先搜索还是广度优先搜索呢？
+  使用的算法呢？应当是一个树的搜索算法，这部分深搜就好
   同时这里，代码里面只弄了一个获取父目录的方法，对照着看看是不是能先写一个函数，获取所有子目录，这个应该是不难的，因为CalvinFS元数据的键值存储中
   值的部分的第三个字段，contents里面是会包含所有的子目录的
+
+  小Tips：content是字段：如果是目录的话，包含的是所有文件和子目录的列表
+  所以说在进行遍历时，判断有没有叶子的方式就是，这个目录的contents里面如果是空，代表这个目录就是一个叶子
+  如果不空，文件时叶子，若有子目录，再去查看子目录的contents的内容。
+
+  广义树的深度优先遍历算法如下
+  Stack<Node> stack = new Stack<Node>();
+  List<Node> result = new ArrayList<Node>();
+  stack.push(root);
+  while (!stack.isEmpty()) {
+	Node top = stack.pop();
+	result.add(top);
+	List<Node> children = top.getChildren();
+	if (children != null && children.size() > 0) {
+		for (int i = children.size() - 1; i >= 0; i--) {
+			stack.push(children.get(i));
+		}
+	}
+} 
+
+
+
+综合版的深度优先遍历
+改写措施
+    MetadataAction::RenameInput in;
+    in.ParseFromString(action->input());
+    Stack<path> stack = new Stack<path>();//建立用于遍历的栈
+    stack.push(in.from_path());//把要更改的这个当作根放入栈里面
+    while (!stack.isEmpty()) 
+    {//栈还不空的时候，对子目录进行处理
+            path top = stack.pop();//出栈最后一个节点
+            //执行对这个目录的获取读写集的逻辑
+            
+            
+            action->add_readset(in.from_path());
+            action->add_writeset(in.from_path());
+            action->add_readset(ParentDir(in.from_path()));
+            action->add_writeset(ParentDir(in.from_path()));  
+            //下面将孩子放入栈中
+            List<Node> children = top.getChildren();//要写一个获取所有孩子的逻辑
+            if (children != null && children.size() > 0)//当孩子列表还没遍历完
+            {
+              for (int i = children.size() - 1; i >= 0; i--) 
+              {
+			            stack.push(children.get(i));
+		          } 
+            }
+     }
+    //把目标位置的读写集获取
+    action->add_writeset(in.to_path());
+    action->add_readset(ParentDir(in.to_path()));
+    action->add_writeset(ParentDir(in.to_path()));
 
 2 ok上面的工作做完之后/做的同时，在新的位置先创建一个新的目录树。这个是不是可以在遍历的时候就直接干了呢？
   就是说我从要修改的部分开始，遍历到一个目录，就获取读写集，同时将这个目录对应元数据拷贝到新位置的目录树下，这不就相当于逻辑上把文件挪到了新的位置上
