@@ -489,18 +489,18 @@ bool MetadataStore::IsLocal(const string& path) {
     in.ParseFromString(action->input());
     Stack<path> stack = new Stack<path>();//建立用于遍历的栈
     stack.push(in.from_path());//把要更改的这个当作根放入栈里面
+    action->add_readset(ParentDir(in.from_path()));//先把原位置的那个父目录读写集加入
+    action->add_writeset(ParentDir(in.from_path()));
     while (!stack.isEmpty()) 
     {//栈还不空的时候，对子目录进行处理
             path top = stack.pop();//出栈最后一个节点
             //执行对这个目录的获取读写集的逻辑
             
-            
-            action->add_readset(in.from_path());
-            action->add_writeset(in.from_path());
-            action->add_readset(ParentDir(in.from_path()));
-            action->add_writeset(ParentDir(in.from_path()));  
+            action->add_readset(top);
+            action->add_writeset(top);
+              
             //下面将孩子放入栈中
-            List<Node> children = top.getChildren();//要写一个获取所有孩子的逻辑
+            List<path> children = top.getChildren();//要写一个获取所有孩子的逻辑
             if (children != null && children.size() > 0)//当孩子列表还没遍历完
             {
               for (int i = children.size() - 1; i >= 0; i--) 
