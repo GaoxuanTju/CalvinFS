@@ -21,6 +21,7 @@
 #include "machine/app/app.h"
 #include "proto/action.pb.h"
 
+#include <typeinfo>//gaoxuan --获取类型的时候使用的
 using std::map;
 using std::set;
 using std::string;
@@ -485,14 +486,15 @@ bool MetadataStore::IsLocal(const string& path) {
 
 综合版的深度优先遍历
 改写措施
-
+#include <stack>
     MetadataAction::RenameInput in;
-    in.ParseFromString(action->input());
-    Stack<path> stack = new Stack<path>();//建立用于遍历的栈
+    in.ParseFromString(action->input());//看这个函数是啥好确定类型
+    //这个action->input()是个字符串类型
+    stack<path> stack;//建立用于遍历的栈
     stack.push(in.from_path());//把要更改的这个当作根放入栈里面
     action->add_readset(ParentDir(in.from_path()));//先把原位置的那个父目录读写集加入
     action->add_writeset(ParentDir(in.from_path()));
-    while (!stack.isEmpty()) 
+    while (!stack.empty()) 
     {//栈还不空的时候，对子目录进行处理
             path top = stack.pop();//出栈最后一个节点
             //执行对这个目录的获取读写集的逻辑
@@ -517,7 +519,16 @@ bool MetadataStore::IsLocal(const string& path) {
 
 上面就是改写后的大体逻辑了，需要让他能跑，要做的事
 （1）查一下c++栈的头文件以及如何使用栈，进栈出栈的函数
+#include <stack>
+创建栈    stack<T> path;
+添加元素  path.push(file_path);
+获取栈顶（不删除） path.top();
+删除栈顶（不获取） path.pop();
+是否为空          path.empty();
+
 （2）找一下in.from_path这是什么类型，好确定栈是什么类型
+
+
 （3）看一下c++有没有列表，如果有就简单一些，没有就用循环
 （4）获取目录所有子目录的逻辑
 
@@ -667,6 +678,11 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
     MetadataAction::RenameInput in;
     in.ParseFromString(action->input());
     //gaoxuan --最后我觉得就是这里在执行一个rename，不然为啥会涉及父目录呢
+    //gaoxuan --这部分用来看一下类型信息
+    const type_info &nInfo1 = typeid(in.from_path());
+    LOG(ERROR)<<nInfo.name();
+    
+    //
     action->add_readset(in.from_path());
     action->add_writeset(in.from_path());
     action->add_readset(ParentDir(in.from_path()));
