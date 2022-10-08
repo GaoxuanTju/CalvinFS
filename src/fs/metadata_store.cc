@@ -21,6 +21,8 @@
 #include "machine/app/app.h"
 #include "proto/action.pb.h"
 #include <typeinfo> //gaoxuan --用于确定数据类型
+#include <stack> //gaoxuan --用于深搜时的栈
+#include <list> //gaoxuan --用于深搜时的列表
 using std::map;
 using std::set;
 using std::string;
@@ -255,7 +257,7 @@ class DistributedExecutionContext : public ExecutionContext {
 };
 
 ///////////////////////          MetadataStore          ///////////////////////
-
+//找父目录的方法是直接对这个文件路径使用rfind逆向搜索，确定最后一个/的位置，那么从位置0到最后一个之间的这个字符串就是它的父目录了，秒哇
 string ParentDir(const string& path) {
   // Root dir is a special case.
   if (path.empty()) {
@@ -266,7 +268,7 @@ string ParentDir(const string& path) {
   CHECK_NE(path.size() - 1, offset);  // filename cannot be empty
   return string(path, 0, offset);
 }
-
+//获取文件名字也是同样的方法，不同点就在于这次是从最后一个/到最后的位置就是文件名字了
 string FileName(const string& path) {
   // Root dir is a special case.
   if (path.empty()) {
@@ -488,15 +490,15 @@ bool MetadataStore::IsLocal(const string& path) {
 #include <stack>
     MetadataAction::RenameInput in;
     in.ParseFromString(action->input());
-    
-    stack<path> stack;//建立用于遍历的栈
+    //姑且当作string来处理
+    stack<string> stack;//建立用于遍历的栈
     stack.push(in.from_path());//把要更改的这个当作根放入栈里面
     action->add_readset(ParentDir(in.from_path()));//先把原位置的那个父目录读写集加入
     action->add_writeset(ParentDir(in.from_path()));
     while (!stack.empty()) 
     {//栈还不空的时候，对子目录进行处理
 
-            path top = stack.top();//获取顶部节点
+            string top = stack.top();//获取顶部的文件路径
             stack.pop();//出栈节点
 
             //执行对这个目录的获取读写集的逻辑
@@ -504,15 +506,13 @@ bool MetadataStore::IsLocal(const string& path) {
             action->add_readset(top);
             action->add_writeset(top);
               
-            //下面将孩子放入栈中
-            List<path> children = top.getChildren();//要写一个获取所有孩子的逻辑
-            if (children != null && children.size() > 0)//当孩子列表还没遍历完
+            //下面将当前目录的所有孩子都放在list中
+            list<path> children = top.getChildren();//要写一个获取所有孩子的逻辑
+            for (list<string>::iterator it = children.begin(); it != children.end(); ++it)
             {
-              for (int i = children.size() - 1; i >= 0; i--) 
-              {
-			            stack.push(children.get(i));
-		          } 
+                  stack.push(*it);
             }
+            
      }
     //把目标位置的读写集获取
     action->add_writeset(in.to_path());
@@ -529,9 +529,16 @@ bool MetadataStore::IsLocal(const string& path) {
 是否为空          path.empty();
 
 （2）找一下in.from_path这是什么类型，好确定栈是什么类型
-
+姑且是当作string来使用，还没有确定
 
 （3）看一下c++有没有列表，如果有就简单一些，没有就用循环
+#include <list>
+创建一个列表  list<string> list;
+//使用迭代器依次输出list容器中的元素
+    for (list<string>::iterator it = values.begin(); it != values.end(); ++it) {
+        cout << *it << " ";
+    }
+
 （4）获取目录所有子目录的逻辑
 
 
