@@ -591,8 +591,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
   //gaoxuan --先看懂下面这个是什么逻辑
     MetadataAction::RenameInput in;
     in.ParseFromString(action->input());
-    //gaoxuan --最后我觉得就是这里在执行一个rename，不然为啥会涉及父目录呢
-    std::cout<<typeid(in.from_path());//gaoxuan --输出一下这个是啥数据类型吧
+    
     action->add_readset(in.from_path());
     action->add_writeset(in.from_path());
     action->add_readset(ParentDir(in.from_path()));
