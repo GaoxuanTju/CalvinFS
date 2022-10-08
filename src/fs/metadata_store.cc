@@ -21,7 +21,6 @@
 #include "machine/app/app.h"
 #include "proto/action.pb.h"
 
-#include <typeinfo>//gaoxuan --获取类型的时候使用的
 using std::map;
 using std::set;
 using std::string;
@@ -496,7 +495,10 @@ bool MetadataStore::IsLocal(const string& path) {
     action->add_writeset(ParentDir(in.from_path()));
     while (!stack.empty()) 
     {//栈还不空的时候，对子目录进行处理
-            path top = stack.pop();//出栈最后一个节点
+    
+            path top = stack.top();//获取顶部节点
+            stack.pop();//出栈节点
+
             //执行对这个目录的获取读写集的逻辑
             
             action->add_readset(top);
