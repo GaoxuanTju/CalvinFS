@@ -485,6 +485,7 @@ bool MetadataStore::IsLocal(const string& path) {
 
 综合版的深度优先遍历
 改写措施
+
     MetadataAction::RenameInput in;
     in.ParseFromString(action->input());
     Stack<path> stack = new Stack<path>();//建立用于遍历的栈
@@ -513,6 +514,15 @@ bool MetadataStore::IsLocal(const string& path) {
     action->add_writeset(in.to_path());
     action->add_readset(ParentDir(in.to_path()));
     action->add_writeset(ParentDir(in.to_path()));
+
+上面就是改写后的大体逻辑了，需要让他能跑，要做的事
+（1）查一下c++栈的头文件以及如何使用栈，进栈出栈的函数
+（2）找一下in.from_path这是什么类型，好确定栈是什么类型
+（3）看一下c++有没有列表，如果有就简单一些，没有就用循环
+（4）获取目录所有子目录的逻辑
+
+
+
 
 2 ok上面的工作做完之后/做的同时，在新的位置先创建一个新的目录树。这个是不是可以在遍历的时候就直接干了呢？
   就是说我从要修改的部分开始，遍历到一个目录，就获取读写集，同时将这个目录对应元数据拷贝到新位置的目录树下，这不就相当于逻辑上把文件挪到了新的位置上
