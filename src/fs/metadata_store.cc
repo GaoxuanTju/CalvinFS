@@ -528,23 +528,17 @@ bool MetadataStore::IsLocal(const string& path) {
 （4）获取目录所有子目录的逻辑
 
 //如果这个对象在这里能够直接用的话，Run里面是直接用的，不知道这里能吗？
-ExecutionContext* context; 
-MetadataEntry entry;
-context->GetEntry(filepath,entry)) ;//如果能这样直接用的话，元数据项就拿到了，这个函数意思就是把元数据以字符串形式放进了entry里面
-string metadata_contents = entry.dir_contents(); //这样就得到了字符串形式的contents内容；但是现在还不确定，没有Run之前是不是有这个context
 
 
-    entry->Clear();
-    if (reads_.count(path) != 0) {
+map<string, string> reads_;
+MetadataEntry* entry
+entry->Clear();
+if (reads_.count(path) != 0) 
+{
       entry->ParseFromString(reads_[path]);
-    }
-
-
-
-如果不能用怎么办？？？？
-看看能不能从calvinfs_client_app.cc里面的那个函数叫做MessageBuffer* CalvinFSClientApp::GetMetadataEntry(const Slice& path)尝试一下
-
-
+}
+//这样就把path的元数据拿过来了！
+string contents = entry.dir_contents();
 
 
 
@@ -599,7 +593,18 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
     action->add_writeset(in.to_path());
     action->add_readset(ParentDir(in.to_path()));
     action->add_writeset(ParentDir(in.to_path()));
-
+    //gaoxuan --测试一下能不能行
+    map<string, string> reads_gaoxuan;
+    MetadataEntry* entry
+    entry->Clear();
+    if (reads_.count(path) != 0) 
+    {
+          entry->ParseFromString(reads_gaoxuan[path]);
+    }
+    //这样就把path的元数据拿过来了！
+    string contents = entry.dir_contents();
+    LOG(ERROR)<<contents;
+    //这里是终止
   } else if (type == MetadataAction::LOOKUP) {
     MetadataAction::LookupInput in;
     in.ParseFromString(action->input());
