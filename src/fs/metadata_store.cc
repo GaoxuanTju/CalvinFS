@@ -487,8 +487,8 @@ bool MetadataStore::IsLocal(const string& path) {
 改写措施
 #include <stack>
     MetadataAction::RenameInput in;
-    in.ParseFromString(action->input());//看这个函数是啥好确定类型
-    //这个action->input()是个字符串类型
+    in.ParseFromString(action->input());
+    
     stack<path> stack;//建立用于遍历的栈
     stack.push(in.from_path());//把要更改的这个当作根放入栈里面
     action->add_readset(ParentDir(in.from_path()));//先把原位置的那个父目录读写集加入
