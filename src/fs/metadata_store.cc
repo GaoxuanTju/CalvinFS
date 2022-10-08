@@ -507,7 +507,7 @@ bool MetadataStore::IsLocal(const string& path) {
             action->add_writeset(top);
               
             //下面将当前目录的所有孩子都放在list中
-            list<path> children = top.getChildren();//要写一个获取所有孩子的逻辑
+            list<string> children = top.getChildren();//要写一个获取所有孩子的逻辑
             for (list<string>::iterator it = children.begin(); it != children.end(); ++it)
             {
                   stack.push(*it);
@@ -545,8 +545,7 @@ bool MetadataStore::IsLocal(const string& path) {
 ExecutionContext* context; 
 MetadataEntry entry;
 context->GetEntry(filepath,entry)) ;//如果能这样直接用的话，元数据项就拿到了，这个函数意思就是把元数据以字符串形式放进了entry里面
-//下一步就是从entry里面把字符串处理一下
-获取方式就是 entry.dir_contents();
+string metadata_contents = entry.dir_contents(); //这样就得到了字符串形式的contents内容；但是现在还不确定，没有Run之前是不是有这个context
 
 
 
