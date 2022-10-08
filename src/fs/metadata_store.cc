@@ -20,7 +20,7 @@
 #include "fs/metadata.pb.h"
 #include "machine/app/app.h"
 #include "proto/action.pb.h"
-
+#include <typeinfo> //gaoxuan --用于确定数据类型
 using std::map;
 using std::set;
 using std::string;
@@ -495,7 +495,7 @@ bool MetadataStore::IsLocal(const string& path) {
     action->add_writeset(ParentDir(in.from_path()));
     while (!stack.empty()) 
     {//栈还不空的时候，对子目录进行处理
-    
+
             path top = stack.top();//获取顶部节点
             stack.pop();//出栈节点
 
@@ -680,7 +680,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
     MetadataAction::RenameInput in;
     in.ParseFromString(action->input());
     //gaoxuan --最后我觉得就是这里在执行一个rename，不然为啥会涉及父目录呢
-  
+    LOG(ERROR)<<typeid(in.from_path());//gaoxuan --输出一下这个是啥数据类型吧
     action->add_readset(in.from_path());
     action->add_writeset(in.from_path());
     action->add_readset(ParentDir(in.from_path()));
