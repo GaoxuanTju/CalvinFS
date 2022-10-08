@@ -531,7 +531,7 @@ bool MetadataStore::IsLocal(const string& path) {
 
 
 map<string, string> reads_;
-MetadataEntry* entry
+MetadataEntry* entry;
 entry->Clear();
 if (reads_.count(path) != 0) 
 {
@@ -595,7 +595,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
     action->add_writeset(ParentDir(in.to_path()));
     //gaoxuan --测试一下能不能行
     map<string, string> reads_gaoxuan;
-    MetadataEntry* entry
+    MetadataEntry* entry;
     entry->Clear();
     if (reads_.count(path) != 0) 
     {
