@@ -541,6 +541,17 @@ bool MetadataStore::IsLocal(const string& path) {
 
 （4）获取目录所有子目录的逻辑
 
+//如果这个对象在这里能够直接用的话，Run里面是直接用的，不知道这里能吗？
+ExecutionContext* context; 
+MetadataEntry entry;
+context->GetEntry(filepath,entry)) ;//如果能这样直接用的话，元数据项就拿到了，这个函数意思就是把元数据以字符串形式放进了entry里面
+//下一步就是从entry里面把字符串处理一下
+获取方式就是 entry.dir_contents();
+
+
+
+
+如果不能用怎么办？？？？
 
 
 
@@ -549,105 +560,6 @@ bool MetadataStore::IsLocal(const string& path) {
 3 上面的工作完成之后，新的RENAME之后的结果我们已经获取到了。需要解决残留工作
   也就是说把原来的元数据删除掉，这里应该从下往上删除，按道理来说应该是从最底层开始，一层一层的删除，这应该是使用广度优先遍历的逆遍历吧？
 OK 上面的就是我当前所需要做的工作啦！
-*/
-
-
-/*gaoxuan --为了对照看起来方便，这是获取父目录对应的逻辑
-string ParentDir(const string& path) {
-  // Root dir is a special case.
-  if (path.empty()) {
-    LOG(FATAL) << "root dir has no parent";
-  }
-  uint32 offset = path.rfind('/');
-  CHECK_NE(string::npos, offset);     // at least 1 slash required
-  CHECK_NE(path.size() - 1, offset);  // filename cannot be empty
-  return string(path, 0, offset);
-}
-
-string FileName(const string& path) {
-  // Root dir is a special case.
-  if (path.empty()) {
-    return path;
-  }
-  uint32 offset = path.rfind('/');
-  CHECK_NE(string::npos, offset);     // at least 1 slash required
-  CHECK_NE(path.size() - 1, offset);  // filename cannot be empty
-  return string(path, offset + 1);
-}
-
-
-
-这个函数是具体的Rename逻辑，所以不管是增加还是删除都要在这个逻辑里，所以前面想的加读写集的时候直接创建这是不太现实的哦
-void MetadataStore::Rename_Internal(
-    ExecutionContext* context,
-    const MetadataAction::RenameInput& in,
-    MetadataAction::RenameOutput* out) {//gaoxuan --这个函数肯定也会被执行
-  // Currently only support Copy: (non-recursive: only succeeds for DATA files and EMPTY directory)
-  MetadataEntry from_entry;
-  if (!context->GetEntry(in.from_path(), &from_entry)) {
-    // File doesn't exist!
-    out->set_success(false);
-    out->add_errors(MetadataAction::FileDoesNotExist);
-    return;
-  }
-
-  string parent_from_path = ParentDir(in.from_path());
-  MetadataEntry parent_from_entry;
-  if (!context->GetEntry(parent_from_path, &parent_from_entry)) {
-    // File doesn't exist!
-    out->set_success(false);
-    out->add_errors(MetadataAction::FileDoesNotExist);
-    return;
-  }
-
-  string parent_to_path = ParentDir(in.to_path());
-  MetadataEntry parent_to_entry;
-  if (!context->GetEntry(parent_to_path, &parent_to_entry)) {
-    // File doesn't exist!
-    out->set_success(false);
-    out->add_errors(MetadataAction::FileDoesNotExist);
-    return;
-  }
-
-  // If file already exists, fail.
-  string to_filename = FileName(in.to_path());
-  for (int i = 0; i < parent_to_entry.dir_contents_size(); i++) {
-    if (parent_to_entry.dir_contents(i) == to_filename) {
-      out->set_success(false);
-      out->add_errors(MetadataAction::FileAlreadyExists);
-      return;
-    }
-  }
-
-  // Update to_parent (add new dir content)
-  parent_to_entry.add_dir_contents(to_filename);
-  context->PutEntry(parent_to_path, parent_to_entry);
-  
-  // Add to_entry
-  MetadataEntry to_entry;
-  to_entry.CopyFrom(from_entry);
-  context->PutEntry(in.to_path(), to_entry);
-
-  // Update from_parent(Find file and remove it from parent directory.)
-  string from_filename = FileName(in.from_path());
-  for (int i = 0; i < parent_from_entry.dir_contents_size(); i++) {
-    if (parent_from_entry.dir_contents(i) == from_filename) {
-      // Remove reference to target file entry from dir contents.
-      parent_from_entry.mutable_dir_contents()
-          ->SwapElements(i, parent_from_entry.dir_contents_size() - 1);
-      parent_from_entry.mutable_dir_contents()->RemoveLast();
-
-      // Write updated parent entry.
-      context->PutEntry(parent_from_path, parent_from_entry);
-      break;
-    }
-  }
-
-  // Erase the from_entry
-  context->DeleteEntry(in.from_path());
-}
-
-
 */
 //gaoxuan --这里是要修改的第一个地方，需要将要Rename的目录以及其所有子目录都获取读写集
 
