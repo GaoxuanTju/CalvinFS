@@ -468,26 +468,12 @@ bool MetadataStore::IsLocal(const string& path) {
   所以说在进行遍历时，判断有没有叶子的方式就是，这个目录的contents里面如果是空，代表这个目录就是一个叶子
   如果不空，文件时叶子，若有子目录，再去查看子目录的contents的内容。
 
-  广义树的深度优先遍历算法如下
-  Stack<Node> stack = new Stack<Node>();
-  List<Node> result = new ArrayList<Node>();
-  stack.push(root);
-  while (!stack.isEmpty()) {
-	Node top = stack.pop();
-	result.add(top);
-	List<Node> children = top.getChildren();
-	if (children != null && children.size() > 0) {
-		for (int i = children.size() - 1; i >= 0; i--) {
-			stack.push(children.get(i));
-		}
-	}
-} 
 
 
 
 综合版的深度优先遍历
 改写措施
-#include <stack>
+
     MetadataAction::RenameInput in;
     in.ParseFromString(action->input());
     //姑且当作string来处理
@@ -506,7 +492,7 @@ bool MetadataStore::IsLocal(const string& path) {
             action->add_readset(top);
             action->add_writeset(top);
               
-            //下面将当前目录的所有孩子都放在list中
+            //下面将top目录的所有孩子都放在list中
             list<string> children = top.getChildren();//要写一个获取所有孩子的逻辑
             for (list<string>::iterator it = children.begin(); it != children.end(); ++it)
             {
@@ -548,9 +534,17 @@ context->GetEntry(filepath,entry)) ;//如果能这样直接用的话，元数据
 string metadata_contents = entry.dir_contents(); //这样就得到了字符串形式的contents内容；但是现在还不确定，没有Run之前是不是有这个context
 
 
+    entry->Clear();
+    if (reads_.count(path) != 0) {
+      entry->ParseFromString(reads_[path]);
+    }
+
 
 
 如果不能用怎么办？？？？
+看看能不能从calvinfs_client_app.cc里面的那个函数叫做MessageBuffer* CalvinFSClientApp::GetMetadataEntry(const Slice& path)尝试一下
+
+
 
 
 
