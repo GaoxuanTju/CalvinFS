@@ -540,7 +540,7 @@ if (reads_.count(path) != 0)
 //这样就把path的元数据拿过来了！
 string contents = entry.dir_contents();
 
-
+//首先明确一点就是，直接使用reads[in.from_path()]是拿不出来的
 
 2 ok上面的工作做完之后/做的同时，在新的位置先创建一个新的目录树。这个是不是可以在遍历的时候就直接干了呢？
   就是说我从要修改的部分开始，遍历到一个目录，就获取读写集，同时将这个目录对应元数据拷贝到新位置的目录树下，这不就相当于逻辑上把文件挪到了新的位置上
@@ -594,9 +594,14 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
     action->add_readset(ParentDir(in.to_path()));
     action->add_writeset(ParentDir(in.to_path()));
     //gaoxuan --测试一下能不能行
+    MetadataEntry* entry;
     map<string, string> reads_gaoxuan;
-    
-    LOG(ERROR)<<in.from_path()<<":"<<reads_gaoxuan[ParentDir(in.from_path())];
+    entry->Clear();
+    if (reads_gaoxuan.count(in.from_path()) != 0) {
+      entry->ParseFromString(reads_gaoxuan[in.from_path()]);
+    }
+
+    LOG(ERROR)<<in.from_path()<<":"<<entry->dir_contents();
     //这里是终止
   } else if (type == MetadataAction::LOOKUP) {
     MetadataAction::LookupInput in;
