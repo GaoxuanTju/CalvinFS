@@ -26,6 +26,7 @@
 using std::map;
 using std::set;
 using std::string;
+using ::google::protobuf::RepeatedField;//gaoxuan --用于输出contents
 
 REGISTER_APP(MetadataStoreApp) {
   return new StoreApp(new MetadataStore(new HybridVersionedKVStore()));
@@ -601,8 +602,13 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
       entry->ParseFromString(reads_gaoxuan[in.from_path()]);
     }
 
-    LOG(ERROR)<<in.from_path()<<":"<<entry->dir_contents();
-    //这里是终止
+    LOG(ERROR)<<in.from_path()<<":";
+    const RepeatedField<string>& dir_vec = entry->dir_contents();
+    for (auto itr = dir_vec.begin();itr != dir_vec.end(); ++itr){
+    LOG(ERROR)<< *itr ;
+    } 
+
+    //gaoxuan --这里是终止
   } else if (type == MetadataAction::LOOKUP) {
     MetadataAction::LookupInput in;
     in.ParseFromString(action->input());
