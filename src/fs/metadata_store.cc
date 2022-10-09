@@ -596,8 +596,15 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
     //gaoxuan --测试一下能不能行
     
     map<string, string> reads_gaoxuan;
-    
-    LOG(ERROR)<<in.from_path()<<":"<<reads_gaoxuan[ParentDir(in.from_path())];
+    //
+    MetadataEntry* entry;
+    entry->Clear();
+    if (reads_gaoxuan.count(in.from_path()) != 0) {
+      entry->ParseFromString(reads_gaoxuan[in.from_path()]);
+    }
+    //
+    LOG(ERROR)<<in.from_path()<<":";
+    //<<reads_gaoxuan[ParentDir(in.from_path())];
     //这里是终止
   } else if (type == MetadataAction::LOOKUP) {
     MetadataAction::LookupInput in;
