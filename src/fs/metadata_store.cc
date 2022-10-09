@@ -603,9 +603,10 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
     }
 
     LOG(ERROR)<<in.from_path()<<":";
-    const RepeatedField<string>& dir_vec = entry->dir_contents();
-    for (auto itr = dir_vec.begin();itr != dir_vec.end(); ++itr){
-    LOG(ERROR)<< *itr ;
+    for(int i=0;i<entry->dir_contents_size();i++)
+    {
+      LOG(ERROR)<<entry->dir_contents(i);
+    }
     } 
 
     //gaoxuan --这里是终止
