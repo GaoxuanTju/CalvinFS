@@ -600,7 +600,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
     MetadataEntry entry;
     entry->Clear();
     if (reads_gaoxuan.count(in.from_path()) != 0) {
-      entry->ParseFromString(reads_gaoxuan[in.from_path()]);//照常理来说，现在entry里面就是in.from_path的元数据了
+      entry.ParseFromString(reads_gaoxuan[in.from_path()]);//照常理来说，现在entry里面就是in.from_path的元数据了
     }
     //
     LOG(ERROR)<<in.from_path()<<":";
