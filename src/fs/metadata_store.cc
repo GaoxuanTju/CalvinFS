@@ -604,10 +604,13 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
     LOG(ERROR)<<in.from_path()<<":";
     for(int i =0;i<entry.dir_contents_size();i++)
     {
-      LOG(ERROR)<<entry.dir_contents(i);
+      LOG(ERROR)<<entry.dir_contents(i)<<"gaoxuan";
     }
     //<<reads_gaoxuan[ParentDir(in.from_path())];
-    //这里是终止
+
+      
+
+    //gaoxuan --这里是终止
   } else if (type == MetadataAction::LOOKUP) {
     MetadataAction::LookupInput in;
     in.ParseFromString(action->input());
