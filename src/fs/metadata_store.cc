@@ -600,12 +600,12 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
     MetadataEntry entry;
     //如果用指针的话会出现一个叫Segmentation fault      (core dumped)这样的错误，运行不起来
     //但是上面人家用的是指针
-    entry->ParseFromString(reads_gaoxuan[ParentDir(in.from_path())]);//照常理来说，现在entry里面就是in.from_path的元数据了
+    entry.ParseFromString(reads_gaoxuan[ParentDir(in.from_path())]);//照常理来说，现在entry里面就是in.from_path的元数据了
     //
     LOG(ERROR)<<in.from_path()<<":";
-    for(int i =0;i<entry->dir_contents_size();i++)
+    for(int i =0;i<entry.dir_contents_size();i++)
     {
-      LOG(ERROR)<<entry->dir_contents(i);
+      LOG(ERROR)<<entry.dir_contents(i);
     }
     //<<reads_gaoxuan[ParentDir(in.from_path())];
 
