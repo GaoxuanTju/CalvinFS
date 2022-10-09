@@ -607,7 +607,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
     {
       LOG(ERROR)<<entry->dir_contents(i);
     }
-    } 
+    
 
     //gaoxuan --这里是终止
   } else if (type == MetadataAction::LOOKUP) {
