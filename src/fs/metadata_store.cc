@@ -472,7 +472,7 @@ bool MetadataStore::IsLocal(const string& path) {
 
 
 综合版的深度优先遍历
-改写措施
+
 
     MetadataAction::RenameInput in;
     in.ParseFromString(action->input());
@@ -596,14 +596,12 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
     //gaoxuan --测试一下能不能行
     
     /*
-   ①这种方法不行,entry.dir_contents_size()=0
-   
-    */
-ExecutionContext *context = new ExecutionContext(store_, action);
+   ①这种方法不行,entry.dir_contents_size()=0，怀疑是ExecutionContext只有Run才会产生
+   ExecutionContext *context = new ExecutionContext(store_, action);
    MetadataEntry entry;
    context->GetEntry(ParentDir(in.from_path()),&entry);//这样entry里面就是
     LOG(ERROR)<<in.from_path()<<":";//下面输出的是in.from_path()的父目录的元数据
-    if (!context->GetEntry(ParentDir(in.from_path()), &entry)) {
+    if (!context->GetEntry(ParentDir(in.from_path()), &entry)) {//这个被执行了呀，哪里的问题？
     // File doesn't exist!
     LOG(ERROR)<<"nothing in entry";
   }
@@ -611,8 +609,10 @@ ExecutionContext *context = new ExecutionContext(store_, action);
     {
       LOG(ERROR)<<entry.dir_contents(i);
     }
+    */
+   
     /* 
-    ②这种方法不行,entry.dir_contents_size()=0
+    ②改变①中思路，直接用GetEntry里面的逻辑,还是entry.dir_contents_size()=0
     map<string, string> reads_gaoxuan;
   
     MetadataEntry entry;
@@ -628,12 +628,26 @@ ExecutionContext *context = new ExecutionContext(store_, action);
     }*/
     
     /*
-    ③这种方法不行，父目录的元数据项什么都不输出
+    ③前面①②都不行，父目录的元数据项什么都不输出，我试试直接用map能拿到东西吗，还是不行
     map<string, string> read_gaoxuan;
     LOG(ERROR)<<in.from_path();
     LOG(ERROR)<<read_gaoxuan[ParentDir(in.from_path())];
     */
-    
+
+   /*④前面三种都不行，看看第四种使用lookup的函数能不能行
+     
+   */
+      Action b;
+      b.set_action_type(MetadataAction::LOOKUP);
+      MetadataAction::LookupInput n;
+      n.set_path(ParentDir(in.from_path()));
+      n.SerializeToString(b.mutable_input());
+      metadata_->GetRWSets(&b);
+      metadata_->Run(&b);
+      MetadataAction::LookupOutput out;
+      out.ParseFromString(b.output());
+      LOG(ERROR)<<out.entry().dir_contents_size();
+        
     
    
    
