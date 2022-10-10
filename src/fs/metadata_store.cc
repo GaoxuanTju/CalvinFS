@@ -610,7 +610,14 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
     }
     //<<reads_gaoxuan[ParentDir(in.from_path())];这样也是输出空的，应该不能这样得到
     */
-   LOG(ERROR)<<reads_[ParentDir(in.from_path())];
+   ExecutionContext *context = new ExecutionContext(store_, action);
+   MetadataEntry entry;
+   context->GetEntry(ParentDir(in.from_path()),&entry);//这样entry里面就是
+    LOG(ERROR)<<in.from_path()<<":";//下面输出的是in.from_path()的父目录的元数据
+    for(int i =0;i<entry.dir_contents_size();i++)
+    {
+      LOG(ERROR)<<entry.dir_contents(i);
+    }
 
       
 
