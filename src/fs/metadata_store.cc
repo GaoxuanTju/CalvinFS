@@ -596,20 +596,23 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
     //gaoxuan --测试一下能不能行
     
     /*
-   ①这种方法不行
-   ExecutionContext *context = new ExecutionContext(store_, action);
+   ①这种方法不行,entry.dir_contents_size()=0
+   
+    */
+ExecutionContext *context = new ExecutionContext(store_, action);
    MetadataEntry entry;
    context->GetEntry(ParentDir(in.from_path()),&entry);//这样entry里面就是
     LOG(ERROR)<<in.from_path()<<":";//下面输出的是in.from_path()的父目录的元数据
-    LOG(ERROR)<<entry.dir_contents_size();
+    if (!context->GetEntry(in.path(), &entry)) {
+    // File doesn't exist!
+    LOG(ERROR)<<"nothing in entry";
+  }
     for(int i =0;i<entry.dir_contents_size();i++)
     {
       LOG(ERROR)<<entry.dir_contents(i);
     }
-    */
-
     /* 
-    ②这种方法不行
+    ②这种方法不行,entry.dir_contents_size()=0
     map<string, string> reads_gaoxuan;
   
     MetadataEntry entry;
@@ -624,12 +627,13 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
       LOG(ERROR)<<entry.dir_contents(i);
     }*/
     
+    /*
+    ③这种方法不行，父目录的元数据项什么都不输出
     map<string, string> read_gaoxuan;
     LOG(ERROR)<<in.from_path();
     LOG(ERROR)<<read_gaoxuan[ParentDir(in.from_path())];
-
-
-    //<<reads_gaoxuan[ParentDir(in.from_path())];这样也是输出空的，应该不能这样得到
+    */
+    
     
    
    
