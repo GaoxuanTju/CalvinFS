@@ -604,7 +604,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
     */
    
     /* 
-    ②改变①中思路，直接用GetEntry里面的逻辑,还是entry.dir_contents_size()=0*/
+    ②改变①中思路，直接用GetEntry里面的逻辑,还是entry.dir_contents_size()=0
     map<string, string> reads_gaoxuan;
   
     MetadataEntry entry;
@@ -618,13 +618,13 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
     {
       LOG(ERROR)<<entry.dir_contents(i);
     }
-    
+    */
     /*
-    ③前面①②都不行，父目录的元数据项什么都不输出，我试试直接用map能拿到东西吗，还是不行
+    ③前面①②都不行，父目录的元数据项什么都不输出，我试试直接用map能拿到东西吗，还是不行*/
     map<string, string> read_gaoxuan;
     LOG(ERROR)<<in.from_path();
     LOG(ERROR)<<read_gaoxuan[ParentDir(in.from_path())];
-    */
+    
 
    /*④前面三种都不行，看看第四种使用lookup的函数能不能行,这也不行，得到的就是空的
      Action b;
