@@ -23,7 +23,6 @@
 #include <typeinfo> //gaoxuan --用于确定数据类型
 #include <stack> //gaoxuan --用于深搜时的栈
 #include <list> //gaoxuan --用于深搜时的列表
-#include "fs/calvinfs_client_app.h" //gaoxuan --
 using std::map;
 using std::set;
 using std::string;
@@ -627,18 +626,18 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
     LOG(ERROR)<<read_gaoxuan[ParentDir(in.from_path())];
     */
 
-   /*④前面三种都不行，看看第四种使用lookup的函数能不能行,这也不行，得到的就是空的*/
+   /*④前面三种都不行，看看第四种使用lookup的函数能不能行,这也不行，得到的就是空的
       Action b;
       b.set_action_type(MetadataAction::LOOKUP);
       MetadataAction::LookupInput n;
       n.set_path(ParentDir(in.from_path()));
       n.SerializeToString(b.mutable_input());
-      metadata_->GetRWSets(&b);
-      metadata_->Run(&b);
+      GetRWSets(&b);
+      Run(&b);
       MetadataAction::LookupOutput out;
       out.ParseFromString(b.output());
       LOG(ERROR)<<out.entry().dir_contents().empty();//这会输出1，也就是说确实是空的
-   
+   */
       
         
     
@@ -942,7 +941,11 @@ void MetadataStore::Rename_Internal(
     out->add_errors(MetadataAction::FileDoesNotExist);
     return;
   }
-
+  //gaouan --在这一行，咱看看它的是啥
+  for(int i=0;i<from_entry.dir_contents_size();i++)
+  {
+    LOG(ERROR)<<"gaoxuan --"<<from_entry.dir_contents(i);
+  }
   string parent_from_path = ParentDir(in.from_path());
   MetadataEntry parent_from_entry;
   if (!context->GetEntry(parent_from_path, &parent_from_entry)) {
