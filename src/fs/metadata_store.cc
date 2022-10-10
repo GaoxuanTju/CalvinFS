@@ -585,18 +585,10 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
   //gaoxuan --先看懂下面这个是什么逻辑
     MetadataAction::RenameInput in;
     in.ParseFromString(action->input());
-    
-    action->add_readset(in.from_path());
-    action->add_writeset(in.from_path());
-    action->add_readset(ParentDir(in.from_path()));
-    action->add_writeset(ParentDir(in.from_path()));
-    action->add_writeset(in.to_path());
-    action->add_readset(ParentDir(in.to_path()));
-    action->add_writeset(ParentDir(in.to_path()));
-    //gaoxuan --测试一下能不能行
+     //gaoxuan --测试一下能不能行
     
     /*
-   ①这种方法不行,entry.dir_contents_size()=0，怀疑是ExecutionContext只有Run才会产生
+   ①这种方法不行,entry.dir_contents_size()=0，怀疑是ExecutionContext只有Run才会产生 */
    ExecutionContext *context = new ExecutionContext(store_, action);
    MetadataEntry entry;
    context->GetEntry(ParentDir(in.from_path()),&entry);//这样entry里面就是
@@ -609,7 +601,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
     {
       LOG(ERROR)<<entry.dir_contents(i);
     }
-    */
+   
    
     /* 
     ②改变①中思路，直接用GetEntry里面的逻辑,还是entry.dir_contents_size()=0
@@ -634,10 +626,8 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
     LOG(ERROR)<<read_gaoxuan[ParentDir(in.from_path())];
     */
 
-   /*④前面三种都不行，看看第四种使用lookup的函数能不能行
-     
-   */
-      Action b;
+   /*④前面三种都不行，看看第四种使用lookup的函数能不能行,这也不行，得到的就是空的
+     Action b;
       b.set_action_type(MetadataAction::LOOKUP);
       MetadataAction::LookupInput n;
       n.set_path(ParentDir(in.from_path()));
@@ -646,7 +636,9 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
       Run(&b);
       MetadataAction::LookupOutput out;
       out.ParseFromString(b.output());
-      LOG(ERROR)<<out.entry().dir_contents().empty();
+      LOG(ERROR)<<out.entry().dir_contents().empty();//这会输出1，也就是说确实是空的
+   */
+      
         
     
    
@@ -657,6 +649,14 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
       
 
     //gaoxuan --这里是终止
+    action->add_readset(in.from_path());
+    action->add_writeset(in.from_path());
+    action->add_readset(ParentDir(in.from_path()));
+    action->add_writeset(ParentDir(in.from_path()));
+    action->add_writeset(in.to_path());
+    action->add_readset(ParentDir(in.to_path()));
+    action->add_writeset(ParentDir(in.to_path()));
+   
   } else if (type == MetadataAction::LOOKUP) {
     MetadataAction::LookupInput in;
     in.ParseFromString(action->input());
