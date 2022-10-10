@@ -943,7 +943,7 @@ void MetadataStore::Rename_Internal(
   }
   //gaouan --在这一行，咱看看它的是啥
   MetadataEntry from_entry1;
-  context->GetEntry(ParentDir(in.from_path()), &from_entry1)
+  context->GetEntry(ParentDir(in.from_path()), &from_entry1);
     
   for(int i=0;i<from_entry1.dir_contents_size();i++)
   {
