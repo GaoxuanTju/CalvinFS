@@ -614,6 +614,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
    MetadataEntry entry;
    context->GetEntry(ParentDir(in.from_path()),&entry);//这样entry里面就是
     LOG(ERROR)<<in.from_path()<<":";//下面输出的是in.from_path()的父目录的元数据
+    LOG(ERROR)<<entry.dir_contents_size();
     for(int i =0;i<entry.dir_contents_size();i++)
     {
       LOG(ERROR)<<entry.dir_contents(i);
