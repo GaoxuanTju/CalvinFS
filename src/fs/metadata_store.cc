@@ -942,10 +942,14 @@ void MetadataStore::Rename_Internal(
     return;
   }
   //gaouan --在这一行，咱看看它的是啥
-  for(int i=0;i<from_entry.dir_contents_size();i++)
+  MetadataEntry from_entry1;
+  context->GetEntry(ParentDir(in.from_path()), &from_entry1)
+    
+  for(int i=0;i<from_entry1.dir_contents_size();i++)
   {
-    LOG(ERROR)<<"gaoxuan --"<<from_entry.dir_contents(i);
+    LOG(ERROR)<<"gaoxuan --"<<from_entry1.dir_contents(i);
   }
+  //gaoxuan --这里是终止
   string parent_from_path = ParentDir(in.from_path());
   MetadataEntry parent_from_entry;
   if (!context->GetEntry(parent_from_path, &parent_from_entry)) {
