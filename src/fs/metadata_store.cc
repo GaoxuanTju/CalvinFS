@@ -23,6 +23,7 @@
 #include <typeinfo> //gaoxuan --用于确定数据类型
 #include <stack> //gaoxuan --用于深搜时的栈
 #include <list> //gaoxuan --用于深搜时的列表
+#include "fs/calvinfs_client_app.h" //gaoxuan --
 using std::map;
 using std::set;
 using std::string;
@@ -632,8 +633,8 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
       MetadataAction::LookupInput n;
       n.set_path(ParentDir(in.from_path()));
       n.SerializeToString(b.mutable_input());
-      GetRWSets(&b);
-      Run(&b);
+      metadata_->GetRWSets(&b);
+      metadata_->Run(&b);
       MetadataAction::LookupOutput out;
       out.ParseFromString(b.output());
       LOG(ERROR)<<out.entry().dir_contents().empty();//这会输出1，也就是说确实是空的
