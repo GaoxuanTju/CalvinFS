@@ -603,7 +603,7 @@ ExecutionContext *context = new ExecutionContext(store_, action);
    MetadataEntry entry;
    context->GetEntry(ParentDir(in.from_path()),&entry);//这样entry里面就是
     LOG(ERROR)<<in.from_path()<<":";//下面输出的是in.from_path()的父目录的元数据
-    if (!context->GetEntry(in.path(), &entry)) {
+    if (!context->GetEntry(ParentDir(in.from_path()), &entry)) {
     // File doesn't exist!
     LOG(ERROR)<<"nothing in entry";
   }
