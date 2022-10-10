@@ -642,8 +642,8 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
       MetadataAction::LookupInput n;
       n.set_path(ParentDir(in.from_path()));
       n.SerializeToString(b.mutable_input());
-      metadata_->GetRWSets(&b);
-      metadata_->Run(&b);
+      GetRWSets(&b);
+      Run(&b);
       MetadataAction::LookupOutput out;
       out.ParseFromString(b.output());
       LOG(ERROR)<<out.entry().dir_contents_size();
