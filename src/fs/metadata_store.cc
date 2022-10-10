@@ -595,7 +595,21 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
     action->add_writeset(ParentDir(in.to_path()));
     //gaoxuan --测试一下能不能行
     
-    /* ②这里是测试失败的一种*/
+    /*
+   ①这种方法不行
+   ExecutionContext *context = new ExecutionContext(store_, action);
+   MetadataEntry entry;
+   context->GetEntry(ParentDir(in.from_path()),&entry);//这样entry里面就是
+    LOG(ERROR)<<in.from_path()<<":";//下面输出的是in.from_path()的父目录的元数据
+    LOG(ERROR)<<entry.dir_contents_size();
+    for(int i =0;i<entry.dir_contents_size();i++)
+    {
+      LOG(ERROR)<<entry.dir_contents(i);
+    }
+    */
+
+    /* 
+    ②这种方法不行
     map<string, string> reads_gaoxuan;
   
     MetadataEntry entry;
@@ -608,22 +622,18 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
     for(int i =0;i<entry.dir_contents_size();i++)
     {
       LOG(ERROR)<<entry.dir_contents(i);
-    }
+    }*/
+    
+    map<string, string> read_gaoxuan;
+    LOG(ERROR)<<in.from_path();
+    LOG(ERROR)<<read_gaoxuan[ParentDir(in.from_path())];
+
+
     //<<reads_gaoxuan[ParentDir(in.from_path())];这样也是输出空的，应该不能这样得到
     
    
    
-   /*
-   ①这种方法不行
-   ExecutionContext *context = new ExecutionContext(store_, action);
-   MetadataEntry entry;
-   context->GetEntry(ParentDir(in.from_path()),&entry);//这样entry里面就是
-    LOG(ERROR)<<in.from_path()<<":";//下面输出的是in.from_path()的父目录的元数据
-    LOG(ERROR)<<entry.dir_contents_size();
-    for(int i =0;i<entry.dir_contents_size();i++)
-    {
-      LOG(ERROR)<<entry.dir_contents(i);
-    }*/
+   
    
 
       
