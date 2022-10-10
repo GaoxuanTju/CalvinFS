@@ -620,14 +620,14 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
     }
     */
     /*
-    ③前面①②都不行，父目录的元数据项什么都不输出，我试试直接用map能拿到东西吗，还是不行*/
+    ③前面①②都不行，父目录的元数据项什么都不输出，我试试直接用map能拿到东西吗，还是不行
     map<string, string> read_gaoxuan;
     LOG(ERROR)<<in.from_path();
     LOG(ERROR)<<read_gaoxuan[ParentDir(in.from_path())];
-    
+    */
 
-   /*④前面三种都不行，看看第四种使用lookup的函数能不能行,这也不行，得到的就是空的
-     Action b;
+   /*④前面三种都不行，看看第四种使用lookup的函数能不能行,这也不行，得到的就是空的*/
+      Action b;
       b.set_action_type(MetadataAction::LOOKUP);
       MetadataAction::LookupInput n;
       n.set_path(ParentDir(in.from_path()));
@@ -637,7 +637,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
       MetadataAction::LookupOutput out;
       out.ParseFromString(b.output());
       LOG(ERROR)<<out.entry().dir_contents().empty();//这会输出1，也就是说确实是空的
-   */
+   
       
         
     
