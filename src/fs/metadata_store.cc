@@ -595,21 +595,26 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
     action->add_writeset(ParentDir(in.to_path()));
     //gaoxuan --测试一下能不能行
     
-    /* 这里是测试失败的一种
+    /* ②这里是测试失败的一种*/
     map<string, string> reads_gaoxuan;
   
     MetadataEntry entry;
-    //如果用指针的话会出现一个叫Segmentation fault      (core dumped)这样的错误，运行不起来
-    //但是上面人家用的是指针
+    if (reads_gaoxuan.count(ParentDir(in.from_path())) != 0) {
     entry.ParseFromString(reads_gaoxuan[ParentDir(in.from_path())]);//照常理来说，现在entry里面就是in.from_path的元数据了
+    }
     //
     LOG(ERROR)<<in.from_path()<<":";
+    LOG(ERROR)<<entry.dir_contents_size();
     for(int i =0;i<entry.dir_contents_size();i++)
     {
       LOG(ERROR)<<entry.dir_contents(i);
     }
     //<<reads_gaoxuan[ParentDir(in.from_path())];这样也是输出空的，应该不能这样得到
-    */
+    
+   
+   
+   /*
+   ①这种方法不行
    ExecutionContext *context = new ExecutionContext(store_, action);
    MetadataEntry entry;
    context->GetEntry(ParentDir(in.from_path()),&entry);//这样entry里面就是
@@ -618,7 +623,8 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
     for(int i =0;i<entry.dir_contents_size();i++)
     {
       LOG(ERROR)<<entry.dir_contents(i);
-    }
+    }*/
+   
 
       
 
