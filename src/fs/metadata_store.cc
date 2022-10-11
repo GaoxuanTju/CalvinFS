@@ -589,7 +589,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
    */
       
   /*
-  //gaoxuan --这个逻辑，人家确实运行出来了，也能够获取到内容，但是在咱这里咋就不行
+  //gaoxuan --⑤这个逻辑，人家确实运行出来了，也能够获取到内容，但是在咱这里咋就不行
   //我当下推测是，没到执行Run的话，没有ExecutionContext
   
        //Run里是这样创建context的
@@ -619,14 +619,18 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
         }
   */
 
-    //现在再实试试新的法子，store_Get    
+/*//⑥现在再实试试新的法子，store_Get ,这个法子还是什么也没拿到，serialized_entry还是个空字符串   */
+    
     //store_->Put("", serialized_entry, 0);这是他加入进去的使用
     string serialized_entry;
-    store_->Get(ParentDir(in.from_path()),action->version(),&serialized_entry);
+    LOG(ERROR)<<store_->Get(ParentDir(in.from_path()),action->version(),&serialized_entry);
     //MetadataEntry entry;
     //entry.ParseFromString(serialized_entry);
-    //上面那两行会出现can't parse ,因为缺少type
-    LOG(ERROR)<<serialized_entry<<";;;";
+    //上面那两行会出现can't parse ,因为缺少type，因为压根还是个空字符串，什么都没拿到，为啥呀？？？？
+    //LOG(ERROR)<<serialized_entry<<";;;";
+    
+    
+    
 
 
 //  gaoxuan --这里是终止
