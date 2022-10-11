@@ -639,26 +639,27 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
       LOG(ERROR)<<out.entry().dir_contents().empty();//这会输出1，也就是说确实是空的
    */
       
-  //gaouan --在这一行，咱看看它的是啥,这里人家确实能够输出，也就是说GetEntry没什么问题
+  //gaouan --这个逻辑，人家确实运行出来了，也能够获取到内容，但是在咱这里咋就不行
+  //我当下推测是，没到执行Run的话，没有ExecutionContext
   
-
-   ExecutionContext* context;
-  if (machine_ == NULL) {
-    context = new ExecutionContext(store_, action);
-  } else {
-    context =
-        new DistributedExecutionContext(machine_, config_, store_, action);
-  }
-  MetadataEntry from_entry1;
-  context->GetEntry(ParentDir(in.from_path()), &from_entry1);
-    
-  for(int i=0;i<from_entry1.dir_contents_size();i++)
-  {
-    LOG(ERROR)<<"gaoxuan --"<<from_entry1.dir_contents(i);
-  }
-
-
-
+       //Run里是这样创建context的
+        ExecutionContext* context;
+        if (machine_ == NULL) {
+          LOG(ERROR)<<"machine=null";
+          context = new ExecutionContext(store_, action);
+        } else {
+          LOG(ERROR)<<"machine!=null";
+          context =
+              new DistributedExecutionContext(machine_, config_, store_, action);
+        }
+        //Run里调用Rename_Internal,context作为参数传进去，然后在Rename_Internal里面执行下面确实能输出东西
+        MetadataEntry from_entry1;
+        context->GetEntry(ParentDir(in.from_path()), &from_entry1);
+          
+        for(int i=0;i<from_entry1.dir_contents_size();i++)
+        {
+          LOG(ERROR)<<"gaoxuan --"<<from_entry1.dir_contents(i);
+        }
 
 //  gaoxuan --这里是终止
         
