@@ -622,15 +622,22 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
 /*//⑥现在再实试试新的法子，store_Get ,这个法子还是什么也没拿到，serialized_entry还是个空字符串   */
     
     //store_->Put("", serialized_entry, 0);这是他加入进去的使用
-    string serialized_entry;
-    LOG(ERROR)<<action->version();
-    LOG(ERROR)<<store_->Get(ParentDir(in.from_path()),0,&serialized_entry);//输出0，证明函数false了
+    //string serialized_entry;
+    //LOG(ERROR)<<store_->Get(ParentDir(in.from_path()),0,&serialized_entry);//输出0，证明函数false了
     //MetadataEntry entry;
     //entry.ParseFromString(serialized_entry);
     //上面那两行会出现can't parse ,因为缺少type，因为压根还是个空字符串，什么都没拿到，为啥呀？？？？
-    LOG(ERROR)<<serialized_entry<<";;;";
-    
-    
+    //LOG(ERROR)<<serialized_entry<<";;;";
+    map<string,string> reads_gaoxuan;
+    for (int i = 0; i < action->readset_size(); i++) {
+      if (!store_->Get(action->readset(i),
+                       action->version(),
+                       &reads_gaoxuan[action->readset(i)])) {
+        reads_gaoxuan.erase(action->readset(i));
+      }
+    //这一步应该是获取所有的键值对
+    LOG(ERROR)<<ParentDir(in.from_path());
+    LOG(ERROR)<<reads_gaoxuan[ParentDir(in.from_path())];
     
 
 
