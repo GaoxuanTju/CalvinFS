@@ -550,10 +550,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
    MetadataEntry entry;
    context->GetEntry(ParentDir(in.from_path()),&entry);//这样entry里面就是
     LOG(ERROR)<<in.from_path()<<":";//下面输出的是in.from_path()的父目录的元数据
-    if (!context->GetEntry(ParentDir(in.from_path()), &entry)) {//这个被执行了呀，哪里的问题？
-    // File doesn't exist!
-    LOG(ERROR)<<"nothing in entry";
-  }
+    
     LOG(ERROR)<<entry.dir_contents_size()<<";";
     for(int i =0;i<entry.dir_contents_size();i++)
     {
