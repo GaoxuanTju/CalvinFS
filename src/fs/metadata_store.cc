@@ -597,7 +597,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
    */
       
   /*
-  //gaoxuan --⑤这个逻辑，人家确实运行出来了，也能够获取到内容，但是在咱这里咋就不行
+  //gaoxuan --⑤这个逻辑，人家确实运行出来了，也能够获取到内容，但是在咱这里咋就不行*/
   //我当下推测是，没到执行Run的话，没有ExecutionContext
   
        //Run里是这样创建context的
@@ -625,7 +625,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
           //按照Execution
           LOG(ERROR)<<"nothing has been gotten";
         }
-  */
+  
 
 /*//⑥现在再实试试新的法子，store_Get ,这个法子还是什么也没拿到，serialized_entry还是个空字符串   
     
@@ -639,20 +639,21 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
     */
 
 
-  /* ⑦看看ExecutionContext里怎么获取全部键值对的，还是不行啊*/
+
+  /* ⑦看看ExecutionContext里怎么获取全部键值对的，还是不行啊
   //这里我倒是知道为啥不行了，因为action->readset_size()=0，这是啥玩意，难道是问题出在action上
     map<string,string> reads_gaoxuan;
     LOG(ERROR)<<action->readset_size();
     for (int i = 0; i < action->readset_size(); i++) {
       LOG(ERROR)<<store_->Get(action->readset(i),
                         action->version(),
-                       &reads_gaoxuan[action->readset(i)]) ;
+                       &reads_gaoxuan[action->readset(i)]) ;//注意这里全是false
         
     }
 
     //这一步应该是获取所有的键值对
     LOG(ERROR)<<reads_gaoxuan.size();//这样还是0，代表在执行的时候没有放进这个键值对里面
-    
+ */   
 
 //  gaoxuan --这里是终止
         
