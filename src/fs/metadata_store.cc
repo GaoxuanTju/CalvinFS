@@ -652,9 +652,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
     }
 
     //这一步应该是获取所有的键值对
-    LOG(ERROR)<<action->readset_size();
-    LOG(ERROR)<<in.from_path()<<":"<<ParentDir(in.from_path());
-    LOG(ERROR)<<reads_gaoxuan[ParentDir(in.from_path())];
+    LOG(ERROR)<<reads_gaoxuan.size();
     
 
 //  gaoxuan --这里是终止
