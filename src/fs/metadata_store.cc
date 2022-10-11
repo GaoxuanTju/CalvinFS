@@ -623,7 +623,8 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
     
     //store_->Put("", serialized_entry, 0);这是他加入进去的使用
     string serialized_entry;
-    LOG(ERROR)<<store_->Get(ParentDir(in.from_path()),action->version(),&serialized_entry);
+    log(ERROR)<<action->version();
+    LOG(ERROR)<<store_->Get(ParentDir(in.from_path()),0,&serialized_entry);//输出0，证明函数false了
     //MetadataEntry entry;
     //entry.ParseFromString(serialized_entry);
     //上面那两行会出现can't parse ,因为缺少type，因为压根还是个空字符串，什么都没拿到，为啥呀？？？？
