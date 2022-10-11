@@ -546,7 +546,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
     
     /*
    ①这种方法不行,entry.dir_contents_size()=0，怀疑是ExecutionContext只有Run才会产生*/
-   ExecutionContext *context = new ExecutionContext(store_, action);
+   ExecutionContext *context = new DistributedExecutionContext(machine_, config_, store_, action);
    MetadataEntry entry;
    context->GetEntry(ParentDir(in.from_path()),&entry);//这样entry里面就是
     LOG(ERROR)<<in.from_path()<<":";//下面输出的是in.from_path()的父目录的元数据
@@ -554,6 +554,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
     // File doesn't exist!
     LOG(ERROR)<<"nothing in entry";
   }
+    LOG(ERROR)<<entry.dir_contents_size()<<";";
     for(int i =0;i<entry.dir_contents_size();i++)
     {
       LOG(ERROR)<<entry.dir_contents(i);
