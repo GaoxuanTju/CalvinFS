@@ -456,23 +456,7 @@ bool MetadataStore::IsLocal(const string& path) {
 }
 
 
-/*gaoxuan --这里是一些碎碎念，想要做的事情
-1 要在GetRWSets函数里面的RENAME部分改写一下，
-  改写成的样子是这个目录，它的父目录，它的所有子目录，都要获取读写集，目的是加锁
-
-  使用的算法呢？应当是一个树的搜索算法，这部分深搜就好
-  同时这里，代码里面只弄了一个获取父目录的方法，对照着看看是不是能先写一个函数，获取所有子目录，这个应该是不难的，因为CalvinFS元数据的键值存储中
-  值的部分的第三个字段，contents里面是会包含所有的子目录的
-
-  小Tips：content是字段：如果是目录的话，包含的是所有文件和子目录的列表
-  所以说在进行遍历时，判断有没有叶子的方式就是，这个目录的contents里面如果是空，代表这个目录就是一个叶子
-  如果不空，文件时叶子，若有子目录，再去查看子目录的contents的内容。
-
-
-
-
-综合版的深度优先遍历
-
+/*gaoxuan --
 
     MetadataAction::RenameInput in;
     in.ParseFromString(action->input());
@@ -505,42 +489,7 @@ bool MetadataStore::IsLocal(const string& path) {
     action->add_readset(ParentDir(in.to_path()));
     action->add_writeset(ParentDir(in.to_path()));
 
-上面就是改写后的大体逻辑了，需要让他能跑，要做的事
-（1）查一下c++栈的头文件以及如何使用栈，进栈出栈的函数
-#include <stack>
-创建栈    stack<T> path;
-添加元素  path.push(file_path);
-获取栈顶（不删除） path.top();
-删除栈顶（不获取） path.pop();
-是否为空          path.empty();
 
-（2）找一下in.from_path这是什么类型，好确定栈是什么类型
-姑且是当作string来使用，还没有确定
-
-（3）看一下c++有没有列表，如果有就简单一些，没有就用循环
-#include <list>
-创建一个列表  list<string> list;
-//使用迭代器依次输出list容器中的元素
-    for (list<string>::iterator it = values.begin(); it != values.end(); ++it) {
-        cout << *it << " ";
-    }
-
-（4）获取目录所有子目录的逻辑
-
-//如果这个对象在这里能够直接用的话，Run里面是直接用的，不知道这里能吗？
-
-
-map<string, string> reads_;
-MetadataEntry* entry;
-entry->Clear();
-if (reads_.count(path) != 0) 
-{
-      entry->ParseFromString(reads_[path]);
-}
-//这样就把path的元数据拿过来了！
-string contents = entry.dir_contents();
-
-//首先明确一点就是，直接使用reads[in.from_path()]是拿不出来的
 
 2 ok上面的工作做完之后/做的同时，在新的位置先创建一个新的目录树。这个是不是可以在遍历的时候就直接干了呢？
   就是说我从要修改的部分开始，遍历到一个目录，就获取读写集，同时将这个目录对应元数据拷贝到新位置的目录树下，这不就相当于逻辑上把文件挪到了新的位置上
@@ -639,6 +588,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
       LOG(ERROR)<<out.entry().dir_contents().empty();//这会输出1，也就是说确实是空的
    */
       
+  /*
   //gaoxuan --这个逻辑，人家确实运行出来了，也能够获取到内容，但是在咱这里咋就不行
   //我当下推测是，没到执行Run的话，没有ExecutionContext
   
@@ -652,9 +602,8 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
           context =
               new DistributedExecutionContext(machine_, config_, store_, action);
         }
-        LOG(ERROR)<<context->EntryExists(ParentDir(in.from_path()));
         //Run里调用Rename_Internal,context作为参数传进去，然后在Rename_Internal里面执行下面确实能输出东西
-       /* MetadataEntry from_entry1;
+        MetadataEntry from_entry1;
         if(context->GetEntry(ParentDir(in.from_path()), &from_entry1))
         {
           LOG(ERROR)<<from_entry1.dir_contents_size();  //这里是0，所以问题出在哪了呢？context确实创建了，GetEntry也没问题，怎么换了个地方就不对劲了
@@ -668,9 +617,16 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
           //按照Execution
           LOG(ERROR)<<"nothing has been gotten";
         }
-        */
-        
-        
+  */
+
+    //现在再实试试新的法子，store_Get    
+    //store_->Put("", serialized_entry, 0);这是他加入进去的使用
+    string serialized_entry;
+    store_->Get(ParentDir(in.from_path()),action->version(),&serialized_entry);
+    MetadataEntry entry;
+    entry.ParseFromString(serialized_entry);
+    LOG<<entry.dir_contents_size();
+
 
 //  gaoxuan --这里是终止
         
