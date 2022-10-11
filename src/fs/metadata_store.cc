@@ -941,7 +941,7 @@ void MetadataStore::Rename_Internal(
     out->add_errors(MetadataAction::FileDoesNotExist);
     return;
   }
-  //gaouan --在这一行，咱看看它的是啥
+  /*gaouan --在这一行，咱看看它的是啥,这里人家确实能够输出，也就是说GetEntry没什么问题
   MetadataEntry from_entry1;
   context->GetEntry(ParentDir(in.from_path()), &from_entry1);
     
@@ -949,7 +949,7 @@ void MetadataStore::Rename_Internal(
   {
     LOG(ERROR)<<"gaoxuan --"<<from_entry1.dir_contents(i);
   }
-  //gaoxuan --这里是终止
+  gaoxuan --这里是终止*/
   string parent_from_path = ParentDir(in.from_path());
   MetadataEntry parent_from_entry;
   if (!context->GetEntry(parent_from_path, &parent_from_entry)) {
