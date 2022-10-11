@@ -635,6 +635,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
                        &reads_gaoxuan[action->readset(i)])) {
         reads_gaoxuan.erase(action->readset(i));
       }
+    }
     //这一步应该是获取所有的键值对
     LOG(ERROR)<<ParentDir(in.from_path());
     LOG(ERROR)<<reads_gaoxuan[ParentDir(in.from_path())];
