@@ -639,7 +639,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
       LOG(ERROR)<<out.entry().dir_contents().empty();//这会输出1，也就是说确实是空的
    */
       
-  //gaouan --这个逻辑，人家确实运行出来了，也能够获取到内容，但是在咱这里咋就不行
+  //gaoxuan --这个逻辑，人家确实运行出来了，也能够获取到内容，但是在咱这里咋就不行
   //我当下推测是，没到执行Run的话，没有ExecutionContext
   
        //Run里是这样创建context的
@@ -654,12 +654,20 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
         }
         //Run里调用Rename_Internal,context作为参数传进去，然后在Rename_Internal里面执行下面确实能输出东西
         MetadataEntry from_entry1;
-        context->GetEntry(ParentDir(in.from_path()), &from_entry1);
-        LOG(ERROR)<<from_entry1.dir_contents_size();  
-        for(int i=0;i<from_entry1.dir_contents_size();i++)
+        if(context->GetEntry(ParentDir(in.from_path()), &from_entry1))
         {
-          LOG(ERROR)<<"gaoxuan --"<<from_entry1.dir_contents(i);
+          LOG(ERROR)<<from_entry1.dir_contents_size();  //这里是0，所以问题出在哪了呢？context确实创建了，GetEntry也没问题，怎么换了个地方就不对劲了
+          for(int i=0;i<from_entry1.dir_contents_size();i++)
+          {
+            LOG(ERROR)<<"gaoxuan --"<<from_entry1.dir_contents(i);
+          }
         }
+        else
+        {
+          LOG(ERROR)<<"nothing has been gotten";
+        }
+        
+        
 
 //  gaoxuan --这里是终止
         
