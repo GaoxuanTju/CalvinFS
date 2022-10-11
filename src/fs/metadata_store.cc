@@ -639,7 +639,28 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
       LOG(ERROR)<<out.entry().dir_contents().empty();//这会输出1，也就是说确实是空的
    */
       
+  //gaouan --在这一行，咱看看它的是啥,这里人家确实能够输出，也就是说GetEntry没什么问题
+  
+
+   ExecutionContext* context;
+  if (machine_ == NULL) {
+    context = new ExecutionContext(store_, action);
+  } else {
+    context =
+        new DistributedExecutionContext(machine_, config_, store_, action);
+  }
+  MetadataEntry from_entry1;
+  context->GetEntry(ParentDir(in.from_path()), &from_entry1);
     
+  for(int i=0;i<from_entry1.dir_contents_size();i++)
+  {
+    LOG(ERROR)<<"gaoxuan --"<<from_entry1.dir_contents(i);
+  }
+
+
+
+
+//  gaoxuan --这里是终止
         
     
    
