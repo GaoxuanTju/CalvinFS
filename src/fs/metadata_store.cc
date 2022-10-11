@@ -82,7 +82,7 @@ class ExecutionContext {
 
   bool GetEntry(const string& path, MetadataEntry* entry) {
     entry->Clear();
-    if (reads_.count(path) != 0) {
+    if (reads_.count(path) != 0) {//gaoxuan --这里判断了一下path是不是在这个键值对里出现过，存在就是1，不存在就是0
       entry->ParseFromString(reads_[path]);
       return true;
     }
@@ -652,8 +652,9 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
           context =
               new DistributedExecutionContext(machine_, config_, store_, action);
         }
+        LOG(ERROR)<<context->EntryExists(ParentDir(in.from_path()));
         //Run里调用Rename_Internal,context作为参数传进去，然后在Rename_Internal里面执行下面确实能输出东西
-        MetadataEntry from_entry1;
+       /* MetadataEntry from_entry1;
         if(context->GetEntry(ParentDir(in.from_path()), &from_entry1))
         {
           LOG(ERROR)<<from_entry1.dir_contents_size();  //这里是0，所以问题出在哪了呢？context确实创建了，GetEntry也没问题，怎么换了个地方就不对劲了
@@ -663,9 +664,11 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
           }
         }
         else
-        {
+        {//这里被执行了，也就是说GetEntry这个函数返回的fasle，分析一下为啥false
+          //按照Execution
           LOG(ERROR)<<"nothing has been gotten";
         }
+        */
         
         
 
