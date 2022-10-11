@@ -545,7 +545,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
      //gaoxuan --测试一下能不能行
     
     /*
-   ①这种方法不行,entry.dir_contents_size()=0，怀疑是ExecutionContext只有Run才会产生
+   ①这种方法不行,entry.dir_contents_size()=0，怀疑是ExecutionContext只有Run才会产生*/
    ExecutionContext *context = new ExecutionContext(store_, action);
    MetadataEntry entry;
    context->GetEntry(ParentDir(in.from_path()),&entry);//这样entry里面就是
@@ -558,7 +558,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
     {
       LOG(ERROR)<<entry.dir_contents(i);
     }
-    */
+    
    
     /* 
     ②改变①中思路，直接用GetEntry里面的逻辑,还是entry.dir_contents_size()=0
@@ -651,7 +651,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
     LOG(ERROR)<<reads_gaoxuan.size();//这样还是0，代表在执行的时候没有放进这个键值对里面
  */   
 
-    LOG(ERROR)<<action->readset(0)<<";"<<action->readset(1)<<";"<<action->readset(2);
+   // LOG(ERROR)<<action->readset(0)<<";"<<action->readset(1)<<";"<<action->readset(2);
 
 //  gaoxuan --这里是终止
         
