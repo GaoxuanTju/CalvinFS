@@ -647,7 +647,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
         if (machine_ == NULL) {
           LOG(ERROR)<<"machine=null";
           context = new ExecutionContext(store_, action);
-        } else {
+        } else {//执行的是这里，那证明确实能够创建这个context
           LOG(ERROR)<<"machine!=null";
           context =
               new DistributedExecutionContext(machine_, config_, store_, action);
@@ -655,7 +655,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
         //Run里调用Rename_Internal,context作为参数传进去，然后在Rename_Internal里面执行下面确实能输出东西
         MetadataEntry from_entry1;
         context->GetEntry(ParentDir(in.from_path()), &from_entry1);
-          
+        LOG(ERROR)<<from_entry1.dir_contents_size();  
         for(int i=0;i<from_entry1.dir_contents_size();i++)
         {
           LOG(ERROR)<<"gaoxuan --"<<from_entry1.dir_contents(i);
