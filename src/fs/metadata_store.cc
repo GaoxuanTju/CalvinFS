@@ -545,7 +545,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
      //gaoxuan --测试一下能不能行
     
     /*
-   ①这种方法不行,entry.dir_contents_size()=0，怀疑是ExecutionContext只有Run才会产生*/
+   ①这种方法不行,entry.dir_contents_size()=0，怀疑是ExecutionContext只有Run才会产生
    ExecutionContext *context = new DistributedExecutionContext(machine_, config_, store_, action);
    MetadataEntry entry;
    context->GetEntry(ParentDir(in.from_path()),&entry);//这样entry里面就是
@@ -556,7 +556,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
     {
       LOG(ERROR)<<entry.dir_contents(i);
     }
-    
+    */
    
     /* 
     ②改变①中思路，直接用GetEntry里面的逻辑,还是entry.dir_contents_size()=0
