@@ -623,7 +623,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
     
     //store_->Put("", serialized_entry, 0);这是他加入进去的使用
     string serialized_entry;
-    log(ERROR)<<action->version();
+    lOG(ERROR)<<action->version();
     LOG(ERROR)<<store_->Get(ParentDir(in.from_path()),0,&serialized_entry);//输出0，证明函数false了
     //MetadataEntry entry;
     //entry.ParseFromString(serialized_entry);
