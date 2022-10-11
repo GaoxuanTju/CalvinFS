@@ -534,6 +534,14 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
   //gaoxuan --先看懂下面这个是什么逻辑
     MetadataAction::RenameInput in;
     in.ParseFromString(action->input());
+
+    action->add_readset(in.from_path());
+    action->add_writeset(in.from_path());
+    action->add_readset(ParentDir(in.from_path()));
+    action->add_writeset(ParentDir(in.from_path()));
+    action->add_writeset(in.to_path());
+    action->add_readset(ParentDir(in.to_path()));
+    action->add_writeset(ParentDir(in.to_path()));
      //gaoxuan --测试一下能不能行
     
     /*
@@ -632,24 +640,28 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
 
 
   /* ⑦看看ExecutionContext里怎么获取全部键值对的，还是不行啊*/
+  //这里我倒是知道为啥不行了，因为action->readset_size()=0，这是啥玩意，难道是问题出在action上
     map<string,string> reads_gaoxuan;
     
     for (int i = 0; i < action->readset_size(); i++) {
-      store_->Get(action->readset(i),
+      if (!store_->Get(action->readset(i),
                         action->version(),
-                       &reads_gaoxuan[action->readset(i)]);
-
-
+                       &reads_gaoxuan[action->readset(i)])) {
+        reads_gaoxuan.erase(action->readset(i));
+      }
     }
-    LOG(ERROR)<<action->readset_size();
-    LOG(ERROR)<<reads_gaoxuan.size();
 
-    
+    //这一步应该是获取所有的键值对
+    LOG(ERROR)<<action->readset_size();
+    LOG(ERROR)<<in.from_path()<<":"<<ParentDir(in.from_path());
+    LOG(ERROR)<<reads_gaoxuan[ParentDir(in.from_path())];
     
 
 //  gaoxuan --这里是终止
         
-    
+//gaoxuan --something occurred to me    action这个是在哪里传过来的！，这里的action，你有没有想过单纯就只有一个in.from_path
+//所以你想去取出它父目录是不是不太现实呢，宝贝
+/*先看一下这里action传进来的是啥*/
    
    
    
@@ -658,13 +670,8 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
       
 
     //gaoxuan --这里是终止
-    action->add_readset(in.from_path());
-    action->add_writeset(in.from_path());
-    action->add_readset(ParentDir(in.from_path()));
-    action->add_writeset(ParentDir(in.from_path()));
-    action->add_writeset(in.to_path());
-    action->add_readset(ParentDir(in.to_path()));
-    action->add_writeset(ParentDir(in.to_path()));
+
+
    
   } else if (type == MetadataAction::LOOKUP) {
     MetadataAction::LookupInput in;
