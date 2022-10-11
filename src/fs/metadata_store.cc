@@ -625,7 +625,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
     store_->Get(ParentDir(in.from_path()),action->version(),&serialized_entry);
     MetadataEntry entry;
     entry.ParseFromString(serialized_entry);
-    LOG<<entry.dir_contents_size();
+    LOG(ERROR)<<entry.dir_contents_size();
 
 
 //  gaoxuan --这里是终止
