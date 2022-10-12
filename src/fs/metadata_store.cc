@@ -520,7 +520,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
             //get all children and push them into stack
 
             string metadata_entry;//gaoxuan --used to get metadata in the format of string
-            LOG(ERROR)<<MetadataStore::store_->Get(in.from_path(),10,&metadata_entry);//the 10 is version
+            LOG(ERROR)<<MetadataStore::store_->Get(in.from_path(),100,&metadata_entry);//the 10 is version
             
             if(!metadata_entry.empty())//this if/else is necessary,because if metadata_entry is null,ParseFromString will be error!
             {
