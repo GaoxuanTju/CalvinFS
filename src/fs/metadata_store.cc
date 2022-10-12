@@ -20,9 +20,7 @@
 #include "fs/metadata.pb.h"
 #include "machine/app/app.h"
 #include "proto/action.pb.h"
-#include <typeinfo> //gaoxuan --用于确定数据类型
-#include <stack> //gaoxuan --用于深搜时的栈
-#include <list> //gaoxuan --用于深搜时的列表
+#include <stack> //gaoxuan --the stack for DFS
 using std::map;
 using std::set;
 using std::string;
@@ -82,7 +80,7 @@ class ExecutionContext {
 
   bool GetEntry(const string& path, MetadataEntry* entry) {
     entry->Clear();
-    if (reads_.count(path) != 0) {//gaoxuan --这里判断了一下path是不是在这个键值对里出现过，存在就是1，不存在就是0
+    if (reads_.count(path) != 0) {
       entry->ParseFromString(reads_[path]);
       return true;
     }
@@ -257,7 +255,7 @@ class DistributedExecutionContext : public ExecutionContext {
 };
 
 ///////////////////////          MetadataStore          ///////////////////////
-//找父目录的方法是直接对这个文件路径使用rfind逆向搜索，确定最后一个/的位置，那么从位置0到最后一个之间的这个字符串就是它的父目录了，秒哇
+//use rfind to get the index of last '/',so the parentdir is for index 0 to index of last '/'
 string ParentDir(const string& path) {
   // Root dir is a special case.
   if (path.empty()) {
@@ -268,7 +266,7 @@ string ParentDir(const string& path) {
   CHECK_NE(path.size() - 1, offset);  // filename cannot be empty
   return string(path, 0, offset);
 }
-//获取文件名字也是同样的方法，不同点就在于这次是从最后一个/到最后的位置就是文件名字了
+//get the name of file, without the absolute path
 string FileName(const string& path) {
   // Root dir is a special case.
   if (path.empty()) {
@@ -456,50 +454,54 @@ bool MetadataStore::IsLocal(const string& path) {
 }
 
 
-/*gaoxuan --
+/*gaoxuan --step1 
+--the logic of Depth-first-search for adding read/write set for rename
 
     MetadataAction::RenameInput in;
     in.ParseFromString(action->input());
-    //姑且当作string来处理
-    stack<string> stack;//建立用于遍历的栈
-    stack.push(in.from_path());//把要更改的这个当作根放入栈里面
-    action->add_readset(ParentDir(in.from_path()));//先把原位置的那个父目录读写集加入
+
+    stack<string> stack;//the stack for tranverse the file tree
+    stack.push(in.from_path());//we want to tranverse all children of this path to add read/write set
+    action->add_readset(ParentDir(in.from_path()));
     action->add_writeset(ParentDir(in.from_path()));
     while (!stack.empty()) 
-    {//栈还不空的时候，对子目录进行处理
-
-            string top = stack.top();//获取顶部的文件路径
-            stack.pop();//出栈节点
-
-            //执行对这个目录的获取读写集的逻辑
+    {
+            string top = stack.top();//get the top
+            stack.pop();//pop the top 
             
             action->add_readset(top);
             action->add_writeset(top);
               
-            //下面将top目录的所有孩子都放在list中
-            list<string> children = top.getChildren();//要写一个获取所有孩子的逻辑
-            for (list<string>::iterator it = children.begin(); it != children.end(); ++it)
+            //get all children and push them into stack
+
+            string metadata_entry;//gaoxuan --used to get metadata in the format of string
+            MetadataStore::store_->Get(in.from_path(),10,&metadata_entry);//the 10 is version
+            MetadataEntry entry;
+            entry.ParseFromString(metadata_entry);//now all the children of from_path has been stored in entry
+            for(int i=0;i<entry.dir_contents_size();i++)//push all children path into stack 
             {
-                  stack.push(*it);
+                stack.push(entry.dir_contents(i));
             }
+
             
      }
-    //把目标位置的读写集获取
+    //the read/write set for to_path
     action->add_writeset(in.to_path());
     action->add_readset(ParentDir(in.to_path()));
     action->add_writeset(ParentDir(in.to_path()));
 
+step 2 
+  after adding read/write set, we need to create a new dir tree in new path
+  from top tp down
 
+step 3 
+  we have finished creating a new tree in to_path,then we should delete the dir tree in from_path 
+  from down to top
 
-2 ok上面的工作做完之后/做的同时，在新的位置先创建一个新的目录树。这个是不是可以在遍历的时候就直接干了呢？
-  就是说我从要修改的部分开始，遍历到一个目录，就获取读写集，同时将这个目录对应元数据拷贝到新位置的目录树下，这不就相当于逻辑上把文件挪到了新的位置上
-3 上面的工作完成之后，新的RENAME之后的结果我们已经获取到了。需要解决残留工作
-  也就是说把原来的元数据删除掉，这里应该从下往上删除，按道理来说应该是从最底层开始，一层一层的删除，这应该是使用广度优先遍历的逆遍历吧？
-OK 上面的就是我当前所需要做的工作啦！
 */
-//gaoxuan --这里是要修改的第一个地方，需要将要Rename的目录以及其所有子目录都获取读写集
 
-void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFile调用了一下
+
+void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is called by RameFile() for RenameExperiment
   action->clear_readset();
   action->clear_writeset();
 
@@ -530,11 +532,44 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
     action->add_readset(ParentDir(in.to_path()));
     action->add_writeset(ParentDir(in.to_path()));
 
-  } else if (type == MetadataAction::RENAME) {//gaoxuan --这里会被调用
-  //gaoxuan --先看懂下面这个是什么逻辑
+  } else if (type == MetadataAction::RENAME) {
+    //gaoxuan --this part is rewrited by gaoxuan
+    //add read/write set in the way of DFS
     MetadataAction::RenameInput in;
     in.ParseFromString(action->input());
+    stack<string> stack;//the stack is used for tranversing  the file tree
+    stack.push(in.from_path());//we want to tranverse all children of this path to add read/write set
+    action->add_readset(ParentDir(in.from_path()));
+    action->add_writeset(ParentDir(in.from_path()));
+    while (!stack.empty()) 
+    {
+            string top = stack.top();//get the top
+            stack.pop();//pop the top 
+            
+            action->add_readset(top);
+            action->add_writeset(top);
+              
+            //get all children and push them into stack
 
+            string metadata_entry;//gaoxuan --used to get metadata in the format of string
+            MetadataStore::store_->Get(in.from_path(),10,&metadata_entry);//the 10 is version
+            MetadataEntry entry;
+            entry.ParseFromString(metadata_entry);//now all the children of from_path has been stored in entry
+            for(int i=0;i<entry.dir_contents_size();i++)//push all children path into stack 
+            {
+                stack.push(entry.dir_contents(i));
+            }
+     }
+    //the read/write set for to_path
+    action->add_writeset(in.to_path());
+    action->add_readset(ParentDir(in.to_path()));
+    action->add_writeset(ParentDir(in.to_path()));
+
+  }
+  /*gaoxuan --this part is the original code
+  else if (type == MetadataAction::RENAME) {
+    MetadataAction::RenameInput in;
+    in.ParseFromString(action->input());
     action->add_readset(in.from_path());
     action->add_writeset(in.from_path());
     action->add_readset(ParentDir(in.from_path()));
@@ -542,140 +577,10 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
     action->add_writeset(in.to_path());
     action->add_readset(ParentDir(in.to_path()));
     action->add_writeset(ParentDir(in.to_path()));
-     //gaoxuan --测试一下能不能行
-    
-    /*
-   ①这种方法不行,entry.dir_contents_size()=0，怀疑是ExecutionContext只有Run才会产生
-   ExecutionContext *context = new DistributedExecutionContext(machine_, config_, store_, action);
-   MetadataEntry entry;
-   context->GetEntry(ParentDir(in.from_path()),&entry);//这样entry里面就是
-    LOG(ERROR)<<in.from_path()<<":";//下面输出的是in.from_path()的父目录的元数据
-    
-    LOG(ERROR)<<entry.dir_contents_size()<<";";
-    for(int i =0;i<entry.dir_contents_size();i++)
-    {
-      LOG(ERROR)<<entry.dir_contents(i);
-    }
-    */
-   
-    /* 
-    ②改变①中思路，直接用GetEntry里面的逻辑,还是entry.dir_contents_size()=0
-    map<string, string> reads_gaoxuan;
-  
-    MetadataEntry entry;
-    if (reads_gaoxuan.count(ParentDir(in.from_path())) != 0) {
-    entry.ParseFromString(reads_gaoxuan[ParentDir(in.from_path())]);//照常理来说，现在entry里面就是in.from_path的元数据了
-    }
-    //
-    LOG(ERROR)<<in.from_path()<<":";
-    LOG(ERROR)<<entry.dir_contents_size();
-    for(int i =0;i<entry.dir_contents_size();i++)
-    {
-      LOG(ERROR)<<entry.dir_contents(i);
-    }
-    */
-    /*
-    ③前面①②都不行，父目录的元数据项什么都不输出，我试试直接用map能拿到东西吗，还是不行
-    map<string, string> read_gaoxuan;
-    LOG(ERROR)<<in.from_path();
-    LOG(ERROR)<<read_gaoxuan[ParentDir(in.from_path())];
-    */
 
-   /*④前面三种都不行，看看第四种使用lookup的函数能不能行,这也不行，得到的就是空的
-      Action b;
-      b.set_action_type(MetadataAction::LOOKUP);
-      MetadataAction::LookupInput n;
-      n.set_path(ParentDir(in.from_path()));
-      n.SerializeToString(b.mutable_input());
-      GetRWSets(&b);
-      Run(&b);
-      MetadataAction::LookupOutput out;
-      out.ParseFromString(b.output());
-      LOG(ERROR)<<out.entry().dir_contents().empty();//这会输出1，也就是说确实是空的
-   */
-      
-  /*
-  //gaoxuan --⑤这个逻辑，在Rename_internal里面运行出来了，也能够获取到内容，但是在咱这里咋就不行
-  //我当下推测是，没到执行Run的话，没有ExecutionContext
-  
-       //Run里是这样创建context的
-        ExecutionContext* context;
-        if (machine_ == NULL) {
-          LOG(ERROR)<<"machine=null";
-          context = new ExecutionContext(store_, action);
-        } else {//执行的是这里，那证明确实能够创建这个context
-          LOG(ERROR)<<"machine!=null";
-          context =
-              new DistributedExecutionContext(machine_, config_, store_, action);
-        }
-        //Run里调用Rename_Internal,context作为参数传进去，然后在Rename_Internal里面执行下面确实能输出东西
-        MetadataEntry from_entry1;
-        context->GetEntry(ParentDir(in.from_path()), &from_entry1);
-        
-          LOG(ERROR)<<from_entry1.dir_contents_size();  //这里是0，所以问题出在哪了呢？context确实创建了，GetEntry也没问题，怎么换了个地方就不对劲了
-          for(int i=0;i<from_entry1.dir_contents_size();i++)
-          {
-            LOG(ERROR)<<"gaoxuan --"<<from_entry1.dir_contents(i);
-          }
-   */     
-        
-  
-
-/*//⑥现在再实试试新的法子，store_Get ,这个法子还是什么也没拿到，serialized_entry还是个空字符串   
-    
-    //store_->Put("", serialized_entry, 0);这是他加入进去的使用
-    //string serialized_entry;
-    //LOG(ERROR)<<store_->Get(ParentDir(in.from_path()),0,&serialized_entry);//输出0，证明函数false了
-    //MetadataEntry entry;
-    //entry.ParseFromString(serialized_entry);
-    //上面那两行会出现can't parse ,因为缺少type，因为压根还是个空字符串，什么都没拿到，为啥呀？？？？
-    //LOG(ERROR)<<serialized_entry<<";;;";
-    */
-
-
-
-  /* ⑦看看ExecutionContext里怎么获取全部键值对的，还是不行啊
-  //这里我倒是知道为啥不行了，因为action->readset_size()=0，这是啥玩意，难道是问题出在action上
-    map<string,string> reads_gaoxuan;
-    LOG(ERROR)<<action->readset_size();
-    for (int i = 0; i < action->readset_size(); i++) {
-      LOG(ERROR)<<store_->Get(action->readset(i),
-                        action->version(),
-                       &reads_gaoxuan[action->readset(i)]) ;//注意这里全是false
-        
-    }
-
-    //这一步应该是获取所有的键值对
-    LOG(ERROR)<<reads_gaoxuan.size();//这样还是0，代表在执行的时候没有放进这个键值对里面
- */   
-
-   // LOG(ERROR)<<action->readset(0)<<";"<<action->readset(1)<<";"<<action->readset(2);
-
-//  gaoxuan --这里是终止
-        
-//gaoxuan --something occurred to me    action这个是在哪里传过来的！，这里的action，你有没有想过单纯就只有一个in.from_path
-//所以你想去取出它父目录是不是不太现实呢，宝贝
-/*先看一下这里action传进来的是啥*/
-   
-   string meta;
-   MetadataStore::store_->Get(ParentDir(in.from_path()),10,&meta);
-   MetadataEntry entry;
-   entry.ParseFromString(meta);
-   for(int i=0;i<entry.dir_contents_size();i++)
-  {
-      LOG(ERROR)<<"gaoxuan --"<<entry.dir_contents(i);
   }
-
-   
-   
-
-      
-
-    //gaoxuan --这里是终止
-
-
-   
-  } else if (type == MetadataAction::LOOKUP) {
+  */ 
+   else if (type == MetadataAction::LOOKUP) {
     MetadataAction::LookupInput in;
     in.ParseFromString(action->input());
     action->add_readset(in.path());
@@ -710,8 +615,8 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
 }
 
 void MetadataStore::Run(Action* action) {
-  //gaoxuan --事实上这里又运行了一个函数
-  //LOG(ERROR) << "Run in metadata_store.cc--gaoxuan";//gaoxuan --这个地方会被schduler执行，在RenameExperiment()中Test progress开始之后
+  //gaoxuan --this part will be executed by scheduler after action has beed append to log
+  
   // Prepare by performing all reads.
   ExecutionContext* context;
   if (machine_ == NULL) {
@@ -752,11 +657,11 @@ void MetadataStore::Run(Action* action) {
     out.SerializeToString(action->mutable_output());
 
   } else if (type == MetadataAction::RENAME) {
-    //gaoxuan --肯定这里也执行了
+    
     MetadataAction::RenameInput in;
     MetadataAction::RenameOutput out;
     in.ParseFromString(action->input());
-    Rename_Internal(context, in, &out);//gaoxuan --调用了这个函数,再过去查一下
+    Rename_Internal(context, in, &out);
     out.SerializeToString(action->mutable_output());
 
   } else if (type == MetadataAction::LOOKUP) {
@@ -950,7 +855,7 @@ void MetadataStore::Copy_Internal(
 void MetadataStore::Rename_Internal(
     ExecutionContext* context,
     const MetadataAction::RenameInput& in,
-    MetadataAction::RenameOutput* out) {//gaoxuan --这个函数肯定也会被执行
+    MetadataAction::RenameOutput* out) {//gaoxuan --this function wiil be executed when running RenameExperiment
   // Currently only support Copy: (non-recursive: only succeeds for DATA files and EMPTY directory)
   MetadataEntry from_entry;
   if (!context->GetEntry(in.from_path(), &from_entry)) {
@@ -959,7 +864,7 @@ void MetadataStore::Rename_Internal(
     out->add_errors(MetadataAction::FileDoesNotExist);
     return;
   }
-  /*gaouan --在这一行，咱看看它的是啥,这里人家确实能够输出，也就是说GetEntry没什么问题
+  /*gaoxuan --this part is used for testing the correctness of GetEntry;it can really print the dir_contents of MetadataEntry
   MetadataEntry from_entry1;
   context->GetEntry(ParentDir(in.from_path()), &from_entry1);
     
@@ -967,7 +872,7 @@ void MetadataStore::Rename_Internal(
   {
     LOG(ERROR)<<"gaoxuan --"<<from_entry1.dir_contents(i);
   }
-  gaoxuan --这里是终止*/
+  gaoxuan --this is the end of notes*/
   string parent_from_path = ParentDir(in.from_path());
   MetadataEntry parent_from_entry;
   if (!context->GetEntry(parent_from_path, &parent_from_entry)) {
