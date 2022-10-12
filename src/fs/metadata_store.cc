@@ -475,13 +475,18 @@ bool MetadataStore::IsLocal(const string& path) {
             //get all children and push them into stack
 
             string metadata_entry;//gaoxuan --used to get metadata in the format of string
+            //gaoxuan --need to confirm whether the metadata_entry is null 
             MetadataStore::store_->Get(in.from_path(),10,&metadata_entry);//the 10 is version
-            MetadataEntry entry;
-            entry.ParseFromString(metadata_entry);//now all the children of from_path has been stored in entry
-            for(int i=0;i<entry.dir_contents_size();i++)//push all children path into stack 
+            if(!metadata_entry.empty())
             {
-                stack.push(entry.dir_contents(i));
+              MetadataEntry entry;
+              entry.ParseFromString(metadata_entry);//now all the children of from_path has been stored in entry
+              for(int i=0;i<entry.dir_contents_size();i++)//push all children path into stack 
+              {
+                  stack.push(entry.dir_contents(i));
+              }
             }
+            
 
             
      }
@@ -553,12 +558,16 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
 
             string metadata_entry;//gaoxuan --used to get metadata in the format of string
             MetadataStore::store_->Get(in.from_path(),10,&metadata_entry);//the 10 is version
-            MetadataEntry entry;
-            entry.ParseFromString(metadata_entry);//now all the children of from_path has been stored in entry
-            for(int i=0;i<entry.dir_contents_size();i++)//push all children path into stack 
+            if(!metadata_entry.empty())
             {
-                stack.push(entry.dir_contents(i));
+              MetadataEntry entry;
+              entry.ParseFromString(metadata_entry);//now all the children of from_path has been stored in entry
+              for(int i=0;i<entry.dir_contents_size();i++)//push all children path into stack 
+              {
+                  stack.push(entry.dir_contents(i));
+              }
             }
+            
      }
     //the read/write set for to_path
     action->add_writeset(in.to_path());
