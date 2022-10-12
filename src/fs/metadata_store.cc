@@ -537,7 +537,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
     //add read/write set in the way of DFS
     MetadataAction::RenameInput in;
     in.ParseFromString(action->input());
-    stack<string> stack;//the stack is used for tranversing  the file tree
+    std::stack<string> stack;//the stack is used for tranversing  the file tree
     stack.push(in.from_path());//we want to tranverse all children of this path to add read/write set
     action->add_readset(ParentDir(in.from_path()));
     action->add_writeset(ParentDir(in.from_path()));
