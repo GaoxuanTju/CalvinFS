@@ -553,7 +553,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
     MetadataEntry entry2;
     string str1,str2;
     LOG(ERROR)<<store_->Get("/a0/b980/c0",100,&str1);
-    LOG(ERROR)<<store_->Get("/a0/b111/c1",100,&str2);
+    //LOG(ERROR)<<store_->Get("/a0/b111/c1",100,&str2);
 
     //gaoxuan -test
 
