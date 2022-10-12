@@ -500,7 +500,8 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
     action->add_readset(ParentDir(in.to_path()));
     action->add_writeset(ParentDir(in.to_path()));
 
-  } else if (type == MetadataAction::RENAME) {
+  }
+  /* else if (type == MetadataAction::RENAME) {
     //gaoxuan --this part is rewrited by gaoxuan
     //add read/write set in the way of DFS
     MetadataAction::RenameInput in;
@@ -541,10 +542,21 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
     action->add_writeset(ParentDir(in.to_path()));
 
   }
-  /*gaoxuan --this part is the original code
+  */
+  /*gaoxuan --this part is the original code*/
   else if (type == MetadataAction::RENAME) {
     MetadataAction::RenameInput in;
     in.ParseFromString(action->input());
+
+    //gaoxuan --test
+    MetadataEntry entry1;
+    MetadataEntry entry2;
+    string str1,str2;
+    LOG(ERROR)<<store_->Get("/a0/b980/c0",100,str1);
+    LOG(ERROR)<<store_->Get("/a0/b111/c1",100,str2);
+
+    //gaoxuan -test
+
     action->add_readset(in.from_path());
     action->add_writeset(in.from_path());
     action->add_readset(ParentDir(in.from_path()));
@@ -554,7 +566,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
     action->add_writeset(ParentDir(in.to_path()));
 
   }
-  */ 
+   
    else if (type == MetadataAction::LOOKUP) {
     MetadataAction::LookupInput in;
     in.ParseFromString(action->input());
