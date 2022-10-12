@@ -658,7 +658,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --这个函数被RameFi
 /*先看一下这里action传进来的是啥*/
    
    string meta;
-   MetadataStore::store_->Get(ParentDir(in.from_path()),10,meta);
+   MetadataStore::store_->Get(ParentDir(in.from_path()),10,&meta);
    LOG(ERROR)<<meta;
    
    
