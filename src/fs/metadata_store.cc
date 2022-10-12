@@ -457,43 +457,6 @@ bool MetadataStore::IsLocal(const string& path) {
 /*gaoxuan --step1 
 --the logic of Depth-first-search for adding read/write set for rename
 
-    MetadataAction::RenameInput in;
-    in.ParseFromString(action->input());
-
-    stack<string> stack;//the stack for tranverse the file tree
-    stack.push(in.from_path());//we want to tranverse all children of this path to add read/write set
-    action->add_readset(ParentDir(in.from_path()));
-    action->add_writeset(ParentDir(in.from_path()));
-    while (!stack.empty()) 
-    {
-            string top = stack.top();//get the top
-            stack.pop();//pop the top 
-            
-            action->add_readset(top);
-            action->add_writeset(top);
-              
-            //get all children and push them into stack
-
-            string metadata_entry;//gaoxuan --used to get metadata in the format of string
-            //gaoxuan --need to confirm whether the metadata_entry is null 
-            MetadataStore::store_->Get(in.from_path(),10,&metadata_entry);//the 10 is version
-            if(!metadata_entry.empty())
-            {
-              MetadataEntry entry;
-              entry.ParseFromString(metadata_entry);//now all the children of from_path has been stored in entry
-              for(int i=0;i<entry.dir_contents_size();i++)//push all children path into stack 
-              {
-                  stack.push(entry.dir_contents(i));
-              }
-            }
-            
-
-            
-     }
-    //the read/write set for to_path
-    action->add_writeset(in.to_path());
-    action->add_readset(ParentDir(in.to_path()));
-    action->add_writeset(ParentDir(in.to_path()));
 
 step 2 
   after adding read/write set, we need to create a new dir tree in new path
@@ -557,8 +520,9 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
             //get all children and push them into stack
 
             string metadata_entry;//gaoxuan --used to get metadata in the format of string
-            MetadataStore::store_->Get(in.from_path(),10,&metadata_entry);//the 10 is version
-            if(!metadata_entry.empty())
+            LOG(ERROR)<<MetadataStore::store_->Get(in.from_path(),10,&metadata_entry);//the 10 is version
+            
+            if(!metadata_entry.empty())//this if/else is necessary,because if metadata_entry is null,ParseFromString will be error!
             {
               MetadataEntry entry;
               entry.ParseFromString(metadata_entry);//now all the children of from_path has been stored in entry
@@ -566,6 +530,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
               {
                   stack.push(entry.dir_contents(i));
               }
+              LOG(ERROR)<<"is it executed?";
             }
             
      }
