@@ -584,6 +584,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
         it->Next();
       }
 
+
       LOG(ERROR)<<key<<";"<<metadata_entry;
     //------------------------------------------------------------------------------
     //gaoxuan --test
