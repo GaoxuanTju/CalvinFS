@@ -245,9 +245,9 @@ bool VersionedKVStore::Get(
       } else {
         *value = it->Value();
         delete it;
-        if(*value.empty())//gaoxuan --check it will be empty
+        if(value->empty())//gaoxuan --check it will be empty
         {
-          LOG(ERROR)<<"can it be empty?"
+          LOG(ERROR)<<"can it be empty?";
         }
         
         return true;
