@@ -560,9 +560,30 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
     action->add_writeset(in.from_path());
     //gaoxuan --test
     string metadata_entry;
-    LOG(ERROR)<<in.from_path()<<";"<<MetadataStore::store_->Get(in.from_path(),10000,&metadata_entry)<<";"<<metadata_entry.empty();
-    //LOG(ERROR)<<in.from_path()<<";"<<MetadataStore::store_->Get(ParentDir(in.from_path()),10,&metadata_entry)<<";"<<metadata_entry.empty();
     
+    //LOG(ERROR)<<in.from_path()<<";"<<MetadataStore::store_->Get(in.from_path(),10000,&metadata_entry)<<";"<<metadata_entry.empty();
+    //LOG(ERROR)<<in.from_path()<<";"<<MetadataStore::store_->Get(ParentDir(in.from_path()),10,&metadata_entry)<<";"<<metadata_entry.empty();
+    //------------------------------------------------------------------------------
+          // Find and lock the map that 'key' lives in.
+      string key = in.from_path();
+      int m = FNVHash(key) % kStoreCount;
+
+      // Seek to first possible record with key 'key'.
+      KVStore::Iterator* it = records_[m]->GetIterator();
+      it->Seek(key);
+      // Advance to first key for same object whose encoded version < 'version'.
+      while (true) {
+        // Check if the current key exists and starts with target prefix.
+        if (!it->Valid() || !Slice(it->Key()).starts_with(key) ||
+            it->Key()[key.size()] != '\0') {
+          delete it;
+        }  
+        metadata_entry = it->Value();
+        delete it;
+        // Move to the next record.
+        it->Next();
+      }
+    //------------------------------------------------------------------------------
     //gaoxuan --test
     action->add_readset(ParentDir(in.from_path()));
     action->add_writeset(ParentDir(in.from_path()));
