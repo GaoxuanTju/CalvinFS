@@ -583,6 +583,8 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
         // Move to the next record.
         it->Next();
       }
+
+      LOG(ERROR)<<key<<";"<<metadata_entry;
     //------------------------------------------------------------------------------
     //gaoxuan --test
     action->add_readset(ParentDir(in.from_path()));
