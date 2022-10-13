@@ -232,6 +232,7 @@ bool VersionedKVStore::Get(
     if (!it->Valid() || !Slice(it->Key()).starts_with(key) ||
         it->Key()[key.size()] != '\0') {
       delete it;
+      LOG(ERROR)<<"gaoxuan --false 1";//gaoxuan --check where is false
       return false;
     }
 
@@ -239,10 +240,16 @@ bool VersionedKVStore::Get(
     if (ParseVersion(it->Key(), flags) < version) {
       if (*flags & kDeletedFlag) {
         delete it;
+        LOG(ERROR)<<"gaoxuan --false 2";//gaoxuan --check where is false
         return false;
       } else {
         *value = it->Value();
         delete it;
+        if(*value.empty())//gaoxuan --check it will be empty
+        {
+          LOG(ERROR)<<"can it be empty?"
+        }
+        
         return true;
       }
     }
