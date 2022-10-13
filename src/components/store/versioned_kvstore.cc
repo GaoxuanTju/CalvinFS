@@ -244,7 +244,7 @@ bool VersionedKVStore::Get(
       } else {
         *value = it->Value();
         delete it;
-        LOG(ERROR)<<*value;//gaoxuan --check can it be null
+        //LOG(ERROR)<<*value;//gaoxuan --check can it be null
         
         return true;
       }
