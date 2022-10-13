@@ -685,7 +685,7 @@ void LatencyExperimentAppend() {
 
     double start = GetTime();
 
-    for (int j = 0; j < 5; j++) {//gaoxuan --改成了5次便于观察，原本是250次
+    for (int j = 0; j < 2; j++) {//gaoxuan --改成了2次便于观察，原本是250次
       int a1 = rand() % 1000;
       int a2 = rand() % 1000;
       while (a2 == a1) {
