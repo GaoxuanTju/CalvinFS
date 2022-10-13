@@ -526,7 +526,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
             {
               MetadataEntry entry;
               entry.ParseFromString(metadata_entry);//now all the children of from_path has been stored in entry
-              LOG(ERROR)<<entry.type();
+              LOG(ERROR)<<(entry.type()==DATA);
               for(int i=0;i<entry.dir_contents_size();i++)//push all children path into stack 
               {
                   stack.push(entry.dir_contents(i));
