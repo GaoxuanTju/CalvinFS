@@ -566,10 +566,10 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
     //------------------------------------------------------------------------------
           // Find and lock the map that 'key' lives in.
       string key = in.from_path();
-      int m = FNVHash(key) % store_->kStoreCount;
+      int m = FNVHash(key) % store_->get_kStoreCount();
 
       // Seek to first possible record with key 'key'.
-      KVStore::Iterator* it = store_->records_[m]->GetIterator();
+      KVStore::Iterator* it = store_->get_records()[m]->GetIterator();
       it->Seek(key);
       // Advance to first key for same object whose encoded version < 'version'.
       while (true) {

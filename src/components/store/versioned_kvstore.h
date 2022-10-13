@@ -52,7 +52,14 @@ class VersionedKVStore : public Store {
 
 
   virtual bool IsLocal(const string& path);
-
+  static const int get_kStoreCount()
+  {
+    return kStoreCount;
+  }
+  KVStore** get_records()
+  {
+    return records_;
+  }
  protected:
   friend class HybridVersionedKVStore;
   VersionedKVStore();
