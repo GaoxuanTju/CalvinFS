@@ -526,12 +526,19 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
             {
               MetadataEntry entry;
               entry.ParseFromString(metadata_entry);//now all the children of from_path has been stored in entry
-              LOG(ERROR)<<string(entry.type());
-              for(int i=0;i<entry.dir_contents_size();i++)//push all children path into stack 
+              //gaoxuan --if type==DIR,maybe it has children dir/file;but if type==DATA,this entry is certainly a file,it doesn't have a child
+              if(entry.type()==DIR)
               {
-                  stack.push(entry.dir_contents(i));
+                  for(int i=0;i<entry.dir_contents_size();i++)//push all children path into stack 
+                  {
+                      stack.push(entry.dir_contents(i));
+                  }
               }
-              LOG(ERROR)<<"is it executed?";
+              else
+              {
+                LOG(ERROR)<<"It is a file";
+              }
+              
             }
             
      }
