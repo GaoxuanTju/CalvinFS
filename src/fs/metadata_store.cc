@@ -562,10 +562,10 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
     string metadata_entry1,metadata_entry2;
     string test;
     //check if the from_path can be gotten successfully
-    //LOG(ERROR)<<in.from_path()<<";"<<MetadataStore::store_->Get(in.from_path(),10000,&metadata_entry1)<<";"<<metadata_entry1.empty()<<":"<<metadata_entry1;
+    LOG(ERROR)<<in.from_path()<<";"<<MetadataStore::store_->Get(in.from_path(),10000,&metadata_entry1)<<";"<<metadata_entry1.empty()<<":"<<metadata_entry1;
     //check if from_path's father can be gotten successfully
     LOG(ERROR)<<ParentDir(in.from_path())<<";"<<MetadataStore::store_->Get(ParentDir(in.from_path()),10000,&metadata_entry2)<<";"<<metadata_entry2;
-    //LOG(ERROR)<<"gaoxuan --/a0/b980/c0"<<";"<<MetadataStore::store_->Get("/a0/b980/c0",10000,&test)<<";"<<test;
+    LOG(ERROR)<<"gaoxuan --/a0/b980/c0"<<";"<<MetadataStore::store_->Get("/a0/b980/c0",10000,&test)<<";"<<test;
     //gaoxuan --test
     action->add_readset(ParentDir(in.from_path()));
     action->add_writeset(ParentDir(in.from_path()));

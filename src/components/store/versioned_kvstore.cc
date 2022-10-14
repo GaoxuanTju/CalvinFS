@@ -239,14 +239,14 @@ bool VersionedKVStore::Get(
 
 
     //gaoxuan --check which part is false
-
+    //gaoxuan --only use this condition which will not result in false to check if we can get right result
     if (!it->Valid() ) {//gaoxuan --this part nerver happens
       delete it;
       LOG(ERROR)<<"gaoxuan --false valid";
       return false;
     }
 
-    if ( !Slice(it->Key()).starts_with(key) ) {//gaoxuan --when key is the path of file,this happens
+    /*if ( !Slice(it->Key()).starts_with(key) ) {//gaoxuan --when key is the path of file,this happens
       delete it;
       LOG(ERROR)<<"gaoxuan --false prefix";
       return false;
@@ -256,7 +256,7 @@ bool VersionedKVStore::Get(
       delete it;
       LOG(ERROR)<<"gaoxuan --false KeySize";
       return false;
-    }
+    }*/
 
 
 
