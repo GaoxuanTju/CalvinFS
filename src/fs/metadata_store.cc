@@ -580,7 +580,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
 
     // Run if local.
     if (IsLocal(in.from_path())) {//gaoxuan --本地的话直接用Get取出
-    string meta;
+    string metadata_entry1;
     LOG(ERROR)<<in.from_path()<<";"<<MetadataStore::store_->Get(in.from_path(),10000,&metadata_entry1)<<";"<<metadata_entry1.empty()<<":"<<metadata_entry1;
 
     // If not local, get result from the right machine (within this replica).
@@ -589,12 +589,12 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
       header->set_from(machine_->machine_id());
       header->set_to(mds_machine);
       header->set_type(Header::RPC);
-      header->set_app(name());
+      header->set_app(APP::name());//gaoxuan --这里怎么拿到APP的name呢？
       header->set_rpc("LOOKUP");
       header->add_misc_string(path.data(), path.size());
       MessageBuffer* m = NULL;
       header->set_data_ptr(reinterpret_cast<uint64>(&m));
-      machine()->SendMessage(header, new MessageBuffer());
+      machine_->SendMessage(header, new MessageBuffer());
       while (m == NULL) {
         usleep(10);
         Noop<MessageBuffer*>(m);
