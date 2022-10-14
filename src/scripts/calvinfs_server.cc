@@ -60,7 +60,7 @@ int main(int argc, char** argv) {
   ClusterConfig cc;
   cc.FromFile(FLAGS_config);
 
-  int replicas = (cc.size() >= 3) ? 3 : 1;
+  int replicas = (cc.size() >= 3) ? 3 : 1;//gaoxuan --we can change the amount of replica,we don't want to have a replica
   int partitions = cc.size() / replicas;
 
   LOG(ERROR) << "Starting CalvinFS node " << FLAGS_machine_id

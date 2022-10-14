@@ -917,12 +917,11 @@ void LatencyExperimentAppend() {
   }
 
   void BackgroundRenameFile (const Slice& from_path, const Slice& to_path) {
-    //LOG(ERROR)<< "Execution step 4: in Calvinfs_client_app.h's BackgroundRenameFile()";//gaoxuan -- 
-    //gaoxuan --首先这个Header类是什么不知道，所以下面的注释都是揣测；参数中的两个路径是什么呢？大概是原来的文件名和重命名之后的文件名？
+    
     Header* header = new Header();
     header->set_from(machine()->machine_id());
     header->set_to(machine()->machine_id());
-    header->set_type(Header::RPC);//gaoxuan --这个RPC应该就是远程过程调用吧，应该调用的就是calvin_client_app.cc中的RenameFile()函数
+    header->set_type(Header::RPC);
     header->set_app(name());
     header->set_rpc("RENAME_FILE");//gaoxuan --应该是在这里调用了RenameFile
     header->add_misc_string(from_path.data(), from_path.size());

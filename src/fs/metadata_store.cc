@@ -558,7 +558,12 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
     in.ParseFromString(action->input());
     action->add_readset(in.from_path());
     action->add_writeset(in.from_path());
-    //gaoxuan --test
+    action->add_readset(ParentDir(in.from_path()));
+    action->add_writeset(ParentDir(in.from_path()));
+    action->add_writeset(in.to_path());
+    action->add_readset(ParentDir(in.to_path()));
+    action->add_writeset(ParentDir(in.to_path()));
+    /*//gaoxuan --test
     string metadata_entry1,metadata_entry2;
     string test;
     //check if the from_path can be gotten successfully
@@ -566,12 +571,44 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
     //check if from_path's father can be gotten successfully
     LOG(ERROR)<<ParentDir(in.from_path())<<";"<<MetadataStore::store_->Get(ParentDir(in.from_path()),10000,&metadata_entry2)<<";"<<metadata_entry2;
     LOG(ERROR)<<"gaoxuan --/a0/b980/c0"<<";"<<MetadataStore::store_->Get("/a0/b980/c0",10000,&test)<<";"<<test;
+    //gaoxuan --test*/
+
+    const Slice path = in.from_path();
+    // Find out what machine to run this on.
+    uint64 mds_machine =
+        config_->LookupMetadataShard(config_->HashFileName(path), config_->LookupReplica(machine_->machine_id()));
+
+    // Run if local.
+    if (IsLocal(in.from_path())) {//gaoxuan --本地的话直接用Get取出
+    string meta;
+    LOG(ERROR)<<in.from_path()<<";"<<MetadataStore::store_->Get(in.from_path(),10000,&metadata_entry1)<<";"<<metadata_entry1.empty()<<":"<<metadata_entry1;
+
+    // If not local, get result from the right machine (within this replica).
+    } else {
+      Header* header = new Header();
+      header->set_from(machine_->machine_id());
+      header->set_to(mds_machine);
+      header->set_type(Header::RPC);
+      header->set_app(name());
+      header->set_rpc("LOOKUP");
+      header->add_misc_string(path.data(), path.size());
+      MessageBuffer* m = NULL;
+      header->set_data_ptr(reinterpret_cast<uint64>(&m));
+      machine()->SendMessage(header, new MessageBuffer());
+      while (m == NULL) {
+        usleep(10);
+        Noop<MessageBuffer*>(m);
+      }
+    }
+
+
+
     //gaoxuan --test
-    action->add_readset(ParentDir(in.from_path()));
-    action->add_writeset(ParentDir(in.from_path()));
-    action->add_writeset(in.to_path());
-    action->add_readset(ParentDir(in.to_path()));
-    action->add_writeset(ParentDir(in.to_path()));
+
+
+
+
+    
 
   }
   
