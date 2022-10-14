@@ -601,7 +601,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
         Noop<MessageBuffer*>(m);
       }
 
-      LOG(ERROR)<<"messageBuffer is"<<m->GetPart();
+      LOG(ERROR)<<"messageBuffer is"<<*m;
     }
 
 
