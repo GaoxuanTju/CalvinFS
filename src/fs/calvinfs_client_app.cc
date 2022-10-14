@@ -246,15 +246,14 @@ MessageBuffer* CalvinFSClientApp::RenameFile(const Slice& from_path, const Slice
   in.set_from_path(from_path.data(), from_path.size());
   in.set_to_path(to_path.data(), to_path.size());
   in.SerializeToString(a->mutable_input());
-
-  //gaoxuan --现在困境就局限在下面这两个调用了，上面应该是没有操作，下面是等待操作完成，所以操作只能是在下面这两个调用中完成
-  metadata_->GetRWSets(a);//gaoxuan --调用了这个函数，在metadata_store.cc，作用是获取要操作的元数据目录的读写集来加锁！
-  log_->Append(a);//gaoxuan --把要进行的目录重命名行为加入元日志里面等待调度器调度执行
+  metadata_->setAPPname(name());//gaoxuan --这一行是我加的，用于在metadata_store.cc里面获得app name
+  
+  metadata_->GetRWSets(a);
+  log_->Append(a);
   //gaoxuan --这里把Rename操作确定后加入元数据日志，等待scheduler进行调度！结果就是执行metadata_store.cc中的Run函数，Run函数再去调用这个文件里面的Rename_Internal()
   //gaoxuan --Rename_Internal()才是Rename的真正逻辑所在
   MessageBuffer* m = NULL;
-  while (!channel->Pop(&m)) {//gaoxuan --这里就说的是等待操作完成被返回，操作在哪执行了？？？？
-    //gaoxuan --这个地方的逻辑应该是action的这个通路里面没有数据了，代表action完成了呗，所以操作还是在上面完成的
+  while (!channel->Pop(&m)) {
     // Wait for action to complete and be sent back.
     usleep(100);
   }

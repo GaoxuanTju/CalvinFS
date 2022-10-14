@@ -32,6 +32,17 @@ class MetadataStore : public Store {
   void Init();
   void InitSmall();
 
+  //gaoxuan --我在这里添加一个函数，用于从calvinfs_client_app.h那里获取app的name
+  string getAPPname()
+  {
+    return APP_name;
+  }
+  void setAPPname(string name)
+  {
+    APP_name = name;
+  }
+  string APP_name;
+  //gaoxuan --在这之前是我加的
  private:
   void CreateFile_Internal(
       ExecutionContext* context,
