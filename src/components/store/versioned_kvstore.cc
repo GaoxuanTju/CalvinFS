@@ -240,21 +240,21 @@ bool VersionedKVStore::Get(
 
     //gaoxuan --check which part is false
 
-    if (!it->Valid() ) {
+    if (!it->Valid() ) {//gaoxuan --this part nerver happens
       delete it;
-      LOG(ERROR)<<"gaoxuan --false valid";//gaoxuan --all false is from here
+      LOG(ERROR)<<"gaoxuan --false valid";
       return false;
     }
 
-    if ( !Slice(it->Key()).starts_with(key) ) {
+    if ( !Slice(it->Key()).starts_with(key) ) {//gaoxuan --when key is the path of file,this happens
       delete it;
-      LOG(ERROR)<<"gaoxuan --false prefix";//gaoxuan --all false is from here
+      LOG(ERROR)<<"gaoxuan --false prefix";
       return false;
     }
 
-    if (it->Key()[key.size()] != '\0') {
+    if (it->Key()[key.size()] != '\0') {//gaoxuan --when key is the path of dir,this happens
       delete it;
-      LOG(ERROR)<<"gaoxuan --false KeySize";//gaoxuan --all false is from here
+      LOG(ERROR)<<"gaoxuan --false KeySize";
       return false;
     }
 
