@@ -573,7 +573,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
     LOG(ERROR)<<"gaoxuan --/a0/b980/c0"<<";"<<MetadataStore::store_->Get("/a0/b980/c0",10000,&test)<<";"<<test;
     //gaoxuan --test*/
 
-    const Slice path = in.from_path();
+    const Slice path = Slice(in.from_path());
     // Find out what machine to run this on.
     uint64 mds_machine =
         config_->LookupMetadataShard(config_->HashFileName(path), config_->LookupReplica(machine_->machine_id()));
@@ -581,7 +581,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
     // Run if local.
     if (IsLocal(in.from_path())) {//gaoxuan --本地的话直接用Get取出
       string metadata_entry1;
-      LOG(ERROR)<<in.from_path()<<";"<<store_->Get(path,10,&metadata_entry1)<<";"<<metadata_entry1.size()<<":"<<metadata_entry1;
+      LOG(ERROR)<<path<<";"<<store_->Get(path,10,&metadata_entry1)<<";"<<metadata_entry1.size()<<":"<<metadata_entry1;
 
     // If not local, get result from the right machine (within this replica).
     }else {//事实上我使用这个RPC，还是会去调用Get，结果还是错误了
@@ -600,6 +600,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
         usleep(10);
         Noop<MessageBuffer*>(m);
       }
+
     }
 
 
