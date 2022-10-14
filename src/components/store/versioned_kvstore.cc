@@ -229,17 +229,17 @@ bool VersionedKVStore::Get(
   // Advance to first key for same object whose encoded version < 'version'.
   while (true) {
     // Check if the current key exists and starts with target prefix.
-    /*original code
+    /*original code*/
     if (!it->Valid() || !Slice(it->Key()).starts_with(key) ||
         it->Key()[key.size()] != '\0') {
       delete it;
-      LOG(ERROR)<<"gaoxuan --false 1";//gaoxuan --all false is from here
+      LOG(ERROR)<<key<<";gaoxuan --false 1";//gaoxuan --all false is from here
       return false;
-    }*/
+    }
 
 
     /*//gaoxuan --check which part is false
-    //gaoxuan --only use this condition which will not result in false to check */
+    //gaoxuan --only use this condition which will not result in false to check 
     if (!it->Valid() ) {//gaoxuan --this part nerver happens
       delete it;
       LOG(ERROR)<<"gaoxuan --false valid";
@@ -257,7 +257,7 @@ bool VersionedKVStore::Get(
       LOG(ERROR)<<"gaoxuan --false KeySize";
       return false;
     }
-
+*/
 
 
     //gaoxuan --check which part is false
