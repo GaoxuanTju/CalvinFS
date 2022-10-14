@@ -580,11 +580,11 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
 
     // Run if local.
     if (IsLocal(in.from_path())) {//gaoxuan --本地的话直接用Get取出
-    string metadata_entry1;
-    LOG(ERROR)<<in.from_path()<<";"<<store_->Get(in.from_path(),10000,&metadata_entry1)<<";"<<metadata_entry1.empty()<<":"<<metadata_entry1;
+      string metadata_entry1;
+      LOG(ERROR)<<in.from_path()<<";"<<store_->Get(in.from_path(),10,&metadata_entry1)<<";"<<metadata_entry1.size()<<":"<<metadata_entry1;
 
     // If not local, get result from the right machine (within this replica).
-    } else {
+    }else {
       Header* header = new Header();
       header->set_from(machine_->machine_id());
       header->set_to(mds_machine);
