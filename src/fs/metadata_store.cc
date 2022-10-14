@@ -585,6 +585,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
 
     // If not local, get result from the right machine (within this replica).
     }else {
+      LOG(ERROR)<<"rpc --"<<in.from_path();
       Header* header = new Header();
       header->set_from(machine_->machine_id());
       header->set_to(mds_machine);
