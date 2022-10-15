@@ -247,7 +247,7 @@ MessageBuffer* CalvinFSClientApp::RenameFile(const Slice& from_path, const Slice
   in.set_to_path(to_path.data(), to_path.size());
   in.SerializeToString(a->mutable_input());
   metadata_->setAPPname(name());//gaoxuan --这一行是我加的，用于在metadata_store.cc里面获得app name
-  LOG(ERROR)<<"app name is "name();//gaoxuan --看一下name
+  LOG(ERROR)<<"app name is "<<name();//gaoxuan --看一下name
   metadata_->GetRWSets(a);
   log_->Append(a);
   //gaoxuan --这里把Rename操作确定后加入元数据日志，等待scheduler进行调度！结果就是执行metadata_store.cc中的Run函数，Run函数再去调用这个文件里面的Rename_Internal()
