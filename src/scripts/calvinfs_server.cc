@@ -23,6 +23,8 @@
 #include "fs/metadata.pb.h"
 #include "scripts/script_utils.h"
 
+//gaoxuan --这个DEFINE_bool之类的是gflags这个外部库提供的功能，就是能够从命令行接受一些参数
+//接受一部分启动时传来的参数bin/scripts/cluster --command="start" --experiment=4  --clients=100 --max_active=1000 --max_running=100 --local_percentage=100
 DEFINE_bool(calvin_version, false, "Print Calvin version information");
 DEFINE_string(binary, "calvinfs_server", "Calvin binary executable program");
 DEFINE_string(config, "calvin.conf", "conf file of Calvin cluster");
@@ -36,9 +38,8 @@ DEFINE_int32(max_running, 100, "max running actions for locking scheduler");
 int main(int argc, char** argv) {
   google::ParseCommandLineFlags(&argc, &argv, true);
   google::InitGoogleLogging(argv[0]);
-  LOG(ERROR) << "Execution step1 in calvinfs_server.cc's main()";//gaoxuan --
   // Print Calvin version
-  if (FLAGS_calvin_version) {
+  if (FLAGS_calvin_version) {//gaoxuan --这个没被执行
     // Check whether Calvin have been running
     if (is_process_exist((char *)FLAGS_binary.c_str()) == true) {
       return -2;
@@ -48,7 +49,7 @@ int main(int argc, char** argv) {
       return 0;
     }
   }
- 
+ //gaoxuan --怎么直接输出了，没看到怎么指定machine id的呀，下面才是创建机器，有点奇怪
   LOG(ERROR) << "Preparing to start CalvinFS node "
              << FLAGS_machine_id << "...";
 
@@ -60,8 +61,8 @@ int main(int argc, char** argv) {
   ClusterConfig cc;
   cc.FromFile(FLAGS_config);
 
-  int replicas = (cc.size() >= 3) ? 3 : 1;//gaoxuan --we can change the amount of replica,we don't want to have a replica
-  int partitions = cc.size() / replicas;
+  int replicas = (cc.size() >= 3) ? 3 : 1;//gaoxuan --在这指定副本数量，这里只有两台机器，所以副本数是1
+  int partitions = cc.size() / replicas;//gaoxuan --这个划分也就是划分几份的意思吧，这里就是2/1=2
 
   LOG(ERROR) << "Starting CalvinFS node " << FLAGS_machine_id
              << " (partition " << (FLAGS_machine_id % partitions)
@@ -69,7 +70,7 @@ int main(int argc, char** argv) {
              << ", replica " << (FLAGS_machine_id / partitions)
              << "/" << replicas << ")";
 
-  Machine m(FLAGS_machine_id, cc);
+  Machine m(FLAGS_machine_id, cc);//gaoxuan --对呀，这里才是创建，怎么FLAGS_machine_id那台机器启动他咋就知道呢
   Spin(1);
 
   string fsconfig;
@@ -78,7 +79,7 @@ int main(int argc, char** argv) {
   Spin(1);
 
   // Start paxos app (maybe).
-  if (FLAGS_machine_id % partitions == 0) {
+  if (FLAGS_machine_id % partitions == 0) {//gaoxuan --这个地方是两台机器第一处不同，paxos Metalog只会在偶数号机器上创建
     StartAppProto sap;
     for (int i = 0; i < replicas; i++) {
       sap.add_participants(i * partitions);
@@ -96,7 +97,10 @@ int main(int argc, char** argv) {
   m.GlobalBarrier();
   Spin(1);
 
+  //gaoxuan --这里元数据存储app在哪，创建怎么创建的，他这里app名字就是metadata，我前面写的传进来的app的name就是client，所以只可能是这两种app？
   // Start metadata store app.
+  //gaoxuan --这里是add_app,也就是说App这个东西是手动创建的
+  //gaoxuan --reinterpret_cast <new_type> (expression)是将expression转换成new_type类型的东西
   m.AddApp("MetadataStoreApp", "metadata");
   reinterpret_cast<MetadataStore*>(
       reinterpret_cast<StoreApp*>(m.GetApp("metadata"))->store())
