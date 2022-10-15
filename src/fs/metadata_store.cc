@@ -578,10 +578,10 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
     LOG(ERROR)<<"gaoxuan --/a0/b980/c0"<<";"<<MetadataStore::store_->Get("/a0/b980/c0",10000,&test)<<";"<<test;
     //gaoxuan --test*/
 
-    const Slice path = Slice(in.from_path());
+
     // Find out what machine to run this on.
     uint64 mds_machine =
-        config_->LookupMetadataShard(config_->HashFileName(path), config_->LookupReplica(machine_->machine_id()));
+        config_->LookupMetadataShard(config_->HashFileName(in.from_path()), config_->LookupReplica(machine_->machine_id()));
 
     // Run if local.
     if (IsLocal(in.from_path())) {//gaoxuan --本地的话直接用Get取出
@@ -603,7 +603,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
       header->set_type(Header::RPC);
       header->set_app(getAPPname());//gaoxuan --这一行一定要想办法获得App；我去传一个过来
       header->set_rpc("LOOKUP");
-      header->add_misc_string(path.data(), path.size());
+      header->add_misc_string(in.from_path(), in.from_path().size());
       MessageBuffer* m = NULL;
       header->set_data_ptr(reinterpret_cast<uint64>(&m));
       machine_->SendMessage(header, new MessageBuffer());
