@@ -599,8 +599,8 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
     MetadataAction::LookupInput in;
     in.set_path(path.data(), path.size());
     in.SerializeToString(a.mutable_input());
-    metadata_->GetRWSets(&a);
-    metadata_->Run(&a);
+    GetRWSets(&a);
+    Run(&a);
     MessageBuffer* m =  new MessageBuffer(a);
 
     // If not local, get result from the right machine (within this replica).
