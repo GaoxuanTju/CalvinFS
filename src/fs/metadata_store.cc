@@ -579,8 +579,8 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
     LOG(ERROR)<<"gaoxuan --/a0/b980/c0"<<";"<<MetadataStore::store_->Get("/a0/b980/c0",10000,&test)<<";"<<test;
 */
     //gaoxuan --test
-/*
-    const Slice path = Slice(in.from_path());
+
+    const Slice path = Slice(ParentDir(in.from_path()));
     // Find out what machine to run this on.
     uint64 mds_machine =
         config_->LookupMetadataShard(config_->HashFileName(path), config_->LookupReplica(machine_->machine_id()));
@@ -596,7 +596,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
     //a.set_version(scheduler_->SafeVersion());
     a.set_action_type(MetadataAction::LOOKUP);
     MetadataAction::LookupInput n;
-    n.set_path(in.from_path());
+    n.set_path(ParentDir(in.from_path()));
     n.SerializeToString(a.mutable_input());
     GetRWSets(&a);
     Run(&a);
@@ -607,7 +607,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
 
     // If not local, get result from the right machine (within this replica).
     }else {//事实上我使用这个RPC，还是会去调用Get，结果还是错误了;肯定是你的RPC没用对，可是要怎么用才对啊啊啊啊啊啊啊啊
-      LOG(ERROR)<<"rpc --"<<in.from_path();
+      LOG(ERROR)<<"rpc --"<<ParentDir(in.from_path());
       Header* header = new Header();
       header->set_from(machine_->machine_id());
       header->set_to(mds_machine);
@@ -626,7 +626,6 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
       
     }
 
-*/
 
     //gaoxuan --test
 
@@ -923,10 +922,6 @@ void MetadataStore::Rename_Internal(
   }
   /*gaoxuan --this part is used for testing the correctness of GetEntry;it can really print the dir_contents of MetadataEntry*/
   
-  
-  LOG(ERROR)<<"gaoxuan --GetEntry了吗"<<(from_entry.type()==DATA);
-
-
   //gaoxuan --this is the end of notes
 
 
