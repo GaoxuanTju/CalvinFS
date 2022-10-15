@@ -594,14 +594,19 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
         LOG(ERROR)<<entry.dir_contents(i);
       }*/
 
+    // Lookup MetadataEntry.
     Action a;
+    //a.set_version(scheduler_->SafeVersion());
     a.set_action_type(MetadataAction::LOOKUP);
     MetadataAction::LookupInput in;
-    in.set_path(path.data(), path.size());
+    in.set_path(path);
     in.SerializeToString(a.mutable_input());
-    GetRWSets(&a);
-    Run(&a);
-    MessageBuffer* m =  new MessageBuffer(a);
+    metadata_->GetRWSets(&a);
+    metadata_->Run(&a);
+    MetadataAction::LookupOutput out;
+    out.ParseFromString(a.output());
+    MetadataEntry entry = out.entry();
+    LOG(ERROR)<<"entry size="<<entry.dir_contents_size();
 
     // If not local, get result from the right machine (within this replica).
     }else {//事实上我使用这个RPC，还是会去调用Get，结果还是错误了;肯定是你的RPC没用对，可是要怎么用才对啊啊啊啊啊啊啊啊
