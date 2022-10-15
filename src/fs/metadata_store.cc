@@ -584,7 +584,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
         config_->LookupMetadataShard(config_->HashFileName(path), config_->LookupReplica(machine_->machine_id()));
 
     // Run if local.
-    if (IsLocal(in.from_path())) {//gaoxuan --本地的话直接用Get取出
+    if (mds_machine == machine_->machine_id()) {//gaoxuan --本地的话直接用Get取出
      /* string metadata_entry1;
       LOG(ERROR)<<in.from_path()<<";"<<store_->Get(in.from_path(),10,&metadata_entry1)<<";"<<metadata_entry1.size()<<":"<<metadata_entry1;
       MetadataEntry entry;
