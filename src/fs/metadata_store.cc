@@ -287,12 +287,13 @@ MetadataStore::~MetadataStore() {
 }
 
 void MetadataStore::SetMachine(Machine* m) {
+  //gaoxuan --在main函数里面执行了这个函数，看一下干什么用的
   machine_ = m;
   config_ = new CalvinFSConfigMap(machine_);
 
   // Initialize by inserting an entry for the root directory "/" (actual
   // representation is "" since trailing slashes are always removed).
-  if (IsLocal("")) {
+  if (IsLocal("")) {//gaoxuan --这里是在本地创建了一个根目录，根目录下没有任何元数据项
     MetadataEntry entry;
     entry.mutable_permissions();
     entry.set_type(DIR);
@@ -598,7 +599,10 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
       header->set_from(machine_->machine_id());
       header->set_to(mds_machine);
       header->set_type(Header::RPC);
-      header->set_app("metadata");//gaoxuan --刚刚看到metadata这个app，试一下管用不,原来是getAppname（），拿到的都是client
+      header->set_app("client");//gaoxuan --刚刚看到metadata这个app，试一下管用不,原来是getAppname（），拿到的都是client
+      //gaoxuan --我将这个name改成了metadata，会出现新的错误，unkonwn RPC type,也就是可能这个APP的handle没有这个操作，所以我们去看一下它的handle是啥
+
+
       header->set_rpc("LOOKUP");
       header->add_misc_string(path.data(), path.size());
       MessageBuffer* m = NULL;

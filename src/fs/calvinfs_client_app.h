@@ -78,6 +78,7 @@ class CalvinFSClientApp : public App {
         break;
 
       case 4:
+        LOG(ERROR)<<"gaoxuan --executing start calcinfs_client app.h";
         RenameExperiment();
         break;
 

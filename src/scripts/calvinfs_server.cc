@@ -102,10 +102,11 @@ int main(int argc, char** argv) {
   //gaoxuan --这里是add_app,也就是说App这个东西是手动创建的
   //gaoxuan --reinterpret_cast <new_type> (expression)是将expression转换成new_type类型的东西
   m.AddApp("MetadataStoreApp", "metadata");
+  //所以说这一步是创建一个MetadataStore,利用里面的SetMachine函数设置一下machine
   reinterpret_cast<MetadataStore*>(
       reinterpret_cast<StoreApp*>(m.GetApp("metadata"))->store())
-          ->SetMachine(&m);
-  LOG(ERROR) << "[" << FLAGS_machine_id << "] created MetadataStore";
+          ->SetMachine(&m);//gaoxuan --这里回答了泽伟师兄的一个问题，在哪创建了根目录
+  LOG(ERROR) << "[" << FLAGS_machine_id << "] created MetadataStore";//gaoxuan --所以这个MetadataStore还是一个机器只有一个，而不是我们想的，一个client app有一个
   m.GlobalBarrier();
   Spin(1);
 
@@ -148,13 +149,14 @@ int main(int argc, char** argv) {
   Spin(1);
 
   // Start client app.
+  //gaoxuan --client app是在这里创建的，main函数里面创建了client app
   m.AddApp("CalvinFSClientApp", "client");
-
+  //在这里面也是只有一个Client_app,多个client通过这个APP来发送请求
   LOG(ERROR) << "[" << FLAGS_machine_id << "] created CalvinFSClientApp";
   reinterpret_cast<CalvinFSClientApp*>(m.GetApp("client"))
       ->set_start_time(FLAGS_time);
   reinterpret_cast<CalvinFSClientApp*>(m.GetApp("client"))
-      ->set_experiment(FLAGS_experiment, FLAGS_clients); //gaoxuan --应该是在这个地方转到调用RenameFileExperiment()的
+      ->set_experiment(FLAGS_experiment, FLAGS_clients); //gaoxuan --在这个地方，设置了clientapp的内容，那么怎么转去执行的呢？？？转到调用RenameFileExperiment()的
 
   while (!m.Stopped()) {
     usleep(10000);
