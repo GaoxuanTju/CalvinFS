@@ -921,14 +921,10 @@ void MetadataStore::Rename_Internal(
     out->add_errors(MetadataAction::FileDoesNotExist);
     return;
   }
-  /*gaoxuan --this part is used for testing the correctness of GetEntry;it can really print the dir_contents of MetadataEntry
-  */
+  /*gaoxuan --this part is used for testing the correctness of GetEntry;it can really print the dir_contents of MetadataEntry*/
   
-    
-  for(int i=0;i<from_entry.dir_contents_size();i++)
-  {
-    LOG(ERROR)<<"gaoxuan --"<<from_entry.dir_contents(i);
-  }
+  
+  LOG(ERROR)<<"gaoxuan --GetEntry了吗"<<(from_entry.type()==DATA);
 
 
   //gaoxuan --this is the end of notes
