@@ -41,7 +41,7 @@ class ExecutionContext {
   ExecutionContext(VersionedKVStore* store, Action* action)
       : store_(store), version_(action->version()), aborted_(false) {
     for (int i = 0; i < action->readset_size(); i++) {
-      if (!store_->Get(action->readset(i),
+      if (!store_->Get(action->readset(i),//gaoxuan --有没有可能，输出的错误信息是在这里呢
                        version_,
                        &reads_[action->readset(i)])) {
         reads_.erase(action->readset(i));
@@ -552,10 +552,11 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
 
   }*/
   
-  /*gaoxuan --this part is the original code*/ 
+  
   else if (type == MetadataAction::RENAME) {
     MetadataAction::RenameInput in;
     in.ParseFromString(action->input());
+    /*gaoxuan --this part is the original code；我把这个地方全注释掉，避免来自ExecutionContext里面Get的影响
     action->add_readset(in.from_path());
     action->add_writeset(in.from_path());
     action->add_readset(ParentDir(in.from_path()));
@@ -563,6 +564,10 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
     action->add_writeset(in.to_path());
     action->add_readset(ParentDir(in.to_path()));
     action->add_writeset(ParentDir(in.to_path()));
+*/ 
+
+
+
     /*//gaoxuan --test
     string metadata_entry1,metadata_entry2;
     string test;
@@ -601,7 +606,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
         Noop<MessageBuffer*>(m);
       }
 
-      LOG(ERROR)<<"messageBuffer is"<<*m;
+      
     }
 
 
