@@ -593,7 +593,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
 
     // If not local, get result from the right machine (within this replica).
     }else {//事实上我使用这个RPC，还是会去调用Get，结果还是错误了;肯定是你的RPC没用对，可是要怎么用才对啊啊啊啊啊啊啊啊
-      LOG(ERROR)<<"rpc --"<<ParentDir(in.from_path());
+      LOG(ERROR)<<"rpc --"<<path.data();
       Header* header = new Header();
       header->set_from(machine_->machine_id());
       header->set_to(mds_machine);
@@ -602,7 +602,8 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
       header->set_rpc("LOOKUP");
       header->add_misc_string(path.data(), path.size());
       MessageBuffer* m = NULL;
-      header->set_data_ptr(reinterpret_cast<uint64>(&m));
+      header->set_data_ptr(reinter
+      pret_cast<uint64>(&m));
       machine_->SendMessage(header, new MessageBuffer());
       while (m == NULL) {
         usleep(10);
