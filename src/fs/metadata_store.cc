@@ -556,7 +556,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
   else if (type == MetadataAction::RENAME) {
     MetadataAction::RenameInput in;
     in.ParseFromString(action->input());
-    /*gaoxuan --this part is the original code；我把这个地方全注释掉，避免来自ExecutionContext里面Get的影响
+    /*gaoxuan --this part is the original code；*/ 
     action->add_readset(in.from_path());
     action->add_writeset(in.from_path());
     action->add_readset(ParentDir(in.from_path()));
@@ -564,7 +564,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
     action->add_writeset(in.to_path());
     action->add_readset(ParentDir(in.to_path()));
     action->add_writeset(ParentDir(in.to_path()));
-*/ 
+
 
 
 
