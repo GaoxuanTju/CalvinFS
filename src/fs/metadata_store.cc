@@ -578,21 +578,30 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
     LOG(ERROR)<<"gaoxuan --/a0/b980/c0"<<";"<<MetadataStore::store_->Get("/a0/b980/c0",10000,&test)<<";"<<test;
     //gaoxuan --test*/
 
-
+    const Slice path = Slice(in.from_path());
     // Find out what machine to run this on.
     uint64 mds_machine =
-        config_->LookupMetadataShard(config_->HashFileName(in.from_path()), config_->LookupReplica(machine_->machine_id()));
+        config_->LookupMetadataShard(config_->HashFileName(path), config_->LookupReplica(machine_->machine_id()));
 
     // Run if local.
     if (IsLocal(in.from_path())) {//gaoxuan --本地的话直接用Get取出
-      string metadata_entry1;
+     /* string metadata_entry1;
       LOG(ERROR)<<in.from_path()<<";"<<store_->Get(in.from_path(),10,&metadata_entry1)<<";"<<metadata_entry1.size()<<":"<<metadata_entry1;
       MetadataEntry entry;
       entry.ParseFromString(metadata_entry1);
       for(int i=0;i<entry.dir_contents_size();i++)
       {
         LOG(ERROR)<<entry.dir_contents(i);
-      }
+      }*/
+
+    Action a;
+    a.set_action_type(MetadataAction::LOOKUP);
+    MetadataAction::LookupInput in;
+    in.set_path(path.data(), path.size());
+    in.SerializeToString(a.mutable_input());
+    metadata_->GetRWSets(&a);
+    metadata_->Run(&a);
+    MessageBuffer* m =  new MessageBuffer(a);
 
     // If not local, get result from the right machine (within this replica).
     }else {//事实上我使用这个RPC，还是会去调用Get，结果还是错误了;肯定是你的RPC没用对，可是要怎么用才对啊啊啊啊啊啊啊啊
@@ -603,7 +612,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
       header->set_type(Header::RPC);
       header->set_app(getAPPname());//gaoxuan --这一行一定要想办法获得App；我去传一个过来
       header->set_rpc("LOOKUP");
-      header->add_misc_string(in.from_path(), in.from_path().size());
+      header->add_misc_string(path.data(), path.size());
       MessageBuffer* m = NULL;
       header->set_data_ptr(reinterpret_cast<uint64>(&m));
       machine_->SendMessage(header, new MessageBuffer());
