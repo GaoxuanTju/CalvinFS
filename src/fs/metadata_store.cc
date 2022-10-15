@@ -568,7 +568,8 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
 
 
     
-    /*//gaoxuan --test
+    //gaoxuan --test
+/*
     string metadata_entry1,metadata_entry2;
     string test;
     //check if the from_path can be gotten successfully
@@ -576,8 +577,9 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
     //check if from_path's father can be gotten successfully
     LOG(ERROR)<<ParentDir(in.from_path())<<";"<<MetadataStore::store_->Get(ParentDir(in.from_path()),10000,&metadata_entry2)<<";"<<metadata_entry2;
     LOG(ERROR)<<"gaoxuan --/a0/b980/c0"<<";"<<MetadataStore::store_->Get("/a0/b980/c0",10000,&test)<<";"<<test;
+*/
     //gaoxuan --test
-
+/*
     const Slice path = Slice(in.from_path());
     // Find out what machine to run this on.
     uint64 mds_machine =
@@ -585,17 +587,12 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
 
     // Run if local.
     if (mds_machine == machine_->machine_id()) {//gaoxuan --本地的话直接用Get取出
-     /* string metadata_entry1;
-      LOG(ERROR)<<in.from_path()<<";"<<store_->Get(in.from_path(),10,&metadata_entry1)<<";"<<metadata_entry1.size()<<":"<<metadata_entry1;
-      MetadataEntry entry;
-      entry.ParseFromString(metadata_entry1);
-      for(int i=0;i<entry.dir_contents_size();i++)
-      {
-        LOG(ERROR)<<entry.dir_contents(i);
-      }*/
+     // string metadata_entry1;
+     // LOG(ERROR)<<in.from_path()<<";"<<store_->Get(in.from_path(),10,&metadata_entry1)<<";"<<metadata_entry1.size()<<":"<<metadata_entry1;
+      
 
     // Lookup MetadataEntry.
-    /*Action a;
+    Action a;
     //a.set_version(scheduler_->SafeVersion());
     a.set_action_type(MetadataAction::LOOKUP);
     MetadataAction::LookupInput n;
@@ -629,9 +626,9 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
       
     }
 
+*/
 
-
-    //gaoxuan --test*/
+    //gaoxuan --test
 
 
 
