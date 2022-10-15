@@ -601,8 +601,8 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
     MetadataAction::LookupInput in;
     in.set_path(path);
     in.SerializeToString(a.mutable_input());
-    metadata_->GetRWSets(&a);
-    metadata_->Run(&a);
+    GetRWSets(&a);
+    Run(&a);
     MetadataAction::LookupOutput out;
     out.ParseFromString(a.output());
     MetadataEntry entry = out.entry();
