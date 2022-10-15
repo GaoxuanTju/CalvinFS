@@ -256,7 +256,7 @@ void Machine::AddAppInternal(const StartAppProto& sap) {
 void Machine::StartAppInternal(const StartAppProto& sap) {
   // Run App Start() method (may not terminate).
   //gaoxuan --感觉这里可能是让实验跑起来的地方
-  LOG(ERROR)<<"shi zhe li diao yong de Start() ma?"
+  LOG(ERROR)<<"shi zhe li diao yong de Start() ma?";
   //gaoxuan
   apps_[sap.app_name()]->Start();
 }
