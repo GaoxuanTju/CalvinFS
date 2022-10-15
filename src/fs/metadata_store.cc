@@ -588,7 +588,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
       string metadata_entry1;
       LOG(ERROR)<<in.from_path()<<";"<<store_->Get(in.from_path(),10,&metadata_entry1)<<";"<<metadata_entry1.size()<<":"<<metadata_entry1;
       MetadataEntry entry;
-      enrty.ParseFromString(metadata_entry1);
+      entry.ParseFromString(metadata_entry1);
       for(int i=0;i<entry.dir_contents_size();i++)
       {
         LOG(ERROR)<<entry.dir_contents(i);
