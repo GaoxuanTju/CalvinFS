@@ -599,7 +599,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
     //a.set_version(scheduler_->SafeVersion());
     a.set_action_type(MetadataAction::LOOKUP);
     MetadataAction::LookupInput in;
-    in.set_path(path);
+    in.set_path(in.from_path());
     in.SerializeToString(a.mutable_input());
     GetRWSets(&a);
     Run(&a);
