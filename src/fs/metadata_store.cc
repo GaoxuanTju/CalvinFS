@@ -587,23 +587,9 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
 
     // Run if local.
     if (mds_machine == machine_->machine_id()) {//gaoxuan --本地的话直接用Get取出
-     // string metadata_entry1;
-     // LOG(ERROR)<<in.from_path()<<";"<<store_->Get(in.from_path(),10,&metadata_entry1)<<";"<<metadata_entry1.size()<<":"<<metadata_entry1;
+      string metadata_entry1;
+      LOG(ERROR)<<ParentDir(in.from_path())<<";"<<store_->Get(ParentDir(in.from_path()),10,&metadata_entry1)<<";"<<metadata_entry1.size()<<":"<<metadata_entry1;
       
-
-    // Lookup MetadataEntry.
-    Action a;
-    //a.set_version(scheduler_->SafeVersion());
-    a.set_action_type(MetadataAction::LOOKUP);
-    MetadataAction::LookupInput n;
-    n.set_path(ParentDir(in.from_path()));
-    n.SerializeToString(a.mutable_input());
-    GetRWSets(&a);
-    Run(&a);
-    MetadataAction::LookupOutput out;
-    out.ParseFromString(a.output());
-    MetadataEntry entry = out.entry();
-    LOG(ERROR)<<"entry size="<<entry.dir_contents_size();
 
     // If not local, get result from the right machine (within this replica).
     }else {//事实上我使用这个RPC，还是会去调用Get，结果还是错误了;肯定是你的RPC没用对，可是要怎么用才对啊啊啊啊啊啊啊啊
