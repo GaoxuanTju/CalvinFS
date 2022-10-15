@@ -587,6 +587,12 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
     if (IsLocal(in.from_path())) {//gaoxuan --本地的话直接用Get取出
       string metadata_entry1;
       LOG(ERROR)<<in.from_path()<<";"<<store_->Get(in.from_path(),10,&metadata_entry1)<<";"<<metadata_entry1.size()<<":"<<metadata_entry1;
+      MetadataEntry entry;
+      enrty.ParseFromString(metadata_entry1);
+      for(int i=0;i<entry.dir_contents_size();i++)
+      {
+        LOG(ERROR)<<entry.dir_contents(i);
+      }
 
     // If not local, get result from the right machine (within this replica).
     }else {//事实上我使用这个RPC，还是会去调用Get，结果还是错误了;肯定是你的RPC没用对，可是要怎么用才对啊啊啊啊啊啊啊啊
