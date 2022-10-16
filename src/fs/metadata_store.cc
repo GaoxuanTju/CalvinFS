@@ -582,10 +582,10 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
       header->set_from(machine_->machine_id());
       header->set_to(mds_machine);
       header->set_type(Header::RPC);
-      header->set_app(getAPPname());//刚刚是client，看看会不会有区别
+      header->set_app(getAPPname());
       header->set_rpc("LOOKUP");
       LOG(ERROR)<<"chuan jin qu de lu jing shi "<<Slice(ParentDir(in.from_path()));
-      header->add_misc_string(Slice(ParentDir(in.from_path())), Slice(ParentDir(in.from_path())).size());//在这也会出错误，path.data怎么就变成了那个呢
+      header->add_misc_string(ParentDir(in.from_path()), ParentDir(in.from_path()).size());
 
       //LOG(ERROR)<<"chuan jin qu de lu jing shi "<<header->misc_string(0);//加这一行的目的主要是看一下为啥机器1会Get的key会变成LOOKUP，确是在这里就变成了LOOKUP
       MessageBuffer* m = NULL;
