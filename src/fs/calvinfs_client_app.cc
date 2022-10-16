@@ -18,6 +18,8 @@ MessageBuffer* CalvinFSClientApp::GetMetadataEntry(const Slice& path) {
   if (mds_machine == machine()->machine_id()) {
     Action a;
     //a.set_version(scheduler_->SafeVersion());
+
+    LOG(ERROR)<<"li lun shang RPC shi zhe li hui zhi xing!"<<path.data()<<"  size is "<<path.size();
     a.set_action_type(MetadataAction::LOOKUP);
     MetadataAction::LookupInput in;
     in.set_path(path.data(), path.size());

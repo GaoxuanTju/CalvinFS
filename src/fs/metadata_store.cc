@@ -583,9 +583,9 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
       header->set_to(mds_machine);
       header->set_type(Header::RPC);
       header->set_app(getAPPname());
-      header->set_rpc("LOOKUP");
-      header->add_misc_string(ParentDir(in.from_path()));
-      LOG(ERROR)<<"Local machine is "<<machine_->machine_id()<<"; Remote machine is "<<mds_machine;
+      header->set_rpc("LOOKUP");//难不成这里出问题了？？我直接去LOOKUP的逻辑里执行一下子
+      header->add_misc_string(ParentDir(in.from_path()));//这一行也没问题
+      LOG(ERROR)<<"Local machine is "<<machine_->machine_id()<<"; Remote machine is "<<mds_machine;//这一行是正常的
       LOG(ERROR)<<"chuan jin qu de lu jing shi "<<header->misc_string(0);//加这一行的目的主要是看一下为啥机器1会Get的key会变成LOOKUP，确是在这里就变成了LOOKUP
       MessageBuffer* m = NULL;
       header->set_data_ptr(reinterpret_cast<uint64>(&m));
@@ -612,6 +612,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
   }
    else if (type == MetadataAction::LOOKUP) {
     MetadataAction::LookupInput in;
+    LOG(ERROR)<<"Remote machine is looking up metadata";//gaoxuan --
     in.ParseFromString(action->input());
     action->add_readset(in.path());
 
@@ -651,7 +652,7 @@ void MetadataStore::Run(Action* action) {
   ExecutionContext* context;
   if (machine_ == NULL) {
     context = new ExecutionContext(store_, action);
-  } else {
+  } else {//gaoxuan --就是在这里创建context的时候会调用Get，应该就是这里会报错
     context =
         new DistributedExecutionContext(machine_, config_, store_, action);
   }
@@ -697,6 +698,7 @@ void MetadataStore::Run(Action* action) {
   } else if (type == MetadataAction::LOOKUP) {
     MetadataAction::LookupInput in;
     MetadataAction::LookupOutput out;
+    LOG(ERROR)<<"Run li mian de LOOKUP ye zhixingle";
     in.ParseFromString(action->input());
     Lookup_Internal(context, in, &out);
     out.SerializeToString(action->mutable_output());
@@ -958,11 +960,12 @@ void MetadataStore::Rename_Internal(
 void MetadataStore::Lookup_Internal(
     ExecutionContext* context,
     const MetadataAction::LookupInput& in,
-    MetadataAction::LookupOutput* out) {
+    MetadataAction::LookupOutput* out) {//gaoxaun --这里不用看了，因为上面创建context的时候Get没取出来，所以这里一定会false
   // Look up existing entry.
   MetadataEntry entry;
   if (!context->GetEntry(in.path(), &entry)) {
     // File doesn't exist!
+    LOG(ERROR)<<"bu chu yi wai zhe li ken ding shi wen jian bu cun zai";
     out->set_success(false);
     out->add_errors(MetadataAction::FileDoesNotExist);
     return;
