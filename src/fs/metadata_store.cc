@@ -566,35 +566,18 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
     action->add_readset(ParentDir(in.to_path()));
     action->add_writeset(ParentDir(in.to_path()));
 
-
-
-    
-    //gaoxuan --test
-/*
-    string metadata_entry1,metadata_entry2;
-    string test;
-    //check if the from_path can be gotten successfully
-    LOG(ERROR)<<in.from_path()<<";"<<MetadataStore::store_->Get(in.from_path(),10000,&metadata_entry1)<<";"<<metadata_entry1.empty()<<":"<<metadata_entry1;
-    //check if from_path's father can be gotten successfully
-    LOG(ERROR)<<ParentDir(in.from_path())<<";"<<MetadataStore::store_->Get(ParentDir(in.from_path()),10000,&metadata_entry2)<<";"<<metadata_entry2;
-    LOG(ERROR)<<"gaoxuan --/a0/b980/c0"<<";"<<MetadataStore::store_->Get("/a0/b980/c0",10000,&test)<<";"<<test;
-*/
-    //gaoxuan --test
-
+//gaoxuan --test
     const Slice path = Slice(ParentDir(in.from_path()));
     // Find out what machine to run this on.
-    uint64 mds_machine =
-        config_->LookupMetadataShard(config_->HashFileName(path), config_->LookupReplica(machine_->machine_id()));
+    uint64 mds_machine =config_->LookupMetadataShard(config_->HashFileName(path), config_->LookupReplica(machine_->machine_id()));
 
     // Run if local.
     if (mds_machine == machine_->machine_id()) {//gaoxuan --本地的话直接用Get取出
       string metadata_entry1;
       LOG(ERROR)<<ParentDir(in.from_path())<<";"<<store_->Get(ParentDir(in.from_path()),10,&metadata_entry1)<<";"<<metadata_entry1.size()<<":"<<metadata_entry1;
-      
-
     // If not local, get result from the right machine (within this replica).
     }else {//事实上我使用这个RPC，还是会去调用Get，结果还是错误了;肯定是你的RPC没用对，可是要怎么用才对啊啊啊啊啊啊啊啊
-      LOG(ERROR)<<"rpc --"<<path.data();
+     /*LOG(ERROR)<<"rpc --"<<path.data();
       Header* header = new Header();
       header->set_from(machine_->machine_id());
       header->set_to(mds_machine);
@@ -612,7 +595,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
         usleep(10);
         Noop<MessageBuffer*>(m);
       }
-
+*/ 
       
     }
 

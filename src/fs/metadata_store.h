@@ -43,6 +43,13 @@ class MetadataStore : public Store {
   }
   string APP_name;
   //gaoxuan --在这之前是我加的
+
+  //gaoxuan --我添加的
+  VersionedKVStore* getStore_()
+  {
+    return store_;
+  } 
+  //gaoxuan
  private:
   void CreateFile_Internal(
       ExecutionContext* context,
