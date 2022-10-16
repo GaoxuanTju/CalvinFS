@@ -585,7 +585,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
       header->set_app(getAPPname());
       header->set_rpc("LOOKUP");
       header->add_misc_string(ParentDir(in.from_path()));
-
+      LOG(ERROR)<<"Local machine is "<<machine_->machine_id()<<"; Remote machine is "<<mds_machine;
       LOG(ERROR)<<"chuan jin qu de lu jing shi "<<header->misc_string(0);//加这一行的目的主要是看一下为啥机器1会Get的key会变成LOOKUP，确是在这里就变成了LOOKUP
       MessageBuffer* m = NULL;
       header->set_data_ptr(reinterpret_cast<uint64>(&m));
