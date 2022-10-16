@@ -657,7 +657,8 @@ void MetadataStore::Run(Action* action) {
         new DistributedExecutionContext(machine_, config_, store_, action);
   }
 
-  if (!context->IsWriter()) {
+  if (!context->IsWriter()) {//肯定是这里就return 了，所以下面LOOKUP internal不会执行
+  LOG(ERROR)<<"zheli ke neng jiu zu duan le RUN";
     delete context;
     return;
   }
