@@ -579,7 +579,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
     }else {//事实上我使用这个RPC，还是会去调用Get，结果还是错误了;肯定是你的RPC没用对，可是要怎么用才对啊啊啊啊啊啊啊啊
      
       Header* header = new Header();
-      header->set_from(machine()->machine_id());
+      header->set_from(machine_->machine_id());
       header->set_to(mds_machine);
       header->set_type(Header::RPC);
       header->set_app("client");
@@ -592,6 +592,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
         usleep(10);
         Noop<MessageBuffer*>(m);
       }
+    }
       //return m;//gaoxuan --现在m里面就是想要获取的message了，但是其实使用这种调用的话，还是会出现错误的，在Get的时候
   
     /*
@@ -606,13 +607,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
 
     //gaoxuan --test
 
-
-
-
-    
-
   }
-  
    else if (type == MetadataAction::LOOKUP) {
     MetadataAction::LookupInput in;
     in.ParseFromString(action->input());
