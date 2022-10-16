@@ -572,32 +572,36 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
     uint64 mds_machine =config_->LookupMetadataShard(config_->HashFileName(path), config_->LookupReplica(machine_->machine_id()));
 
     // Run if local.
-    if (mds_machine == machine_->machine_id()) {//gaoxuan --本地的话直接用Get取出
+    if (mds_machine == machine_->machine_id()) {//gaoxuan --本地的话直接用Get取出,当前来看是能够取出来的
       string metadata_entry1;
       LOG(ERROR)<<ParentDir(in.from_path())<<";"<<store_->Get(ParentDir(in.from_path()),10,&metadata_entry1)<<";"<<metadata_entry1.size()<<":"<<metadata_entry1;
     // If not local, get result from the right machine (within this replica).
     }else {//事实上我使用这个RPC，还是会去调用Get，结果还是错误了;肯定是你的RPC没用对，可是要怎么用才对啊啊啊啊啊啊啊啊
-     /*LOG(ERROR)<<"rpc --"<<path.data();
+     
       Header* header = new Header();
-      header->set_from(machine_->machine_id());
+      header->set_from(machine()->machine_id());
       header->set_to(mds_machine);
       header->set_type(Header::RPC);
-      header->set_app("client");//gaoxuan --刚刚看到metadata这个app，试一下管用不,原来是getAppname（），拿到的都是client
-      //gaoxuan --我将这个name改成了metadata，会出现新的错误，unkonwn RPC type,也就是可能这个APP的handle没有这个操作，所以我们去看一下它的handle是啥
-
-
+      header->set_app("client");
       header->set_rpc("LOOKUP");
       header->add_misc_string(path.data(), path.size());
       MessageBuffer* m = NULL;
       header->set_data_ptr(reinterpret_cast<uint64>(&m));
-      machine_->SendMessage(header, new MessageBuffer());
+      machine()->SendMessage(header, new MessageBuffer());
       while (m == NULL) {
         usleep(10);
         Noop<MessageBuffer*>(m);
       }
-*/ 
+      //return m;//gaoxuan --现在m里面就是想要获取的message了，但是其实使用这种调用的话，还是会出现错误的，在Get的时候
+  
+    /*
+    //gaoxuan --这个好像实现不了，你怎么能从一个机器上拿到另一个机器呢，只能是用一下传过来的信息
+    //所以只能是RPC
+    MetadataStore* newmetadata_ =
+        reinterpret_cast<MetadataStore*>(
+           reinterpret_cast<StoreApp*>(machine()->GetApp("metadata"))->store());
       
-    }
+    }*/
 
 
     //gaoxuan --test
