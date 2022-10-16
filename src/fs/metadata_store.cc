@@ -308,14 +308,14 @@ int RandomSize() {
 }
 
 void MetadataStore::Init() {
-  LOG(ERROR)<< "Execution step2 ：in metadata_store.cc's Init";//gaoxuan --
+  
   int asize = machine_->config().size();
   int bsize = 1000;
   int csize = 500;
   
   double start = GetTime();
 
-  // Update root dir.
+  // Update root dir.之前在创建MetadataStoreApp时，调用了setMachine函数创建了根目录，所以在这里是更新根目录元数据项的内容
   if (IsLocal("")) {
     MetadataEntry entry;
     entry.mutable_permissions();

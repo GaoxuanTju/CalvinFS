@@ -28,8 +28,10 @@ class CalvinFSClientApp : public App {
     while (going_.load()) {}
   }
 
-  virtual void Start() {
+  virtual void Start() {//gaoxuan --这里会执行具体实验流程
+  
     action_count_ = 0;
+    //Random_data是一个字符串类型的，应该就是随便产生一些字符串，放进文件吧
     for (int i = 0; i < 20000000; i++) {
       random_data_.push_back(rand() % 256);
     }
@@ -55,12 +57,12 @@ class CalvinFSClientApp : public App {
     metadata_ =
         reinterpret_cast<MetadataStore*>(
            reinterpret_cast<StoreApp*>(machine()->GetApp("metadata"))->store());
-
+//gaoxuan --注意，metadata_就是最初创建的那个MetadataStoreApp,他的名字是metadata
     Spin(1);
 
-    capacity_ = kMaxCapacity;
+    capacity_ = kMaxCapacity;//gaoxuan --这里指的就是这个App能够最大容纳的client数量
 
-    switch(experiment) {
+    switch(experiment) {//gaoxuan --这里正式开始运行实验
       case 0:
         FillExperiment();
         break;
@@ -77,7 +79,7 @@ class CalvinFSClientApp : public App {
         CopyExperiment();
         break;
 
-      case 4:
+      case 4://gaoxuan --当然是这里被执行，进入RenameExperiment的逻辑
         LOG(ERROR)<<"gaoxuan --executing start calcinfs_client app.h";
         RenameExperiment();
         break;
@@ -676,9 +678,10 @@ void LatencyExperimentAppend() {
   }
 
   void RenameExperiment() {
-    
-    LOG(ERROR)<<"Execution step3:incalvinfs_client_app.h's RenameExperiment()";//gaoxuan --
+    //gaoxuan --执行到这里
+  
     Spin(1);
+    //gaoxuan --因为在这个里面获取到了metadataStoreAPP，所以也要在这里面进行初始化，所以调用Init函数
     metadata_->Init();//gaoxuan --这里转去执行metadat_store.cc中的Init()函数去了，对元数据存储进行一个初始化
     Spin(1);
     machine()->GlobalBarrier();
