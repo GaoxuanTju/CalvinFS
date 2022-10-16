@@ -587,7 +587,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
       header->add_misc_string(path.data(), path.size());
       MessageBuffer* m = NULL;
       header->set_data_ptr(reinterpret_cast<uint64>(&m));
-      machine()->SendMessage(header, new MessageBuffer());
+      machine_->SendMessage(header, new MessageBuffer());
       while (m == NULL) {
         usleep(10);
         Noop<MessageBuffer*>(m);
