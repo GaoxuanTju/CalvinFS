@@ -585,6 +585,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
       header->set_app(getAPPname());//刚刚是client，看看会不会有区别
       header->set_rpc("LOOKUP");
       header->add_misc_string(path.data(), path.size());
+      LOG(ERROR)<<"chuan jin qu de lu jing shi "<<header->misc_string(0);
       MessageBuffer* m = NULL;
       header->set_data_ptr(reinterpret_cast<uint64>(&m));
       machine_->SendMessage(header, new MessageBuffer());
