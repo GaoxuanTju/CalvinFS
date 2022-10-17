@@ -612,6 +612,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
   }
    else if (type == MetadataAction::LOOKUP) {
     MetadataAction::LookupInput in;
+    //gaoxuan --这里就是问题所在了。你传进来的路径到这里就变成空的了，下面创建context怎么可能成功呢！！！马上了，快去查一下怎么传进来的
     LOG(ERROR)<<"Remote machine is looking up metadata "<<machine_->machine_id()<<"  "<<in.path().size();//gaoxuan --在这里看看是那台机器取什么路径
     in.ParseFromString(action->input());
     action->add_readset(in.path());
