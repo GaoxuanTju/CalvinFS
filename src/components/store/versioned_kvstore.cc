@@ -224,7 +224,13 @@ bool VersionedKVStore::Get(
 
   // Seek to first possible record with key 'key'.
   KVStore::Iterator* it = records_[m]->GetIterator();
-  it->Seek(key);//有没可能是这里不对，这个的意思是，获得第一个大于等于key的，这里不对
+  it->Seek(key);//gaoxuan --这里是为了获得第一个大于等于key的key
+
+  
+  //下面的目的：先看看是不是key不对；第二就是看看根据key取出来的key对不对
+  LOG(ERROR)<<"key input is: "<<key<<"; seek key is"<<it->Key();
+  //gaoxuan --上面的要删掉
+
 
   // Advance to first key for same object whose encoded version < 'version'.
   while (true) {
