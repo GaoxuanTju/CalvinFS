@@ -249,11 +249,11 @@ bool VersionedKVStore::Get(
       {
         LOG(ERROR)<<"not error in size"; 
       }
-      const char *k = key.c_str();
+      /*const char *k = key.c_str();
       if(memcmp(Slice(it->Key()).data(), k, strlen(k)) == 0)
       {
         LOG(ERROR)<<"not error in cmp";
-      }
+      }*/
       LOG(ERROR)<<key<<";gaoxuan --false 2";//gaoxuan --all false is from here
       return false;
     }
