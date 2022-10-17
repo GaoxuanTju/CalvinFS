@@ -243,6 +243,7 @@ bool VersionedKVStore::Get(
     }
     if (!Slice(it->Key()).starts_with(key)) {//gaoxuan --
       delete it;
+      LOG(ERROR)<<Slice(it->Key()).starts_with(key);
       //LOG(ERROR)<<Slice(it->Key()).data();//gaoxuan --in this way, system will be down,why??
       //gaoxuan --observe which one is true false
       //LOG(ERROR)<<(Slice(it->Key()).size()>=key.size());
