@@ -500,7 +500,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
     action->add_readset(ParentDir(in.to_path()));
     action->add_writeset(ParentDir(in.to_path()));
 
-  }else if (type == MetadataAction::RENAME) {/*the version of gaoxuan*/ 
+  }/*else if (type == MetadataAction::RENAME) {the version of gaoxuan
     //gaoxuan --this part is rewrited by gaoxuan
     //gaoxuan --add read/write set in the way of DFS
     MetadataAction::RenameInput in;
@@ -568,7 +568,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
     action->add_writeset(in.to_path());
     action->add_readset(ParentDir(in.to_path()));
     action->add_writeset(ParentDir(in.to_path()));
-  }/*else if (type == MetadataAction::RENAME) {
+  }*/ /**/else if (type == MetadataAction::RENAME) {
     MetadataAction::RenameInput in;
     in.ParseFromString(action->input());
     action->add_readset(in.from_path());
@@ -591,6 +591,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
       entry.ParseFromString(metadata_entry1);
       if (entry.type() == DIR) {
         //gaoxuan --目录的话才取子目录或文件
+        LOG(ERROR)<<"Local Machine "<<machine_->machine_id()<<"'s entry num is "<<entry.dir_contents_size();
         for (int i = 0; i < entry.dir_contents_size(); i++) {
           //LOG(ERROR)<<"machine is "<<machine_->machine_id()<<"entry is"<<entry.dir_contents(i);//输出一下所有的元数据项,确实能够实现从远程拿元数据项了，输出成功了
         }
@@ -620,13 +621,14 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
       out.ParseFromString(a.output());
       if (out.success() && out.entry().type() == DIR) {
         //gaoxuan --目录的话才取子目录或文件
+        LOG(ERROR)<<"Remote Machine "<<mds_machine<<"'s entry num is "<<entry.dir_contents_size();
         for (int i = 0; i < out.entry().dir_contents_size(); i++) {
           //LOG(ERROR)<<"machine is "<<machine_->machine_id()<<"entry is"<<out.entry().dir_contents(i);//输出一下所有的元数据项,确实能够实现从远程拿元数据项了，输出成功了
         }
       } 
     }
     //gaoxuan --test
-  }*/else if (type == MetadataAction::LOOKUP) {
+  }else if (type == MetadataAction::LOOKUP) {
     MetadataAction::LookupInput in;
     in.ParseFromString(action->input());
    // LOG(ERROR)<<"Remote machine is looking up metadata "<<machine_->machine_id()<<"  "<<in.path();//gaoxuan --在这里看看是那台机器取什么路径
