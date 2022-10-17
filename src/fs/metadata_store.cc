@@ -569,11 +569,9 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
 //gaoxuan --test
     //const Slice path = Slice(ParentDir(in.from_path()));
     // Find out what machine to run this on.
-      string metadata_entry1;
-      LOG(ERROR)<<"/a0/980/c0"<<";"<<store_->Get("/a0/980/c0",10,&metadata_entry1)<<";"<<metadata_entry1.size()<<":"<<metadata_entry1;
       //return m;//gaoxuan --现在m里面就是想要获取的message了，但是其实使用这种调用的话，还是会出现错误的，在Get的时候
   
-    /*
+    /**/
     uint64 mds_machine =config_->LookupMetadataShard(config_->HashFileName(Slice(in.from_path())), config_->LookupReplica(machine_->machine_id()));
 
     // Run if local.
@@ -600,7 +598,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
       }
     }
       
-    */
+    
 
 
     //gaoxuan --test
