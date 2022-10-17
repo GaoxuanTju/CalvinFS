@@ -226,9 +226,9 @@ bool VersionedKVStore::Get(
   KVStore::Iterator* it = records_[m]->GetIterator();
   it->Seek(key);//gaoxuan --这里是为了获得第一个大于等于key的key
 
-  
+
   //下面的目的：先看看是不是key不对；第二就是看看根据key取出来的key对不对
-  LOG(ERROR)<<"key input is: "<<key<<"; seek key is"<<it->Key();
+  LOG(ERROR)<<"key input is: "<<key<<"; seek key is"<<it->Key().data();
   //gaoxuan --上面的要删掉
 
 
