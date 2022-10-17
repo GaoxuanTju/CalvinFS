@@ -689,14 +689,17 @@ void LatencyExperimentAppend() {
 
     double start = GetTime();
 
-    for (int j = 0; j < 3; j++) {//gaoxuan --改成了3次便于观察，原本是250次
+    for (int j = 0; j < 250; j++) {//gaoxuan --改成了3次便于观察，原本是250次
       int a1 = rand() % 1000;
       int a2 = rand() % 1000;
       while (a2 == a1) {
         a2 = rand() % 1000;
       }
-      BackgroundRenameFile("/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1) + "/c" + IntToString(j),
-                           "/a" + IntToString(rand() % machine()->config().size()) + "/b" + IntToString(a2) + "/d" + IntToString(machine()->GetGUID())); 
+      //gaoxuan --only for file rename
+      //BackgroundRenameFile("/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1) + "/c" + IntToString(j),"/a" + IntToString(rand() % machine()->config().size()) + "/b" + IntToString(a2) + "/d" + IntToString(machine()->GetGUID())); 
+
+      BackgroundRenameFile("/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1),
+                           "/a" + IntToString(rand() % machine()->config().size()) + "/d" + IntToString(a2)); 
 
       // contention-free workload
       /**BackgroundRenameFile("/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(j) + "/c" + IntToString(j),
