@@ -224,16 +224,18 @@ bool VersionedKVStore::Get(
 
   // Seek to first possible record with key 'key'.
   KVStore::Iterator* it = records_[m]->GetIterator();
-  it->Seek(key);//gaoxuan --这里是为了获得第一个大于等于key的key 
+  it->Seek(key);
+
   // Advance to first key for same object whose encoded version < 'version'.
-  while (true) {
-   
-    if (!(Slice(it->Key().data()).starts_with(key))) {
+
+    // Check if the current key exists and starts with target prefix.
+    if (!it->Valid() || !Slice(it->Key()).starts_with(key) ||
+        it->Key()[key.size()] != '\0') {
       delete it;
-      LOG(ERROR)<<it->Key().data()<<"and "<<key;
-      LOG(ERROR)<<key<<";gaoxuan --false in prefix";//gaoxuan --all false is from here
+      LOG(ERROR)<<"can this be error?"<<key<<"   "<<it->Key().data();
       return false;
     }
+
     // Check if the current key's version < 'version'.
     if (ParseVersion(it->Key(), flags) < version) {
       if (*flags & kDeletedFlag) {
@@ -245,9 +247,11 @@ bool VersionedKVStore::Get(
         return true;
       }
     }
+
     // Move to the next record.
-    //it->Next();
-  }
+   
+  
+    
 }
 
 bool VersionedKVStore::GetVersion(
