@@ -653,7 +653,7 @@ void MetadataStore::Run(Action* action) {
   }
 
   if (!context->IsWriter()) {//这里就return 了，所以下面LOOKUP internal不会执行，看一下Iswriter
-  LOG(ERROR)<<"zheli ke neng jiu zu duan le RUN";
+  //LOG(ERROR)<<"zheli ke neng jiu zu duan le RUN";
     delete context;
     return;
   }
@@ -961,7 +961,7 @@ void MetadataStore::Lookup_Internal(
   MetadataEntry entry;
   if (!context->GetEntry(in.path(), &entry)) {
     // File doesn't exist!
-    LOG(ERROR)<<"bu chu yi wai zhe li ken ding shi wen jian bu cun zai";
+    //LOG(ERROR)<<"bu chu yi wai zhe li ken ding shi wen jian bu cun zai";
     out->set_success(false);
     out->add_errors(MetadataAction::FileDoesNotExist);
     return;

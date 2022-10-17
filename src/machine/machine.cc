@@ -257,7 +257,7 @@ void Machine::StartAppInternal(const StartAppProto& sap) {
   // Run App Start() method (may not terminate).
   //gaoxuan --感觉这里可能是让实验跑起来的地方
   //确实这里被调用了11次，难道是每个app添加之后都会执行一次吗，那个出来的单数应该就是metalog app了
-  LOG(ERROR)<<"shi zhe li diao yong de Start() ma?";
+  //LOG(ERROR)<<"shi zhe li diao yong de Start() ma?";
   //gaoxuan
   apps_[sap.app_name()]->Start();
 }

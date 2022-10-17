@@ -224,18 +224,10 @@ bool VersionedKVStore::Get(
 
   // Seek to first possible record with key 'key'.
   KVStore::Iterator* it = records_[m]->GetIterator();
-  it->Seek(key);//gaoxuan --这里是为了获得第一个大于等于key的key
-
-
-  //下面的目的：先看看是不是key不对；第二就是看看根据key取出来的key对不对
-  //LOG(ERROR)<<"key input is: "<<key<<"; seek key is"<<it->Key().data();//这里完全正确
-  //gaoxuan --上面的要删掉
-
-
+  it->Seek(key);//gaoxuan --这里是为了获得第一个大于等于key的key 
   // Advance to first key for same object whose encoded version < 'version'.
   while (true) {
     // Check if the current key exists and starts with target prefix.
-    
     /*if (!it->Valid() || !Slice(it->Key()).starts_with(key) ||
         it->Key()[key.size()] != '\0') {
       delete it;
@@ -247,13 +239,9 @@ bool VersionedKVStore::Get(
       LOG(ERROR)<<key<<";gaoxuan --false 1";//gaoxuan --all false is from here
       return false;
     }
-    
+    LOG(ERROR)<<"key input is: "<<key<<"; seek key is"<<it->Key().data();//这里完全正确,现在还是对的
     if (!Slice(it->Key()).starts_with(key)) {//gaoxuan --
-      //LOG(ERROR)<<Slice(it->Key()).data();//gaoxuan --in this way, system will be down,why??
-      //gaoxuan --observe which one is true false
-      const char *k = key.c_str();
-      LOG(ERROR)<<(memcmp(it->Key().data(), k, strlen(k)));
-      LOG(ERROR)<<it->Key().data()<<" memcmp "<<k;
+      LOG(ERROR)<<"key put has been changed into"<<in->Key().data();
       LOG(ERROR)<<key<<";gaoxuan --false 2";//gaoxuan --all false is from here
       delete it;
       return false;
