@@ -595,6 +595,26 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
         usleep(10);
         Noop<MessageBuffer*>(m);
       }
+      //gaoxuan --如今m里面就是读到的信息了
+      
+      MessageBuffer* serialized = m;
+      Action a;
+      a.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
+      delete serialized;
+
+      MetadataAction::LookupOutput out;
+      out.ParseFromString(a.output());
+      if (out.success() && out.entry().type() == DIR) {
+        //gaoxuan --目录的话才取子目录或文件
+        for (int i = 0; i < out.entry().dir_contents_size(); i++) {
+          LOG(ERROR)<<"machine is "<<machine_->machine_id()<<"entry is"<<out.entry().dir_contents(i);//输出一下所有的元数据项
+        }
+
+      } 
+
+      //gaoxuan --
+
+
     }
       
     
