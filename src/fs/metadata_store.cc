@@ -157,6 +157,10 @@ class DistributedExecutionContext : public ExecutionContext {
       uint64 machine = config_->LookupMetadataShard(mds, replica_);
       if (machine == machine_->machine_id()) {
         // Local read.
+        //gaoxuan --执行的一定是这里
+        LOG(ERROR)<<"zhe li hui zhi xing ma in gou zao han shu";
+
+        //gaoxuan --上面的东西要删掉
         if (!store_->Get(action->readset(i),
                          version_,
                          &reads_[action->readset(i)])) {
@@ -613,7 +617,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
    else if (type == MetadataAction::LOOKUP) {
     MetadataAction::LookupInput in;
     in.ParseFromString(action->input());
-    //gaoxuan --我是弱智，还没变字符串你写上面肯定会错误呀
+    //gaoxuan --我是弱智，还没变字符串你写上面肯定会错误呀,事实证明，这里路径也没错误，就是说，这个没任何问题
     LOG(ERROR)<<"Remote machine is looking up metadata "<<machine_->machine_id()<<"  "<<in.path();//gaoxuan --在这里看看是那台机器取什么路径
     action->add_readset(in.path());
 
@@ -658,7 +662,7 @@ void MetadataStore::Run(Action* action) {
         new DistributedExecutionContext(machine_, config_, store_, action);
   }
 
-  if (!context->IsWriter()) {//肯定是这里就return 了，所以下面LOOKUP internal不会执行
+  if (!context->IsWriter()) {//这里就return 了，所以下面LOOKUP internal不会执行，看一下Iswriter
   LOG(ERROR)<<"zheli ke neng jiu zu duan le RUN";
     delete context;
     return;

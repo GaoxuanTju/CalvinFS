@@ -27,7 +27,7 @@ MessageBuffer* CalvinFSClientApp::GetMetadataEntry(const Slice& path) {
     LOG(ERROR)<<"shi bu shi zhe li in.path bu dui jin le :::"<<in.path();//gaoxuan --查过了，不是它，in.path是对的 
     
     in.SerializeToString(a.mutable_input());
-    metadata_->GetRWSets(&a);
+    metadata_->GetRWSets(&a);//理论上这里都是没有任何问题的
     metadata_->Run(&a);
     return new MessageBuffer(a);
 
