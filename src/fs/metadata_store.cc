@@ -572,14 +572,25 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
       //return m;//gaoxuan --现在m里面就是想要获取的message了，但是其实使用这种调用的话，还是会出现错误的，在Get的时候
   
     /**/
+
+    //the following part is used to get the child of a DIR
     uint64 mds_machine =config_->LookupMetadataShard(config_->HashFileName(Slice(ParentDir(in.from_path()))), config_->LookupReplica(machine_->machine_id()));
 
     // Run if local.
     if (mds_machine == machine_->machine_id()) {//gaoxuan --本地的话直接用Get取出,当前来看是能够取出来的
       string metadata_entry1;
-      LOG(ERROR)<<ParentDir(in.from_path())<<";"<<store_->Get(ParentDir(in.from_path()),10,&metadata_entry1)<<";"<<metadata_entry1.size()<<":"<<metadata_entry1;
-    // If not local, get result from the right machine (within this replica).
-    }else {//
+      LOG(ERROR)<<ParentDir(in.from_path())<<";"<<store_->Get(ParentDir(in.from_path()),10,&metadata_entry1);
+      MetadataEntry entry;
+      entry.ParseFromString(metadata_entry1);
+      if (entry.type() == DIR) {
+        //gaoxuan --目录的话才取子目录或文件
+        for (int i = 0; i < entry.dir_contents_size(); i++) {
+          LOG(ERROR)<<"machine is "<<machine_->machine_id()<<"entry is"<<entry.dir_contents(i);//输出一下所有的元数据项,确实能够实现从远程拿元数据项了，输出成功了
+        }
+
+      } 
+    // If not local, get result from the right machine (within this replica).Use RPC 
+    }else {
       Header* header = new Header();
       header->set_from(machine_->machine_id());
       header->set_to(mds_machine);
@@ -607,7 +618,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
       if (out.success() && out.entry().type() == DIR) {
         //gaoxuan --目录的话才取子目录或文件
         for (int i = 0; i < out.entry().dir_contents_size(); i++) {
-          LOG(ERROR)<<"machine is "<<machine_->machine_id()<<"entry is"<<out.entry().dir_contents(i);//输出一下所有的元数据项
+          //LOG(ERROR)<<"machine is "<<machine_->machine_id()<<"entry is"<<out.entry().dir_contents(i);//输出一下所有的元数据项,确实能够实现从远程拿元数据项了，输出成功了
         }
 
       } 
