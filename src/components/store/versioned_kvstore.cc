@@ -227,8 +227,25 @@ bool VersionedKVStore::Get(
   it->Seek(key);//gaoxuan --这里是为了获得第一个大于等于key的key 
   // Advance to first key for same object whose encoded version < 'version'.
   while (true) {
-    LOG(ERROR)<<it->Key().data();
-    it->Next();
+   
+    if (!(Slice(it->Key()).starts_with(key))) {
+      delete it;
+      LOG(ERROR)<<key<<";gaoxuan --false in prefix";//gaoxuan --all false is from here
+      return false;
+    }
+    // Check if the current key's version < 'version'.
+    if (ParseVersion(it->Key(), flags) < version) {
+      if (*flags & kDeletedFlag) {
+        delete it;
+        return false;
+      } else {
+        *value = it->Value();
+        delete it;
+        return true;
+      }
+    }
+    // Move to the next record.
+    //it->Next();
   }
 }
 
