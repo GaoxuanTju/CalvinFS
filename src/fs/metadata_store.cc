@@ -646,13 +646,13 @@ void MetadataStore::Run(Action* action) {
   ExecutionContext* context;
   if (machine_ == NULL) {
     context = new ExecutionContext(store_, action);
-  } else {//gaoxuan --就是在这里创建context的时候会调用Get，应该就是这里会报错
+  } else {//gaoxuan --就是在这里创建context的时候会调用Get
     context =
         new DistributedExecutionContext(machine_, config_, store_, action);
   }
-
+  
   if (!context->IsWriter()) {//这里就return 了，所以下面LOOKUP internal不会执行，看一下Iswriter
-  //LOG(ERROR)<<"zheli ke neng jiu zu duan le RUN";
+    LOG(ERROR)<<"zheli ke neng jiu zu duan le RUN";
     delete context;
     return;
   }
