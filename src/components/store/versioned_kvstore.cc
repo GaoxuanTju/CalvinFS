@@ -227,49 +227,7 @@ bool VersionedKVStore::Get(
   it->Seek(key);//gaoxuan --这里是为了获得第一个大于等于key的key 
   // Advance to first key for same object whose encoded version < 'version'.
   while (true) {
-    // Check if the current key exists and starts with target prefix.
-    /*if (!it->Valid() || !Slice(it->Key()).starts_with(key) ||
-        it->Key()[key.size()] != '\0') {
-      delete it;
-      LOG(ERROR)<<key<<";gaoxuan --false 1";//gaoxuan --all false is from here
-      return false;
-    }*/
-    if (!it->Valid() ) {
-      delete it;
-      LOG(ERROR)<<key<<";gaoxuan --false 1";//gaoxuan --all false is from here
-      return false;
-    }
-    LOG(ERROR)<<"key input is: "<<key<<"; seek key is"<<it->Key().data();//这里完全正确,现在还是对的
-    if (!Slice(it->Key()).starts_with(key)) {//gaoxuan --
-      LOG(ERROR)<<"key put has been changed into"<<it->Key().data();
-      LOG(ERROR)<<key<<";gaoxuan --false 2";//gaoxuan --all false is from here
-      delete it;
-      return false;
-    }
-    
-    if (it->Key()[key.size()] != '\0') {
-      
-      LOG(ERROR)<<it->Key(); //in this way,system will be down
-      LOG(ERROR)<<key<<";gaoxuan --false 3";//gaoxuan --all false is from here
-      delete it;
-      return false;
-    }
-
-    // Check if the current key's version < 'version'.
-    if (ParseVersion(it->Key(), flags) < version) {
-      if (*flags & kDeletedFlag) {
-        delete it;
-        return false;
-      } else {
-        *value = it->Value();
-        delete it;
-        //LOG(ERROR)<<*value;//gaoxuan --check can it be null
-        
-        return true;
-      }
-    }
-
-    // Move to the next record.
+    LOG(ERROR)<<it->Key().data();
     it->Next();
   }
 }
