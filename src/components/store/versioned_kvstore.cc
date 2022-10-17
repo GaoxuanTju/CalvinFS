@@ -243,6 +243,7 @@ bool VersionedKVStore::Get(
     }
     if (!Slice(it->Key()).starts_with(key)) {
       delete it;
+      LOG(ERROR)<<Slice(it->Key()).data();
       LOG(ERROR)<<key<<";gaoxuan --false 2";//gaoxuan --all false is from here
       return false;
     }
