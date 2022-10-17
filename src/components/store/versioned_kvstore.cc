@@ -224,7 +224,7 @@ bool VersionedKVStore::Get(
 
   // Seek to first possible record with key 'key'.
   KVStore::Iterator* it = records_[m]->GetIterator();
-  it->Seek(key);
+  it->Seek(key);//有没可能是这里不对，没可能，因为本地怎么去得到
 
   // Advance to first key for same object whose encoded version < 'version'.
   while (true) {
@@ -243,7 +243,7 @@ bool VersionedKVStore::Get(
     }
     if (!Slice(it->Key()).starts_with(key)) {
       delete it;
-      LOG(ERROR)<<*Slice(it->Key()).data();//gaoxuan --in this way, system will be down
+      //LOG(ERROR)<<Slice(it->Key()).data();//gaoxuan --in this way, system will be down,why??
       LOG(ERROR)<<key<<";gaoxuan --false 2";//gaoxuan --all false is from here
       return false;
     }

@@ -19,12 +19,12 @@ MessageBuffer* CalvinFSClientApp::GetMetadataEntry(const Slice& path) {
     Action a;
     //a.set_version(scheduler_->SafeVersion());
 
-    LOG(ERROR)<<"li lun shang RPC shi zhe li hui zhi xing!"<<path.data()<<"  size is "<<path.size();
+    //LOG(ERROR)<<"li lun shang RPC shi zhe li hui zhi xing!"<<path.data()<<"  size is "<<path.size();
     a.set_action_type(MetadataAction::LOOKUP);
     MetadataAction::LookupInput in;
     in.set_path(path.data(), path.size());
     //gaoxuan --就是上面这小子把路径传错了，看看是不是这里in.path就设置失败了！！！如果是，这里就是症结所在
-    LOG(ERROR)<<"shi bu shi zhe li in.path bu dui jin le :::"<<in.path();//gaoxuan --查过了，不是它，in.path是对的 
+    //LOG(ERROR)<<"shi bu shi zhe li in.path bu dui jin le :::"<<in.path();//gaoxuan --查过了，不是它，in.path是对的 
     
     in.SerializeToString(a.mutable_input());
     metadata_->GetRWSets(&a);//理论上这里都是没有任何问题的

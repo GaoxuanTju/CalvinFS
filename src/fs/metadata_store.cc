@@ -586,7 +586,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
       header->set_rpc("LOOKUP");//难不成这里出问题了？？我直接去LOOKUP的逻辑里执行一下子
       header->add_misc_string(in.from_path());//这一行也没问题
       LOG(ERROR)<<"Local machine is "<<machine_->machine_id()<<"; Remote machine is "<<mds_machine;//这一行是正常的
-      LOG(ERROR)<<"chuan jin qu de lu jing shi "<<header->misc_string(0);//加这一行的目的主要是看一下为啥机器1会Get的key会变成LOOKUP，确是在这里就变成了LOOKUP
+      //LOG(ERROR)<<"chuan jin qu de lu jing shi "<<header->misc_string(0);//加这一行的目的主要是看一下为啥机器1会Get的key会变成LOOKUP，确是在这里就变成了LOOKUP
       MessageBuffer* m = NULL;
       header->set_data_ptr(reinterpret_cast<uint64>(&m));
       machine_->SendMessage(header, new MessageBuffer());
