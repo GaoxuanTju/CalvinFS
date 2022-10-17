@@ -243,6 +243,7 @@ bool VersionedKVStore::Get(
         return false;
       } else {
         *value = it->Value();
+        LOG(ERROR)<<key<<"  "<<it->Key().data()<<"  "<<*value;
         delete it;
         return true;
       }
