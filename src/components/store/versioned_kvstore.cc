@@ -251,7 +251,7 @@ bool VersionedKVStore::Get(
         LOG(ERROR)<<"not error in size"; 
       }
       const char *k = key.c_str();
-      if(memcmp(Slice(it->Key()).data(), k, strlen(k)) == 0)
+      if(memcmp(Slice(it->Key()).data(), k, strlen(k)) != 0)
       {
         LOG(ERROR)<<Slice(it->Key()).data()<<"  "<<k;
         LOG(ERROR)<<"not error in cmp";
