@@ -577,14 +577,13 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
       LOG(ERROR)<<in.from_path()<<";"<<store_->Get(in.from_path(),10,&metadata_entry1)<<";"<<metadata_entry1.size()<<":"<<metadata_entry1;
     // If not local, get result from the right machine (within this replica).
     }else {//事实上我使用这个RPC，还是会去调用Get，结果还是错误了;肯定是你的RPC没用对，可是要怎么用才对啊啊啊啊啊啊啊啊
-      string from_path =in.from_path()+"\0";
       Header* header = new Header();
       header->set_from(machine_->machine_id());
       header->set_to(mds_machine);
       header->set_type(Header::RPC);
       header->set_app(getAPPname());
       header->set_rpc("LOOKUP");//难不成这里出问题了？？我直接去LOOKUP的逻辑里执行一下子
-      header->add_misc_string(from_path);//这一行也没问题
+      header->add_misc_string(in.from_path().c_str(),strlen(in.from_path().c_str()));//这一行也没问题
       LOG(ERROR)<<"Local machine is "<<machine_->machine_id()<<"; Remote machine is "<<mds_machine;//这一行是正常的
       //LOG(ERROR)<<"chuan jin qu de lu jing shi "<<header->misc_string(0);//加这一行的目的主要是看一下为啥机器1会Get的key会变成LOOKUP，确是在这里就变成了LOOKUP
       MessageBuffer* m = NULL;
