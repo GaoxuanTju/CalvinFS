@@ -248,7 +248,7 @@ bool VersionedKVStore::Get(
     }
     if (it->Key()[key.size()] != '\0') {
       delete it;
-      LOG(ERROR)<<it->Key()[key.size()];
+      LOG(ERROR)<<it->Key();
       LOG(ERROR)<<key<<";gaoxuan --false 3";//gaoxuan --all false is from here
       return false;
     }
