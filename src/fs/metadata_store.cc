@@ -621,7 +621,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
       out.ParseFromString(a.output());
       if (out.success() && out.entry().type() == DIR) {
         //gaoxuan --目录的话才取子目录或文件
-        LOG(ERROR)<<"Remote Machine "<<mds_machine<<"'s entry num is "<<entry.dir_contents_size();
+        LOG(ERROR)<<"Remote Machine "<<mds_machine<<"'s entry num is "<<out.entry().dir_contents_size();
         for (int i = 0; i < out.entry().dir_contents_size(); i++) {
           //LOG(ERROR)<<"machine is "<<machine_->machine_id()<<"entry is"<<out.entry().dir_contents(i);//输出一下所有的元数据项,确实能够实现从远程拿元数据项了，输出成功了
         }
