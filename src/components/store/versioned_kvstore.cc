@@ -243,13 +243,13 @@ bool VersionedKVStore::Get(
     }
     if (!Slice(it->Key()).starts_with(key)) {
       delete it;
-      LOG(ERROR)<<Slice(it->Key()).data();
+      LOG(ERROR)<<*Slice(it->Key()).data();//gaoxuan --in this way, system will be down
       LOG(ERROR)<<key<<";gaoxuan --false 2";//gaoxuan --all false is from here
       return false;
     }
     if (it->Key()[key.size()] != '\0') {
       delete it;
-      LOG(ERROR)<<it->Key();
+      //LOG(ERROR)<<it->Key(); //in this way,system will be down
       LOG(ERROR)<<key<<";gaoxuan --false 3";//gaoxuan --all false is from here
       return false;
     }
