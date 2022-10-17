@@ -228,7 +228,7 @@ bool VersionedKVStore::Get(
 
 
   //下面的目的：先看看是不是key不对；第二就是看看根据key取出来的key对不对
-  LOG(ERROR)<<"key input is: "<<key<<"; seek key is"<<it->Key().data();
+  //LOG(ERROR)<<"key input is: "<<key<<"; seek key is"<<it->Key().data();//这里完全正确
   //gaoxuan --上面的要删掉
 
 
@@ -249,15 +249,11 @@ bool VersionedKVStore::Get(
     }
     
     if (!Slice(it->Key()).starts_with(key)) {//gaoxuan --
-      
       //LOG(ERROR)<<Slice(it->Key()).data();//gaoxuan --in this way, system will be down,why??
       //gaoxuan --observe which one is true false
-    
       const char *k = key.c_str();
-      if(memcmp(Slice(it->Key()).data(), k, strlen(k)) != 0)
-      {
-        LOG(ERROR)<<Slice(it->Key()).data()<<" memcmp "<<k;
-      }
+      LOG(ERROR)<<(memcmp(it->Key().data(), k, strlen(k)));
+      LOG(ERROR)<<it->Key().data()<<" memcmp "<<k;
       LOG(ERROR)<<key<<";gaoxuan --false 2";//gaoxuan --all false is from here
       delete it;
       return false;
