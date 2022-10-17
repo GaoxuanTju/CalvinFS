@@ -253,6 +253,7 @@ bool VersionedKVStore::Get(
       const char *k = key.c_str();
       if(memcmp(Slice(it->Key()).data(), k, strlen(k)) == 0)
       {
+        LOG(ERROR)<<Slice(it->Key()).data()<<"  "<<k;
         LOG(ERROR)<<"not error in cmp";
       }
       LOG(ERROR)<<key<<";gaoxuan --false 2";//gaoxuan --all false is from here
