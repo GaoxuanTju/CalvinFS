@@ -245,10 +245,10 @@ bool VersionedKVStore::Get(
       delete it;
       //LOG(ERROR)<<Slice(it->Key()).data();//gaoxuan --in this way, system will be down,why??
       //gaoxuan --observe which one is true false
-      if(Slice(it->Key()).size()>=key.size())
+      /*if(Slice(it->Key()).size()>=key.size())
       {
         LOG(ERROR)<<"not error in size"; 
-      }
+      }*/
       /*const char *k = key.c_str();
       if(memcmp(Slice(it->Key()).data(), k, strlen(k)) == 0)
       {
