@@ -49,6 +49,7 @@ class MetadataStore : public Store {
   {
     return store_;
   } 
+  void Get_MetadataEntry(Action* action,MetadataEntry& entry);//get MetadataEntry for RENAME,only for RENAME, MetadataEntry is put into entry  
   //gaoxuan
  private:
   void CreateFile_Internal(

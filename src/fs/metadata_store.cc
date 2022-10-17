@@ -469,7 +469,6 @@ step 3
 
 */
 
-
 void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is called by RameFile() for RenameExperiment
   action->clear_readset();
   action->clear_writeset();
@@ -501,63 +500,77 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
     action->add_readset(ParentDir(in.to_path()));
     action->add_writeset(ParentDir(in.to_path()));
 
-  }
-  /* else if (type == MetadataAction::RENAME) {
+  }else if (type == MetadataAction::RENAME) {/*the version of gaoxuan*/ 
     //gaoxuan --this part is rewrited by gaoxuan
-    //add read/write set in the way of DFS
+    //gaoxuan --add read/write set in the way of DFS
     MetadataAction::RenameInput in;
     in.ParseFromString(action->input());
     std::stack<string> stack;//the stack is used for tranversing  the file tree
     stack.push(in.from_path());//we want to tranverse all children of this path to add read/write set
     while (!stack.empty()) 
     {
-            string top = stack.top();//get the top
-            stack.pop();//pop the top 
+        string top = stack.top();//get the top
+        stack.pop();//pop the top 
             
-            action->add_readset(top);
-            action->add_writeset(top);
+        action->add_readset(top);
+        action->add_writeset(top);
               
-            //get all children and push them into stack
-
-            string metadata_entry;//gaoxuan --used to get metadata in the format of string
-            
-            LOG(ERROR)<<top<<";"<<MetadataStore::store_->Get(top,100,&metadata_entry);//the 10 is version
-        
-            if(!metadata_entry.empty())//this if/else is necessary,because if metadata_entry is null,ParseFromString will be error!
-            {
-              MetadataEntry entry;
-              entry.ParseFromString(metadata_entry);//now all the children of from_path has been stored in entry
-              //gaoxuan --if type==DIR,maybe it has children dir/file;but if type==DATA,this entry is certainly a file,it doesn't have a child
-              if(entry.type()==DIR)
-              {
-                  for(int i=0;i<entry.dir_contents_size();i++)//push all children path into stack 
-                  {
-                      stack.push(entry.dir_contents(i));
-                  }
-              }
-              else
-              {
-                LOG(ERROR)<<"It is a file";
-              }
-              
+        //gaoxuan --the following part is used to get the child path of a DIR and push them to stack
+        uint64 mds_machine =config_->LookupMetadataShard(config_->HashFileName(Slice(in.from_path())), config_->LookupReplica(machine_->machine_id()));
+        // Run if local.
+        if (mds_machine == machine_->machine_id()) {
+          string metadata_entry1;
+          store_->Get(in.from_path(),10,&metadata_entry1);
+          MetadataEntry entry;
+          entry.ParseFromString(metadata_entry1);
+          if (entry.type() == DIR) {
+            //gaoxuan --目录的话才取子目录或文件
+            for (int i = 0; i < entry.dir_contents_size(); i++) {
+              //LOG(ERROR)<<"machine is "<<machine_->machine_id()<<"entry is"<<entry.dir_contents(i);//输出一下所有的元数据项,确实能够实现从本地拿元数据项了，输出成功了
+              stack.push(entry.dir_contents(i));
             }
-            
-     }
+          } 
+        }else {// If not local, get result from the right machine (within this replica).Use RPC 
+          Header* header = new Header();
+          header->set_from(machine_->machine_id());
+          header->set_to(mds_machine);
+          header->set_type(Header::RPC);
+          header->set_app(getAPPname());
+          header->set_rpc("LOOKUP");
+          header->add_misc_string(in.from_path().c_str(),strlen(in.from_path().c_str()));
+          MessageBuffer* m = NULL;
+          header->set_data_ptr(reinterpret_cast<uint64>(&m));
+          machine_->SendMessage(header, new MessageBuffer());
+          while (m == NULL) {
+            usleep(10);
+            Noop<MessageBuffer*>(m);
+          }
+          //gaoxuan --如今m里面就是读到的信息了
+          MessageBuffer* serialized = m;
+          Action a;
+          a.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
+          delete serialized;
+          MetadataAction::LookupOutput out;
+          out.ParseFromString(a.output());
+          if (out.success() && out.entry().type() == DIR) {
+            //gaoxuan --目录的话才取子目录或文件
+            for (int i = 0; i < out.entry().dir_contents_size(); i++) {
+              //LOG(ERROR)<<"machine is "<<machine_->machine_id()<<"entry is"<<out.entry().dir_contents(i);//输出一下所有的元数据项,确实能够实现从远程拿元数据项了，输出成功了
+              stack.push(out.entry().dir_contents(i));
+            }
+          } 
+        }           
+    }
+
     action->add_readset(ParentDir(in.from_path()));
     action->add_writeset(ParentDir(in.from_path()));
     //the read/write set for to_path
-
     action->add_writeset(in.to_path());
     action->add_readset(ParentDir(in.to_path()));
     action->add_writeset(ParentDir(in.to_path()));
-
-  }*/
-  
-  
-  else if (type == MetadataAction::RENAME) {
+  }/*else if (type == MetadataAction::RENAME) {
     MetadataAction::RenameInput in;
     in.ParseFromString(action->input());
-    /*gaoxuan --this part is the original code；*/ 
     action->add_readset(in.from_path());
     action->add_writeset(in.from_path());
     action->add_readset(ParentDir(in.from_path()));
@@ -567,15 +580,9 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
     action->add_writeset(ParentDir(in.to_path()));
 
 //gaoxuan --test
-    //const Slice path = Slice(ParentDir(in.from_path()));
-    // Find out what machine to run this on.
-      //return m;//gaoxuan --现在m里面就是想要获取的message了，但是其实使用这种调用的话，还是会出现错误的，在Get的时候
-  
-    /**/
-
-    //the following part is used to get the child of a DIR
+   
+    //gaoxuan --the following part is used to get the child of a DIR
     uint64 mds_machine =config_->LookupMetadataShard(config_->HashFileName(Slice(ParentDir(in.from_path()))), config_->LookupReplica(machine_->machine_id()));
-
     // Run if local.
     if (mds_machine == machine_->machine_id()) {//gaoxuan --本地的话直接用Get取出,当前来看是能够取出来的
       string metadata_entry1;
@@ -585,9 +592,8 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
       if (entry.type() == DIR) {
         //gaoxuan --目录的话才取子目录或文件
         for (int i = 0; i < entry.dir_contents_size(); i++) {
-          LOG(ERROR)<<"machine is "<<machine_->machine_id()<<"entry is"<<entry.dir_contents(i);//输出一下所有的元数据项,确实能够实现从远程拿元数据项了，输出成功了
+          //LOG(ERROR)<<"machine is "<<machine_->machine_id()<<"entry is"<<entry.dir_contents(i);//输出一下所有的元数据项,确实能够实现从远程拿元数据项了，输出成功了
         }
-
       } 
     // If not local, get result from the right machine (within this replica).Use RPC 
     }else {
@@ -598,7 +604,6 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
       header->set_app(getAPPname());
       header->set_rpc("LOOKUP");
       header->add_misc_string(ParentDir(in.from_path()).c_str(),strlen(ParentDir(in.from_path()).c_str()));
-
       MessageBuffer* m = NULL;
       header->set_data_ptr(reinterpret_cast<uint64>(&m));
       machine_->SendMessage(header, new MessageBuffer());
@@ -607,12 +612,10 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
         Noop<MessageBuffer*>(m);
       }
       //gaoxuan --如今m里面就是读到的信息了
-      
       MessageBuffer* serialized = m;
       Action a;
       a.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
       delete serialized;
-
       MetadataAction::LookupOutput out;
       out.ParseFromString(a.output());
       if (out.success() && out.entry().type() == DIR) {
@@ -620,21 +623,10 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
         for (int i = 0; i < out.entry().dir_contents_size(); i++) {
           //LOG(ERROR)<<"machine is "<<machine_->machine_id()<<"entry is"<<out.entry().dir_contents(i);//输出一下所有的元数据项,确实能够实现从远程拿元数据项了，输出成功了
         }
-
       } 
-
-      //gaoxuan --
-
-
     }
-      
-    
-
-
     //gaoxuan --test
-
-  }
-   else if (type == MetadataAction::LOOKUP) {
+  }*/else if (type == MetadataAction::LOOKUP) {
     MetadataAction::LookupInput in;
     in.ParseFromString(action->input());
    // LOG(ERROR)<<"Remote machine is looking up metadata "<<machine_->machine_id()<<"  "<<in.path();//gaoxuan --在这里看看是那台机器取什么路径
