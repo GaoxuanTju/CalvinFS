@@ -224,7 +224,7 @@ bool VersionedKVStore::Get(
 
   // Seek to first possible record with key 'key'.
   KVStore::Iterator* it = records_[m]->GetIterator();
-  it->Seek(key);//有没可能是这里不对，这个的意思是，获得第一个大于等于key的KV
+  it->Seek(key);//有没可能是这里不对，这个的意思是，获得第一个大于等于key的，这里不对
 
   // Advance to first key for same object whose encoded version < 'version'.
   while (true) {
@@ -246,30 +246,25 @@ bool VersionedKVStore::Get(
       
       //LOG(ERROR)<<Slice(it->Key()).data();//gaoxuan --in this way, system will be down,why??
       //gaoxuan --observe which one is true false
-      if(Slice(it->Key()).size()>=key.size())
-      {
-        LOG(ERROR)<<"not error in size"; 
-      }
-
-      if (it->Key()[key.size()] != '\0') {
-      
-      LOG(ERROR)<<it->Key(); //in this way,system will be down
-      LOG(ERROR)<<key<<";gaoxuan --false 3";//gaoxuan --all false is from here
-      delete it;
-      return false;
-    }
     
       const char *k = key.c_str();
       if(memcmp(Slice(it->Key()).data(), k, strlen(k)) != 0)
       {
-        LOG(ERROR)<<Slice(it->Key()).data()<<"  "<<k;
-        LOG(ERROR)<<"not error in cmp";
+        LOG(ERROR)<<Slice(it->Key()).data()<<" memcmp "<<k;
       }
       LOG(ERROR)<<key<<";gaoxuan --false 2";//gaoxuan --all false is from here
       delete it;
       return false;
     }
     
+    if (it->Key()[key.size()] != '\0') {
+      
+      LOG(ERROR)<<it->Key(); //in this way,system will be down
+      LOG(ERROR)<<key<<";gaoxuan --false 3";//gaoxuan --all false is from here
+      delete it;
+      return false;
+    }
+
     // Check if the current key's version < 'version'.
     if (ParseVersion(it->Key(), flags) < version) {
       if (*flags & kDeletedFlag) {
