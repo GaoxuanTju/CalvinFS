@@ -569,6 +569,34 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
 //gaoxuan --test
     //const Slice path = Slice(ParentDir(in.from_path()));
     // Find out what machine to run this on.
+    uint64 mds_machine =config_->LookupMetadataShard(config_->HashFileName("/a0/980/c0"), config_->LookupReplica(machine_->machine_id()));
+
+    // Run if local.
+    if (mds_machine == machine_->machine_id()) {//gaoxuan --本地的话直接用Get取出,当前来看是能够取出来的
+      string metadata_entry1;
+      LOG(ERROR)<<"/a0/980/c0"<<";"<<store_->Get("/a0/980/c0",10,&metadata_entry1)<<";"<<metadata_entry1.size()<<":"<<metadata_entry1;
+    // If not local, get result from the right machine (within this replica).
+    }else {//事实上我使用这个RPC，还是会去调用Get，结果还是错误了;肯定是你的RPC没用对，可是要怎么用才对啊啊啊啊啊啊啊啊
+      Header* header = new Header();
+      header->set_from(machine_->machine_id());
+      header->set_to(mds_machine);
+      header->set_type(Header::RPC);
+      header->set_app(getAPPname());
+      header->set_rpc("LOOKUP");//难不成这里出问题了？？我直接去LOOKUP的逻辑里执行一下子
+      header->add_misc_string("/a0/980/c0");//这一行也没问题
+      LOG(ERROR)<<"Local machine is "<<machine_->machine_id()<<"; Remote machine is "<<mds_machine;//这一行是正常的
+      //LOG(ERROR)<<"chuan jin qu de lu jing shi "<<header->misc_string(0);//加这一行的目的主要是看一下为啥机器1会Get的key会变成LOOKUP，确是在这里就变成了LOOKUP
+      MessageBuffer* m = NULL;
+      header->set_data_ptr(reinterpret_cast<uint64>(&m));
+      machine_->SendMessage(header, new MessageBuffer());
+      while (m == NULL) {
+        usleep(10);
+        Noop<MessageBuffer*>(m);
+      }
+    }
+      //return m;//gaoxuan --现在m里面就是想要获取的message了，但是其实使用这种调用的话，还是会出现错误的，在Get的时候
+  
+    /*
     uint64 mds_machine =config_->LookupMetadataShard(config_->HashFileName(Slice(in.from_path())), config_->LookupReplica(machine_->machine_id()));
 
     // Run if local.
@@ -594,16 +622,8 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
         Noop<MessageBuffer*>(m);
       }
     }
-      //return m;//gaoxuan --现在m里面就是想要获取的message了，但是其实使用这种调用的话，还是会出现错误的，在Get的时候
-  
-    /*
-    //gaoxuan --这个好像实现不了，你怎么能从一个机器上拿到另一个机器呢，只能是用一下传过来的信息
-    //所以只能是RPC
-    MetadataStore* newmetadata_ =
-        reinterpret_cast<MetadataStore*>(
-           reinterpret_cast<StoreApp*>(machine()->GetApp("metadata"))->store());
       
-    }*/
+    */
 
 
     //gaoxuan --test
