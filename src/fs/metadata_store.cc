@@ -572,12 +572,12 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
       //return m;//gaoxuan --现在m里面就是想要获取的message了，但是其实使用这种调用的话，还是会出现错误的，在Get的时候
   
     /**/
-    uint64 mds_machine =config_->LookupMetadataShard(config_->HashFileName(Slice(in.from_path())), config_->LookupReplica(machine_->machine_id()));
+    uint64 mds_machine =config_->LookupMetadataShard(config_->HashFileName(Slice(ParentDir(in.from_path()))), config_->LookupReplica(machine_->machine_id()));
 
     // Run if local.
     if (mds_machine == machine_->machine_id()) {//gaoxuan --本地的话直接用Get取出,当前来看是能够取出来的
       string metadata_entry1;
-      LOG(ERROR)<<in.from_path()<<";"<<store_->Get(in.from_path(),10,&metadata_entry1)<<";"<<metadata_entry1.size()<<":"<<metadata_entry1;
+      LOG(ERROR)<<ParentDir(in.from_path())<<";"<<store_->Get(ParentDir(in.from_path()),10,&metadata_entry1)<<";"<<metadata_entry1.size()<<":"<<metadata_entry1;
     // If not local, get result from the right machine (within this replica).
     }else {//
       Header* header = new Header();
@@ -586,7 +586,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
       header->set_type(Header::RPC);
       header->set_app(getAPPname());
       header->set_rpc("LOOKUP");
-      header->add_misc_string(in.from_path().c_str(),strlen(in.from_path().c_str()));
+      header->add_misc_string(ParentDir(in.from_path()).c_str(),strlen(ParentDir(in.from_path()).c_str()));
 
       MessageBuffer* m = NULL;
       header->set_data_ptr(reinterpret_cast<uint64>(&m));
@@ -626,7 +626,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
    else if (type == MetadataAction::LOOKUP) {
     MetadataAction::LookupInput in;
     in.ParseFromString(action->input());
-    LOG(ERROR)<<"Remote machine is looking up metadata "<<machine_->machine_id()<<"  "<<in.path();//gaoxuan --在这里看看是那台机器取什么路径
+   // LOG(ERROR)<<"Remote machine is looking up metadata "<<machine_->machine_id()<<"  "<<in.path();//gaoxuan --在这里看看是那台机器取什么路径
     action->add_readset(in.path());
     //gaoxuan --下面那一行是我加的，这里可能是作者的问题？没这个Run根本不会跑，更不用说里面的LOOKUP逻辑了
     action->add_writeset(in.path());
@@ -714,7 +714,7 @@ void MetadataStore::Run(Action* action) {
   } else if (type == MetadataAction::LOOKUP) {
     MetadataAction::LookupInput in;
     MetadataAction::LookupOutput out;
-    LOG(ERROR)<<"The logic of LOOKUP in Run ";
+   // LOG(ERROR)<<"The logic of LOOKUP in Run ";
     in.ParseFromString(action->input());
     Lookup_Internal(context, in, &out);
     out.SerializeToString(action->mutable_output());
@@ -986,7 +986,7 @@ void MetadataStore::Lookup_Internal(
     out->add_errors(MetadataAction::FileDoesNotExist);
     return;
   }
-  LOG(ERROR)<<"The logic of LOOKUP in Lookup_Internal";
+  //LOG(ERROR)<<"The logic of LOOKUP in Lookup_Internal";
   // TODO(agt): Check permissions.
 
   // Return entry.
