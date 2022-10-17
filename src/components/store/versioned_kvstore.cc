@@ -241,9 +241,11 @@ bool VersionedKVStore::Get(
       LOG(ERROR)<<key<<";gaoxuan --false 1";//gaoxuan --all false is from here
       return false;
     }
-    if (!Slice(it->Key()).starts_with(key)) {
+    if (!Slice(it->Key()).starts_with(key)) {//gaoxuan --
       delete it;
       //LOG(ERROR)<<Slice(it->Key()).data();//gaoxuan --in this way, system will be down,why??
+      //gaoxuan --observe which one is true false
+      LOG(ERROR)<<Slice(it->Key()).size()>=key.size<<" ::: "(memcmp(Slice(it->Key()).data(), key, key.size()) == 0);
       LOG(ERROR)<<key<<";gaoxuan --false 2";//gaoxuan --all false is from here
       return false;
     }
