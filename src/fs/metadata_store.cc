@@ -606,9 +606,10 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
    else if (type == MetadataAction::LOOKUP) {
     MetadataAction::LookupInput in;
     in.ParseFromString(action->input());
-    //gaoxuan --我是弱智，还没变字符串你写上面肯定会错误呀,事实证明，这里路径也没错误，就是说，这个没任何问题
     LOG(ERROR)<<"Remote machine is looking up metadata "<<machine_->machine_id()<<"  "<<in.path();//gaoxuan --在这里看看是那台机器取什么路径
     action->add_readset(in.path());
+    //gaoxuan --下面那一行是我加的，这里可能是作者的问题？没这个Run根本不会跑，更不用说里面的LOOKUP逻辑了
+    action->add_writeset(in.path());
 
   } else if (type == MetadataAction::RESIZE) {
     MetadataAction::ResizeInput in;
@@ -693,7 +694,7 @@ void MetadataStore::Run(Action* action) {
   } else if (type == MetadataAction::LOOKUP) {
     MetadataAction::LookupInput in;
     MetadataAction::LookupOutput out;
-    LOG(ERROR)<<"Run li mian de LOOKUP ye zhixingle";
+    LOG(ERROR)<<"The logic of LOOKUP in Run ";
     in.ParseFromString(action->input());
     Lookup_Internal(context, in, &out);
     out.SerializeToString(action->mutable_output());
@@ -965,7 +966,7 @@ void MetadataStore::Lookup_Internal(
     out->add_errors(MetadataAction::FileDoesNotExist);
     return;
   }
-
+  LOG(ERROR)<<"The logic of LOOKUP in Lookup_Internal";
   // TODO(agt): Check permissions.
 
   // Return entry.
