@@ -228,8 +228,9 @@ bool VersionedKVStore::Get(
   // Advance to first key for same object whose encoded version < 'version'.
   while (true) {
    
-    if (!(Slice(it->Key()).starts_with(key))) {
+    if (!(Slice(it->Key().data()).starts_with(key))) {
       delete it;
+      LOG(ERROR)<<it->Key().data()<<"and "<<key;
       LOG(ERROR)<<key<<";gaoxuan --false in prefix";//gaoxuan --all false is from here
       return false;
     }
