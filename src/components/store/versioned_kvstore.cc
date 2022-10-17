@@ -246,7 +246,7 @@ bool VersionedKVStore::Get(
       //LOG(ERROR)<<Slice(it->Key()).data();//gaoxuan --in this way, system will be down,why??
       //gaoxuan --observe which one is true false
       LOG(ERROR)<<(Slice(it->Key()).size()>=key.size());
-      const char *k = key;
+      const char *k = key.c_str();
       LOG(ERROR)<<" ::: "<<(memcmp(Slice(it->Key()).data(), k, strlen(k)) == 0);
       LOG(ERROR)<<key<<";gaoxuan --false 2";//gaoxuan --all false is from here
       return false;
