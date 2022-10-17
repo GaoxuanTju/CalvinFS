@@ -612,7 +612,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
   }
    else if (type == MetadataAction::LOOKUP) {
     MetadataAction::LookupInput in;
-    LOG(ERROR)<<"Remote machine is looking up metadata";//gaoxuan --
+    LOG(ERROR)<<"Remote machine is looking up metadata "<<machine_->machine_id()<<"  "<<in.path();//gaoxuan --在这里看看是那台机器取什么路径
     in.ParseFromString(action->input());
     action->add_readset(in.path());
 
