@@ -230,10 +230,25 @@ bool VersionedKVStore::Get(
   while (true) {
     // Check if the current key exists and starts with target prefix.
     
-    if (!it->Valid() || !Slice(it->Key()).starts_with(key) ||
+    /*if (!it->Valid() || !Slice(it->Key()).starts_with(key) ||
         it->Key()[key.size()] != '\0') {
       delete it;
       LOG(ERROR)<<key<<";gaoxuan --false 1";//gaoxuan --all false is from here
+      return false;
+    }*/
+    if (!it->Valid() ) {
+      delete it;
+      LOG(ERROR)<<key<<";gaoxuan --false 1";//gaoxuan --all false is from here
+      return false;
+    }
+    if (!Slice(it->Key()).starts_with(key)) {
+      delete it;
+      LOG(ERROR)<<key<<";gaoxuan --false 2";//gaoxuan --all false is from here
+      return false;
+    }
+    if (it->Key()[key.size()] != '\0') {
+      delete it;
+      LOG(ERROR)<<key<<";gaoxuan --false 3";//gaoxuan --all false is from here
       return false;
     }
     // Check if the current key's version < 'version'.

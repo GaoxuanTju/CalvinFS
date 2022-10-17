@@ -157,10 +157,6 @@ class DistributedExecutionContext : public ExecutionContext {
       uint64 machine = config_->LookupMetadataShard(mds, replica_);
       if (machine == machine_->machine_id()) {
         // Local read.
-        //gaoxuan --执行的一定是这里,但是为什么为执行三次，这可能就是问题所在
-        LOG(ERROR)<<"zhe li hui zhi xing ma in gou zao han shu"<<action->readset(i);
-
-        //gaoxuan --上面的东西要删掉
         if (!store_->Get(action->readset(i),
                          version_,
                          &reads_[action->readset(i)])) {
