@@ -227,12 +227,12 @@ bool VersionedKVStore::Get(
   it->Seek(key);
 
   // Advance to first key for same object whose encoded version < 'version'.
-
+  while (true) {
     // Check if the current key exists and starts with target prefix.
     if (!it->Valid() || !Slice(it->Key()).starts_with(key) ||
         it->Key()[key.size()] != '\0') {
+      LOG(ERROR)<<"still error";
       delete it;
-      LOG(ERROR)<<"can this be error?"<<key<<"   "<<it->Key().data();
       return false;
     }
 
@@ -249,8 +249,8 @@ bool VersionedKVStore::Get(
     }
 
     // Move to the next record.
-   
-  
+    it->Next();
+  }
     
 }
 
