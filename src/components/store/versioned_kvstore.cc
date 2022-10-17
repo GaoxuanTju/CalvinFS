@@ -241,6 +241,12 @@ bool VersionedKVStore::Get(
       LOG(ERROR)<<key<<";gaoxuan --false 1";//gaoxuan --all false is from here
       return false;
     }
+    if (it->Key()[key.size()] != '\0') {
+      delete it;
+      //LOG(ERROR)<<it->Key(); //in this way,system will be down
+      LOG(ERROR)<<key<<";gaoxuan --false 3";//gaoxuan --all false is from here
+      return false;
+    }
     if (!Slice(it->Key()).starts_with(key)) {//gaoxuan --
       delete it;
       //LOG(ERROR)<<Slice(it->Key()).data();//gaoxuan --in this way, system will be down,why??
@@ -257,12 +263,7 @@ bool VersionedKVStore::Get(
       LOG(ERROR)<<key<<";gaoxuan --false 2";//gaoxuan --all false is from here
       return false;
     }
-    if (it->Key()[key.size()] != '\0') {
-      delete it;
-      //LOG(ERROR)<<it->Key(); //in this way,system will be down
-      LOG(ERROR)<<key<<";gaoxuan --false 3";//gaoxuan --all false is from here
-      return false;
-    }
+    
     // Check if the current key's version < 'version'.
     if (ParseVersion(it->Key(), flags) < version) {
       if (*flags & kDeletedFlag) {
