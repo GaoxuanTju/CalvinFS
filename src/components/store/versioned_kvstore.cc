@@ -241,7 +241,7 @@ bool VersionedKVStore::Get(
     }
     LOG(ERROR)<<"key input is: "<<key<<"; seek key is"<<it->Key().data();//这里完全正确,现在还是对的
     if (!Slice(it->Key()).starts_with(key)) {//gaoxuan --
-      LOG(ERROR)<<"key put has been changed into"<<in->Key().data();
+      LOG(ERROR)<<"key put has been changed into"<<it->Key().data();
       LOG(ERROR)<<key<<";gaoxuan --false 2";//gaoxuan --all false is from here
       delete it;
       return false;
