@@ -250,6 +250,15 @@ bool VersionedKVStore::Get(
       {
         LOG(ERROR)<<"not error in size"; 
       }
+
+      if (it->Key()[key.size()] != '\0') {
+      
+      LOG(ERROR)<<it->Key(); //in this way,system will be down
+      LOG(ERROR)<<key<<";gaoxuan --false 3";//gaoxuan --all false is from here
+      delete it;
+      return false;
+    }
+    
       const char *k = key.c_str();
       if(memcmp(Slice(it->Key()).data(), k, strlen(k)) != 0)
       {
@@ -260,12 +269,7 @@ bool VersionedKVStore::Get(
       delete it;
       return false;
     }
-    if (it->Key()[key.size()] != '\0') {
-      delete it;
-      //LOG(ERROR)<<it->Key(); //in this way,system will be down
-      LOG(ERROR)<<key<<";gaoxuan --false 3";//gaoxuan --all false is from here
-      return false;
-    }
+    
     // Check if the current key's version < 'version'.
     if (ParseVersion(it->Key(), flags) < version) {
       if (*flags & kDeletedFlag) {
