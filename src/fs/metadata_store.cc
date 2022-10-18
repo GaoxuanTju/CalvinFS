@@ -625,12 +625,12 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
     in.ParseFromString(action->input());
     std::stack <string> stack1;//the stack is used for tranversing  the file tree
     stack1.push(in.from_path());//we want to tranverse all children of this path to add read/write set
-    LOG(ERROR)<<"from_path is "<<in.from_path();
+   // LOG(ERROR)<<"from_path is "<<in.from_path();
     while (!stack1.empty()) 
     {
     string top = stack1.top(); // get the top
     stack1.pop();              // pop the top
-    LOG(ERROR)<<"top is "<<top;
+   // LOG(ERROR)<<"top is "<<top;
     action->add_readset(top);
     action->add_writeset(top);
     uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(top)), config_->LookupReplica(machine_->machine_id()));
@@ -664,7 +664,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
       {
         string full_path =top + "/" + out.entry().dir_contents(i);
         stack1.push(full_path);
-        LOG(ERROR)<<"top is "<<top<<" it's child:"<<full_path;
+       // LOG(ERROR)<<"top is "<<top<<" it's child:"<<full_path;
       }
     }     
     }
@@ -675,6 +675,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
     action->add_writeset(in.to_path());
     action->add_readset(ParentDir(in.to_path()));
     action->add_writeset(ParentDir(in.to_path()));
+    LOG(ERROR)<<"Is this position is executing?";//如果这里执行了，就说明这里的循环正常终止
   }
   else if (type == MetadataAction::LOOKUP) {
     MetadataAction::LookupInput in;
