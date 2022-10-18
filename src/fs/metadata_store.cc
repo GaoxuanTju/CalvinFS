@@ -159,7 +159,7 @@ class DistributedExecutionContext : public ExecutionContext {
       if (machine == machine_->machine_id()) {//gaoxuan --if the path in read/write set is local,put it's metadataentry into map reads_,key is path,value is entry
         // Local read.
         if (!store_->Get(action->readset(i),//gaoxuan --第二个参数我改一下，原本是version_
-                         version_,
+                         10,
                          &reads_[action->readset(i)])) {
           reads_.erase(action->readset(i));
         }
