@@ -635,8 +635,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
       action->add_readset(top);
       action->add_writeset(top);
       int index = top.substr(in.to_path().size()).find('/');
-      //这行非常的精妙
-      To_path = in.to_path()+top.substr(index);
+      //To_path = in.to_path()+top.substr(index);
       action->add_writeset(To_path);
 
       uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(top)), config_->LookupReplica(machine_->machine_id()));
