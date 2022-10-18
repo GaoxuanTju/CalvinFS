@@ -1009,7 +1009,7 @@ void MetadataStore::Rename_Internal(
   {
   //使用广度优先的方式来一层层添加新的entry
   //gaoxuan --这中间是广度优先遍历添加新的元数据项
-
+      LOG(ERROR)<<"is this executing before loop in Internal,and may be just don't come into this branch?";
       std::queue<string> queue1; //gaoxuan --用于BFS的队列
       string root = in.to_path();
       queue1.push(root); //将根节点加入队列
@@ -1040,7 +1040,7 @@ void MetadataStore::Rename_Internal(
           }
           from_path = in.from_path() + queue1.front().substr(len);
             
-      LOG(ERROR)<<"is this position is executing?";
+      LOG(ERROR)<<"is this position is executing?";//这句话没输出
           
       } 
     //gaoxuan --这中间是广度优先遍历添加新的元数据项
