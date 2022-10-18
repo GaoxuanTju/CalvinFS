@@ -231,7 +231,7 @@ bool VersionedKVStore::Get(
     // Check if the current key exists and starts with target prefix.
     if (!it->Valid() || !Slice(it->Key()).starts_with(key) ||
         it->Key()[key.size()] != '\0') {
-      LOG(ERROR)<<"still error";//自从改了版本号，这一行没在执行过了
+      LOG(ERROR)<<"still error";//这里又执行了
       delete it;
       return false;
     }
