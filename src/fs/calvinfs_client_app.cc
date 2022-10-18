@@ -290,9 +290,9 @@ MessageBuffer *CalvinFSClientApp::RenameFile(const Slice &from_path, const Slice
   metadata_->setAPPname(name()); // gaoxuan --这一行是我加的，用于在metadata_store.cc里面获得app name
 
   metadata_->GetRWSets(a);
-  LOG(ERROR)<<"after GetRW in mds.cc";
+ // LOG(ERROR)<<"after GetRW in mds.cc";
   log_->Append(a);
-  LOG(ERROR)<<"after log_->Append(a) in mds.cc";
+  //LOG(ERROR)<<"after log_->Append(a) in mds.cc";
   // gaoxuan --这里把Rename操作确定后加入元数据日志，等待scheduler进行调度！结果就是执行metadata_store.cc中的Run函数，Run函数再去调用这个文件里面的Rename_Internal()
   // gaoxuan --Rename_Internal()才是Rename的真正逻辑所在
   MessageBuffer *m = NULL;
@@ -307,7 +307,7 @@ MessageBuffer *CalvinFSClientApp::RenameFile(const Slice &from_path, const Slice
   delete m;
   MetadataAction::RenameOutput out;
   out.ParseFromString(result.output());
-  LOG(ERROR)<<"finish rename in REnamefile in mds.cc";
+  LOG(ERROR)<<"finish rename in REnamefile in mds.cc";//目前这行没有执行
   if (out.success())
   {
     return new MessageBuffer();
