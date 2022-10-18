@@ -950,15 +950,15 @@ void MetadataStore::Rename_Internal(
   //使用广度优先的方式来一层层添加新的entry
   //gaoxuan --这中间是广度优先遍历添加新的元数据项
 
-      std::queue<string> queue; //gaoxuan --用于BFS的队列
+      std::queue<string> queue1; //gaoxuan --用于BFS的队列
       string root = in.to_path();
-      queue.push(root); //将根节点加入队列
+      queue1.push(root); //将根节点加入队列
       string from_path =in.from_path();//用于从中copyEntry，每次循环后要更新
       int len = from_path.size();//获取一下字符串大小
-      while (!queue.empty()) { //队列不空执行逻辑
+      while (!queue1.empty()) { //队列不空执行逻辑
 
-          string front = queue.front();//获取队首元素
-          queue.pop();//出队队首元素
+          string front = queue1.front();//获取队首元素
+          queue1.pop();//出队队首元素
           //z这中间要对队首元素操作
           //Add Entry
           MetadataEntry to_entry1;//对应于front中路径的entry，是要被新添加进去的
@@ -975,10 +975,10 @@ void MetadataStore::Rename_Internal(
             for (int i = 0; i < to_entry1.dir_contents_size(); i++) {
               //gaoxuan --the dir_contents only includes the absolute path,we need to change it to full path
               string full_path = front+"/"+to_entry1.dir_contents(i);
-              queue.push(full_path);
+              queue1.push(full_path);
             }  
           }
-          from_path = in.from_path() + queue.front().substr(len);
+          from_path = in.from_path() + queue1.front().substr(len);
             
       
           
