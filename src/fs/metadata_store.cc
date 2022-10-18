@@ -625,11 +625,12 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
     in.ParseFromString(action->input());
     std::stack <string> stack1;//the stack is used for tranversing  the file tree
     stack1.push(in.from_path());//we want to tranverse all children of this path to add read/write set
+    LOG(ERROR)<<"from_path is "<<in.from_path();
     while (!stack1.empty()) 
     {
     string top = stack1.top(); // get the top
     stack1.pop();              // pop the top
-
+    LOG(ERROR)<<"top is "<<top;
     action->add_readset(top);
     action->add_writeset(top);
     uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(top)), config_->LookupReplica(machine_->machine_id()));
