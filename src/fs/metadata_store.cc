@@ -662,7 +662,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
       // gaoxuan --目录的话才取子目录或文件
       for (int i = 0; i < out.entry().dir_contents_size(); i++)
       {
-        string full_path =ParentDir(top) + "/" + out.entry().dir_contents(i);
+        string full_path =top + "/" + out.entry().dir_contents(i);
         stack1.push(full_path);
         LOG(ERROR)<<"top is "<<top<<" it's child:"<<full_path;
       }
