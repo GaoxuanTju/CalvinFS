@@ -634,9 +634,8 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
     // LOG(ERROR)<<"top is "<<top;
       action->add_readset(top);
       action->add_writeset(top);
-      int index = top.substr(in.to_path().size()).find('/');
-      LOG(ERROR)<<index;
-      //To_path = in.to_path()+top.substr(index);
+      string s = top.substr(in.from_path().size());//s是去除from_path的后半段路径
+      To_path = in.to_path()+s;//To_path就是to_path加上去除from_path的路径
       action->add_writeset(To_path);
 
       uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(top)), config_->LookupReplica(machine_->machine_id()));
