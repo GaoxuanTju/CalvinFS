@@ -944,7 +944,7 @@ void MetadataStore::Rename_Internal(
   // Update to_parent (add new dir content)
   parent_to_entry.add_dir_contents(to_filename);//gaoxuan --这一步不用循环
   context->PutEntry(parent_to_path, parent_to_entry);
-  LOG(ERROR)<<"this part is executing";
+ // LOG(ERROR)<<"this part is executing";
   if((from_entry.type()==DIR)&&(from_entry.dir_contents_size()!=0))//gaoxuan --only if the object we want to rename is DIR we need to loop,if its a file we don't need loop
   {
   //使用广度优先的方式来一层层添加新的entry
