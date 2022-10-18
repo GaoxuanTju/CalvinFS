@@ -304,9 +304,9 @@ MessageBuffer *CalvinFSClientApp::RenameFile(const Slice &from_path, const Slice
 
     a->add_readset(top);
     a->add_writeset(top);
-    uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(top)), config_->LookupReplica(get_machine_()->machine_id()));
+    uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(top)), config_->LookupReplica(metadata_->get_machine_()->machine_id()));
     Header *header = new Header();
-    header->set_from(get_machine_()->machine_id());
+    header->set_from(metadata_->get_machine_()->machine_id());
     header->set_to(mds_machine);
     header->set_type(Header::RPC);
     header->set_app(name());
@@ -314,7 +314,7 @@ MessageBuffer *CalvinFSClientApp::RenameFile(const Slice &from_path, const Slice
     header->add_misc_string(top.c_str(), strlen(top.c_str()));
     MessageBuffer *m = NULL;
     header->set_data_ptr(reinterpret_cast<uint64>(&m));
-    machine_->SendMessage(header, new MessageBuffer());
+    metadata_->get_machine_()->SendMessage(header, new MessageBuffer());
     while (m == NULL)
     {
       usleep(10);
@@ -334,7 +334,7 @@ MessageBuffer *CalvinFSClientApp::RenameFile(const Slice &from_path, const Slice
       for (int i = 0; i < out.entry().dir_contents_size(); i++)
       {
         string full_path = top + "/" + out.entry().dir_contents(i);
-        stack.push(full_path);
+        stack1.push(full_path);
       }
     }
   }
