@@ -522,7 +522,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
     header->set_to(mds_machine);
     header->set_type(Header::RPC);
     header->set_app(getAPPname());
-    header->set_rpc("LS");
+    header->set_rpc("LOOKUP");
     header->add_misc_string(top.c_str(), strlen(top.c_str()));
     MessageBuffer *m = NULL;
     header->set_data_ptr(reinterpret_cast<uint64>(&m));
