@@ -965,6 +965,7 @@ void MetadataStore::Rename_Internal(
   MetadataEntry from_entry;//gaoxuan --get from_path's entry to check if it's existed,put it into from_entry
   if (!context->GetEntry(in.from_path(), &from_entry)) {
     // File doesn't exist!
+    LOG(ERROR)<<"File doesn't exist!";
     out->set_success(false);
     out->add_errors(MetadataAction::FileDoesNotExist);
     return;
@@ -974,6 +975,7 @@ void MetadataStore::Rename_Internal(
   MetadataEntry parent_from_entry;
   if (!context->GetEntry(parent_from_path, &parent_from_entry)) {
     // File doesn't exist!
+    LOG(ERROR)<<"From_Parent File doesn't exist!";
     out->set_success(false);
     out->add_errors(MetadataAction::FileDoesNotExist);
     return;
@@ -983,6 +985,7 @@ void MetadataStore::Rename_Internal(
   MetadataEntry parent_to_entry;
   if (!context->GetEntry(parent_to_path, &parent_to_entry)) {
     // File doesn't exist!
+    LOG(ERROR)<<"To_Parent File doesn't exist!";
     out->set_success(false);
     out->add_errors(MetadataAction::FileDoesNotExist);
     return;
@@ -993,6 +996,7 @@ void MetadataStore::Rename_Internal(
   string to_filename = FileName(in.to_path());
   for (int i = 0; i < parent_to_entry.dir_contents_size(); i++) {
     if (parent_to_entry.dir_contents(i) == to_filename) {
+      LOG(ERROR)<<"file already exists, fail.";
       out->set_success(false);
       out->add_errors(MetadataAction::FileAlreadyExists);
       return;
@@ -1005,11 +1009,12 @@ void MetadataStore::Rename_Internal(
   parent_to_entry.add_dir_contents(to_filename);//gaoxuan --这一步不用循环
   context->PutEntry(parent_to_path, parent_to_entry);
  // LOG(ERROR)<<"this part is executing";
+ LOG(ERROR)<<(from_entry.type()==DIR)&&(from_entry.dir_contents_size()!=0)<<";"<<(from_entry.type()==DIR)<<";"<<from_entry.dir_contents_size()
   if((from_entry.type()==DIR)&&(from_entry.dir_contents_size()!=0))//gaoxuan --only if the object we want to rename is DIR we need to loop,if its a file we don't need loop
   {
   //使用广度优先的方式来一层层添加新的entry
   //gaoxuan --这中间是广度优先遍历添加新的元数据项
-      LOG(ERROR)<<"is this executing before loop in Internal,and may be just don't come into this branch?";
+      LOG(ERROR)<<"is this executing before loop in Internal,and may be just don't come into this branch?";//这一行也没执行，就没进入这个分支
       std::queue<string> queue1; //gaoxuan --用于BFS的队列
       string root = in.to_path();
       queue1.push(root); //将根节点加入队列
