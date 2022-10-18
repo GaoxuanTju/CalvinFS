@@ -675,7 +675,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
     action->add_writeset(in.to_path());
     action->add_readset(ParentDir(in.to_path()));
     action->add_writeset(ParentDir(in.to_path()));
-    LOG(ERROR)<<"Is this position is executing?";//如果这里执行了，就说明这里的循环正常终止
+   // LOG(ERROR)<<"Is this position is executing?";//如果这里执行了，就说明这里的循环正常终止
   }
   else if (type == MetadataAction::LOOKUP) {
     MetadataAction::LookupInput in;
@@ -1040,7 +1040,7 @@ void MetadataStore::Rename_Internal(
           }
           from_path = in.from_path() + queue1.front().substr(len);
             
-      
+      LOG(ERROR)<<"is this position is executing?";
           
       } 
     //gaoxuan --这中间是广度优先遍历添加新的元数据项
