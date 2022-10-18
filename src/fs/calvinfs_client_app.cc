@@ -290,65 +290,7 @@ MessageBuffer *CalvinFSClientApp::RenameFile(const Slice &from_path, const Slice
   in.SerializeToString(a->mutable_input());
   metadata_->setAPPname(name()); // gaoxuan --这一行是我加的，用于在metadata_store.cc里面获得app name
 
-  // gaoxuan --change
-
-  // gaoxuan --change
-  // gaoxuan --change
-  std::stack<string> stack1;   // the stack is used for tranversing  the file tree
-  stack1.push(in.from_path()); // we want to tranverse all children of this path to add read/write set
-  while (!stack1.empty())
-  {
-
-    string top = stack1.top(); // get the top
-    stack1.pop();              // pop the top
-
-    a->add_readset(top);
-    a->add_writeset(top);
-    uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(top)), config_->LookupReplica(metadata_->get_machine_()->machine_id()));
-    Header *header = new Header();
-    header->set_from(metadata_->get_machine_()->machine_id());
-    header->set_to(mds_machine);
-    header->set_type(Header::RPC);
-    header->set_app(name());
-    header->set_rpc("LS");
-    header->add_misc_string(top.c_str(), strlen(top.c_str()));
-    MessageBuffer *m = NULL;
-    header->set_data_ptr(reinterpret_cast<uint64>(&m));
-    metadata_->get_machine_()->SendMessage(header, new MessageBuffer());
-    while (m == NULL)
-    {
-      usleep(10);
-      Noop<MessageBuffer *>(m);
-    }
-
-    // gaoxuan --如今m里面就是读到的信息了
-    MessageBuffer *serialized = m;
-    Action b;
-    b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
-    delete serialized;
-    MetadataAction::LookupOutput out;
-    out.ParseFromString(b.output());
-    if (out.success() && out.entry().type() == DIR)
-    {
-      // gaoxuan --目录的话才取子目录或文件
-      for (int i = 0; i < out.entry().dir_contents_size(); i++)
-      {
-        string full_path = top + "/" + out.entry().dir_contents(i);
-        stack1.push(full_path);
-      }
-    }
-  }
-
-  a->add_readset(ParentDir(in.from_path()));
-  a->add_writeset(ParentDir(in.from_path()));
-  // the read/write set for to_path
-  a->add_writeset(in.to_path());
-  a->add_readset(ParentDir(in.to_path()));
-  a->add_writeset(ParentDir(in.to_path()));
-
-  // gaoxuan --change
-
-  // metadata_->GetRWSets(a);
+  metadata_->GetRWSets(a);
   log_->Append(a);
   // gaoxuan --这里把Rename操作确定后加入元数据日志，等待scheduler进行调度！结果就是执行metadata_store.cc中的Run函数，Run函数再去调用这个文件里面的Rename_Internal()
   // gaoxuan --Rename_Internal()才是Rename的真正逻辑所在
