@@ -4,6 +4,9 @@
 
 #include "fs/calvinfs_client_app.h"
 #include "machine/app/app.h"
+#include <stack>
+#include "fs/metadata_store.h"
+#include "fs/metadata_store.cc"
 
 REGISTER_APP(CalvinFSClientApp)
 {
@@ -301,9 +304,9 @@ MessageBuffer *CalvinFSClientApp::RenameFile(const Slice &from_path, const Slice
 
     a->add_readset(top);
     a->add_writeset(top);
-    uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(top)), config_->LookupReplica(machine_->machine_id()));
+    uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(top)), config_->LookupReplica(get_machine_()->machine_id()));
     Header *header = new Header();
-    header->set_from(machine_->machine_id());
+    header->set_from(get_machine_()->machine_id());
     header->set_to(mds_machine);
     header->set_type(Header::RPC);
     header->set_app(name());
