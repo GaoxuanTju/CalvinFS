@@ -716,7 +716,6 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
 
 void MetadataStore::Run(Action* action) {
   //gaoxuan --this part will be executed by scheduler after action has beed append to log
-  LOG(ERROR)<<"Run is executing!!!!";
   // Prepare by performing all reads.
   ExecutionContext* context;
   if (machine_ == NULL) {
