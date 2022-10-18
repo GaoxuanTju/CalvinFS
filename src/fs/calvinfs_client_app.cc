@@ -4,9 +4,8 @@
 
 #include "fs/calvinfs_client_app.h"
 #include "machine/app/app.h"
-#include <stack>
-#include "fs/metadata_store.h"
-#include "fs/metadata_store.cc"
+
+
 
 REGISTER_APP(CalvinFSClientApp)
 {
