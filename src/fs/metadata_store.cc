@@ -21,6 +21,7 @@
 #include "machine/app/app.h"
 #include "proto/action.pb.h"
 #include <stack> //gaoxuan --the stack for DFS
+#include <queue> //gaoxuan --the queue for BFS
 using std::map;
 using std::set;
 using std::string;
@@ -152,10 +153,10 @@ class DistributedExecutionContext : public ExecutionContext {
     // Figure out what machines are readers (and perform local reads).
     reader_ = false;
     set<uint64> remote_readers;
-    for (int i = 0; i < action->readset_size(); i++) {
+    for (int i = 0; i < action->readset_size(); i++) {//gaoxuan --now handle the read/write set passed from GetRWs
       uint64 mds = config_->HashFileName(action->readset(i));
-      uint64 machine = config_->LookupMetadataShard(mds, replica_);
-      if (machine == machine_->machine_id()) {
+      uint64 machine = config_->LookupMetadataShard(mds, replica_);//gaoxuan --get right machine of the path
+      if (machine == machine_->machine_id()) {//gaoxuan --if the path in read/write set is local,put it's metadataentry into map reads_,key is path,value is entry
         // Local read.
         if (!store_->Get(action->readset(i),//gaoxuan --第二个参数我改一下，原本是version_
                          10,
@@ -163,7 +164,7 @@ class DistributedExecutionContext : public ExecutionContext {
           reads_.erase(action->readset(i));
         }
         reader_ = true;
-      } else {
+      } else {//gaoxuan --this machine is that we want to read. Put it into set remote_readers
         remote_readers.insert(machine);
       }
     }
@@ -189,12 +190,13 @@ class DistributedExecutionContext : public ExecutionContext {
         e->set_key(it->first);
         e->set_value(it->second);
       }
+      //gaoxuan --why do we want to read but we need to broadcast to writers?
       for (auto it = remote_writers.begin(); it != remote_writers.end(); ++it) {
         Header* header = new Header();
         header->set_from(machine_->machine_id());
         header->set_to(*it);
-        header->set_type(Header::DATA);
-        header->set_data_channel("action-" + UInt64ToString(version_));
+        header->set_type(Header::DATA);//gaoxuan --deliver packets directly,and the specific logic refers to lock
+        header->set_data_channel("action-" + UInt64ToString(version_));//gaoxuan --Can this version make a difference ? 
         machine_->SendMessage(header, new MessageBuffer(local_reads));
       }
     }
@@ -204,7 +206,7 @@ class DistributedExecutionContext : public ExecutionContext {
       // Get channel.
       AtomicQueue<MessageBuffer*>* channel =
           machine_->DataChannel("action-" + UInt64ToString(version_));
-      for (uint32 i = 0; i < remote_readers.size(); i++) {
+      for (uint32 i = 0; i < remote_readers.size(); i++) {//gaoxuan --in this part we get remote entry
         MessageBuffer* m = NULL;
         // Get results.
         while (!channel->Pop(&m)) {
@@ -500,7 +502,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
     action->add_readset(ParentDir(in.to_path()));
     action->add_writeset(ParentDir(in.to_path()));
 
-  }/*else if (type == MetadataAction::RENAME) {the version of gaoxuan
+  }/**/else if (type == MetadataAction::RENAME) {// the version of gaoxuan
     //gaoxuan --this part is rewrited by gaoxuan
     //gaoxuan --add read/write set in the way of DFS
     MetadataAction::RenameInput in;
@@ -516,18 +518,20 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
         action->add_writeset(top);
               
         //gaoxuan --the following part is used to get the child path of a DIR and push them to stack
-        uint64 mds_machine =config_->LookupMetadataShard(config_->HashFileName(Slice(in.from_path())), config_->LookupReplica(machine_->machine_id()));
+        uint64 mds_machine =config_->LookupMetadataShard(config_->HashFileName(Slice(top)), config_->LookupReplica(machine_->machine_id()));
         // Run if local.
         if (mds_machine == machine_->machine_id()) {
           string metadata_entry1;
-          store_->Get(in.from_path(),10,&metadata_entry1);
+          store_->Get(top,10,&metadata_entry1);
           MetadataEntry entry;
           entry.ParseFromString(metadata_entry1);
           if (entry.type() == DIR) {
             //gaoxuan --目录的话才取子目录或文件
             for (int i = 0; i < entry.dir_contents_size(); i++) {
               //LOG(ERROR)<<"machine is "<<machine_->machine_id()<<"entry is"<<entry.dir_contents(i);//输出一下所有的元数据项,确实能够实现从本地拿元数据项了，输出成功了
-              stack.push(entry.dir_contents(i));
+              //gaoxuan --the dir_contents only includes the absolute path,we need to change it to full path
+              string full_path = ParentDir(top)+"/"+entry.dir_contents(i);
+              stack.push(full_path);
             }
           } 
         }else {// If not local, get result from the right machine (within this replica).Use RPC 
@@ -537,7 +541,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
           header->set_type(Header::RPC);
           header->set_app(getAPPname());
           header->set_rpc("LOOKUP");
-          header->add_misc_string(in.from_path().c_str(),strlen(in.from_path().c_str()));
+          header->add_misc_string(top.c_str(),strlen(top.c_str()));
           MessageBuffer* m = NULL;
           header->set_data_ptr(reinterpret_cast<uint64>(&m));
           machine_->SendMessage(header, new MessageBuffer());
@@ -556,7 +560,8 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
             //gaoxuan --目录的话才取子目录或文件
             for (int i = 0; i < out.entry().dir_contents_size(); i++) {
               //LOG(ERROR)<<"machine is "<<machine_->machine_id()<<"entry is"<<out.entry().dir_contents(i);//输出一下所有的元数据项,确实能够实现从远程拿元数据项了，输出成功了
-              stack.push(out.entry().dir_contents(i));
+              string full_path = ParentDir(top)+"/"+out.entry().dir_contents(i);
+              stack.push(full_path);
             }
           } 
         }           
@@ -568,7 +573,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
     action->add_writeset(in.to_path());
     action->add_readset(ParentDir(in.to_path()));
     action->add_writeset(ParentDir(in.to_path()));
-  }*/ /**/else if (type == MetadataAction::RENAME) {
+  } /*else if (type == MetadataAction::RENAME) {
     MetadataAction::RenameInput in;
     in.ParseFromString(action->input());
     action->add_readset(in.from_path());
@@ -628,7 +633,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
       } 
     }
     //gaoxuan --test
-  }else if (type == MetadataAction::LOOKUP) {
+  }*/else if (type == MetadataAction::LOOKUP) {
     MetadataAction::LookupInput in;
     in.ParseFromString(action->input());
    // LOG(ERROR)<<"Remote machine is looking up metadata "<<machine_->machine_id()<<"  "<<in.path();//gaoxuan --在这里看看是那台机器取什么路径
@@ -672,7 +677,7 @@ void MetadataStore::Run(Action* action) {
   ExecutionContext* context;
   if (machine_ == NULL) {
     context = new ExecutionContext(store_, action);
-  } else {//gaoxuan --就是在这里创建context的时候会调用Get
+  } else {//gaoxuan --we can confirm we get all entry we want,because in DistributedExecutionContext has this logic
     context =
         new DistributedExecutionContext(machine_, config_, store_, action);
   }
@@ -910,17 +915,16 @@ void MetadataStore::Rename_Internal(
     const MetadataAction::RenameInput& in,
     MetadataAction::RenameOutput* out) {//gaoxuan --this function wiil be executed when running RenameExperiment
   // Currently only support Copy: (non-recursive: only succeeds for DATA files and EMPTY directory)
-  MetadataEntry from_entry;
+
+//gaoxuan --now consider how to modify the logic of rename with correct context
+
+  MetadataEntry from_entry;//gaoxuan --get from_path's entry to check if it's existed,put it into from_entry
   if (!context->GetEntry(in.from_path(), &from_entry)) {
     // File doesn't exist!
     out->set_success(false);
     out->add_errors(MetadataAction::FileDoesNotExist);
     return;
   }
-  /*gaoxuan --this part is used for testing the correctness of GetEntry;it can really print the dir_contents of MetadataEntry*/
-  
-  //gaoxuan --this is the end of notes
-
 
   string parent_from_path = ParentDir(in.from_path());
   MetadataEntry parent_from_entry;
@@ -941,6 +945,7 @@ void MetadataStore::Rename_Internal(
   }
 
   // If file already exists, fail.
+  //gaoxuan --check if exist a file with same name in the Parent dir of to_path 
   string to_filename = FileName(in.to_path());
   for (int i = 0; i < parent_to_entry.dir_contents_size(); i++) {
     if (parent_to_entry.dir_contents(i) == to_filename) {
@@ -949,11 +954,58 @@ void MetadataStore::Rename_Internal(
       return;
     }
   }
+//gaoxuan --the part above is used to check if we can rename
+//gaoxuan --in the following part we should change it to a loop
 
   // Update to_parent (add new dir content)
-  parent_to_entry.add_dir_contents(to_filename);
+  parent_to_entry.add_dir_contents(to_filename);//gaoxuan --这一步不用循环
   context->PutEntry(parent_to_path, parent_to_entry);
-  
+
+  if((from_entry.type()==DIR)&&(from_entry.dir_contents_size()!=0))//gaoxuan --only if the object we want to rename is DIR we need to loop,if its a file we don't need loop
+  {
+  //使用广度优先的方式来一层层添加新的entry
+  //gaoxuan --这中间是广度优先遍历添加新的元数据项
+
+      std::queue<string> queue; //gaoxuan --用于BFS的队列
+      string root = in.to_path();
+      queue.push(root); //将根节点加入队列
+      string from_path =in.from_path();//用于从中copyEntry，每次循环后要更新
+      int len = from_path.size();//获取一下字符串大小
+      while (!queue.empty()) { //队列不空执行逻辑
+
+          string front = queue.front();//获取队首元素
+          queue.pop();//出队队首元素
+          //z这中间要对队首元素操作
+          //Add Entry
+          MetadataEntry to_entry1;//对应于front中路径的entry，是要被新添加进去的
+          MetadataEntry from_entry1;//对应于from_path的entry，是用于copy的
+          context->GetEntry(from_path, &from_entry1);//先获取from_path的entry，用于拷贝
+          to_entry1.CopyFrom(from_entry1);//将from_path的entry拷贝过来
+          context->PutEntry(front, to_entry1);//将拷贝过来的entry加入存储，键是front中的路径
+          //z这中间要对队首元素操作
+          
+          //下面是要循环，把子目录加入到队列中去
+          
+          if (to_entry1.type() == DIR) {
+            //gaoxuan --目录的话才取子目录或文件
+            for (int i = 0; i < to_entry1.dir_contents_size(); i++) {
+              //gaoxuan --the dir_contents only includes the absolute path,we need to change it to full path
+              string full_path = front+"/"+to_entry1.dir_contents(i);
+              queue.push(full_path);
+            }  
+          }
+          from_path = in.from_path() + queue.front().substr(len);
+            
+      
+          
+      } 
+    //gaoxuan --这中间是广度优先遍历添加新的元数据项
+
+
+  } 
+  else
+  {//gaoxuan --empty dir or file RENAME opretaion
+      
   // Add to_entry
   MetadataEntry to_entry;
   to_entry.CopyFrom(from_entry);
@@ -976,6 +1028,8 @@ void MetadataStore::Rename_Internal(
 
   // Erase the from_entry
   context->DeleteEntry(in.from_path());
+  }
+
 }
 
 void MetadataStore::Lookup_Internal(
