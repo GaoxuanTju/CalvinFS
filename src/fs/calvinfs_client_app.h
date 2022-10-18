@@ -699,7 +699,7 @@ void LatencyExperimentAppend() {
                            "/a" + IntToString(rand() % machine()->config().size()) + "/b" + IntToString(a2) + "/d" + IntToString(machine()->GetGUID())); */
       //gaoxuan --change it to DIR
       BackgroundRenameFile("/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1) ,
-                           "/a" + IntToString(rand() % machine()->config().size()) + "/d" + IntToString(a2)); 
+                           "/a" + IntToString(machine()->machine_id()) + "/d" + IntToString(a2)); 
 
       // contention-free workload
       /**BackgroundRenameFile("/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(j) + "/c" + IntToString(j),
