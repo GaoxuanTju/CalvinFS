@@ -626,53 +626,59 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
     std::stack <string> stack1;//the stack is used for tranversing  the file tree
     stack1.push(in.from_path());//we want to tranverse all children of this path to add read/write set
    // LOG(ERROR)<<"from_path is "<<in.from_path();
+   string To_path = in.to_path();//需要更新
     while (!stack1.empty()) 
     {
-    string top = stack1.top(); // get the top
-    stack1.pop();              // pop the top
-   // LOG(ERROR)<<"top is "<<top;
-    action->add_readset(top);
-    action->add_writeset(top);
-    uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(top)), config_->LookupReplica(machine_->machine_id()));
-    Header *header = new Header();
-    header->set_from(machine_->machine_id());
-    header->set_to(mds_machine);
-    header->set_type(Header::RPC);
-    header->set_app(getAPPname());
-    header->set_rpc("LOOKUP");
-    header->add_misc_string(top.c_str(), strlen(top.c_str()));
-    MessageBuffer *m = NULL;
-    header->set_data_ptr(reinterpret_cast<uint64>(&m));
-    machine_->SendMessage(header, new MessageBuffer());
-    while (m == NULL)
-    {
-      usleep(10);
-      Noop<MessageBuffer *>(m);
-    }
+      string top = stack1.top(); // get the top
+      stack1.pop();              // pop the top
+    // LOG(ERROR)<<"top is "<<top;
+      action->add_readset(top);
+      action->add_writeset(top);
+      int index = top.substr(in.to_path().size()).find('/');
+      //这行非常的精妙
+      To_path = in.to_path()+top.substr(index);
+      action->add_writeset(To_path);
 
-    // gaoxuan --如今m里面就是读到的信息了
-    MessageBuffer *serialized = m;
-    Action b;
-    b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
-    delete serialized;
-    MetadataAction::LookupOutput out;
-    out.ParseFromString(b.output());
-    if (out.success() && out.entry().type() == DIR)
-    {
-      // gaoxuan --目录的话才取子目录或文件
-      for (int i = 0; i < out.entry().dir_contents_size(); i++)
+      uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(top)), config_->LookupReplica(machine_->machine_id()));
+      Header *header = new Header();
+      header->set_from(machine_->machine_id());
+      header->set_to(mds_machine);
+      header->set_type(Header::RPC);
+      header->set_app(getAPPname());
+      header->set_rpc("LOOKUP");
+      header->add_misc_string(top.c_str(), strlen(top.c_str()));
+      MessageBuffer *m = NULL;
+      header->set_data_ptr(reinterpret_cast<uint64>(&m));
+      machine_->SendMessage(header, new MessageBuffer());
+      while (m == NULL)
       {
-        string full_path =top + "/" + out.entry().dir_contents(i);
-        stack1.push(full_path);
-       // LOG(ERROR)<<"top is "<<top<<" it's child:"<<full_path;
+        usleep(10);
+        Noop<MessageBuffer *>(m);
       }
-    }     
+
+      // gaoxuan --如今m里面就是读到的信息了
+      MessageBuffer *serialized = m;
+      Action b;
+      b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
+      delete serialized;
+      MetadataAction::LookupOutput out;
+      out.ParseFromString(b.output());
+      if (out.success() && out.entry().type() == DIR)
+      {
+        // gaoxuan --目录的话才取子目录或文件
+        for (int i = 0; i < out.entry().dir_contents_size(); i++)
+        {
+          string full_path =top + "/" + out.entry().dir_contents(i);
+          stack1.push(full_path);
+        // LOG(ERROR)<<"top is "<<top<<" it's child:"<<full_path;
+        }
+      }     
     }
 
     action->add_readset(ParentDir(in.from_path()));
     action->add_writeset(ParentDir(in.from_path()));
     //the read/write set for to_path
-    action->add_writeset(in.to_path());
+   // action->add_writeset(in.to_path());
     action->add_readset(ParentDir(in.to_path()));
     action->add_writeset(ParentDir(in.to_path()));
    // LOG(ERROR)<<"Is this position is executing?";//如果这里执行了，就说明这里的循环正常终止
