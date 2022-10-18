@@ -704,7 +704,7 @@ void LatencyExperimentAppend() {
       /**BackgroundRenameFile("/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(j) + "/c" + IntToString(j),
                              "/a" + IntToString((machine()->machine_id()+1)%9) + "/b" + IntToString(j+250) + "/d" + IntToString(machine()->GetGUID()));**/
 
-
+      LOG(ERROR) <<"gaoxuan --[" << machine()->machine_id() << "] "<< "Test progress : " << j;
       if (j % 50 == 0) {
         
         LOG(ERROR) << "[" << machine()->machine_id() << "] "
