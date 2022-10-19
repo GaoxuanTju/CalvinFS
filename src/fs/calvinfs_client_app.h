@@ -19,13 +19,9 @@
 #include <stack>
 using std::make_pair;
 string PDir(const string& path) {
-  // Root dir is a special case.
-  if (path.empty()) {
-    LOG(FATAL) << "root dir has no parent";
-  }
+
   uint32 offset = path.rfind('/');
-  CHECK_NE(string::npos, offset);     // at least 1 slash required
-  CHECK_NE(path.size() - 1, offset);  // filename cannot be empty
+
   return string(path, 0, offset);
 }
 class CalvinFSClientApp : public App {
