@@ -43,7 +43,7 @@ class ExecutionContext {
       : store_(store), version_(action->version()), aborted_(false) {//gaoxuan --在version初始化的时候改成10
     for (int i = 0; i < action->readset_size(); i++) {
       if (!store_->Get(action->readset(i),//gaoxuan --version is changed to 10
-                       version_,
+                       10,
                        &reads_[action->readset(i)])) {
         reads_.erase(action->readset(i));
       }
