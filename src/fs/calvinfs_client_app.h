@@ -18,10 +18,7 @@
 #include "machine/machine.h"
 #include <stack>
 using std::make_pair;
-string PDir(const string& path) {
 
-
-}
 class CalvinFSClientApp : public App {
  public:
   CalvinFSClientApp()
