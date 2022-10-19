@@ -1017,6 +1017,7 @@ void MetadataStore::Rename_Internal(
   LOG(ERROR)<<(from_entry.type()==DIR)<<";"<<from_entry.dir_contents_size();
   if((from_entry.type()==DIR)&&(from_entry.dir_contents_size()!=0))//gaoxuan --only if the object we want to rename is DIR we need to loop,if its a file we don't need loop
   {
+    
   //使用广度优先的方式来一层层添加新的entry
   //gaoxuan --这中间是广度优先遍历添加新的元数据项
       //LOG(ERROR)<<"is this executing before loop in Internal,and may be just don't come into this branch?";//这一行也没执行，就没进入这个分支
