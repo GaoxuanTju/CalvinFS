@@ -288,7 +288,6 @@ MessageBuffer *CalvinFSClientApp::RenameFile(const Slice &from_path, const Slice
   in.set_to_path(to_path.data(), to_path.size());
   in.SerializeToString(a->mutable_input());
   metadata_->setAPPname(name()); // gaoxuan --这一行是我加的，用于在metadata_store.cc里面获得app name
-  a->set_version(10);//gaoxuan --这一行是我写的
   metadata_->GetRWSets(a);
  // LOG(ERROR)<<"after GetRW in mds.cc";
   log_->Append(a);
