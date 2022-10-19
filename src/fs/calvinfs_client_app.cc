@@ -282,7 +282,7 @@ MessageBuffer *CalvinFSClientApp::RenameFile(const Slice &from_path, const Slice
   a->set_client_machine(machine()->machine_id());
   a->set_client_channel(channel_name);        // gaoxuan --这个channel应该指的是一个行为的数据通路吧
   a->set_action_type(MetadataAction::RENAME); // gaoxuan --这里确定action类型是RENAME
-
+  a->set_version(10);//gaoxuan --这里是我加的
   MetadataAction::RenameInput in;
   in.set_from_path(from_path.data(), from_path.size());
   in.set_to_path(to_path.data(), to_path.size());
