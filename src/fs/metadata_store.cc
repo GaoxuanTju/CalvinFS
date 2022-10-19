@@ -42,8 +42,8 @@ class ExecutionContext {
   ExecutionContext(VersionedKVStore* store, Action* action)
       : store_(store), version_(action->version()), aborted_(false) {
     for (int i = 0; i < action->readset_size(); i++) {
-      if (!store_->Get(action->readset(i),//gaoxuan --有没有可能，输出的错误信息是在这里呢
-                       version_,
+      if (!store_->Get(action->readset(i),//gaoxuan --version gaicheng 10
+                       10,
                        &reads_[action->readset(i)])) {
         reads_.erase(action->readset(i));
       }
