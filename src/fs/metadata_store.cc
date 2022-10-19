@@ -1047,10 +1047,10 @@ void MetadataStore::Rename_Internal(
               queue1.push(full_path);
             }  
           }
+          LOG(ERROR)<<"the front of queue1 is  "<<queue1.front();
           from_path = in.from_path() + queue1.front().substr(in.to_path().size());
             
-      //LOG(ERROR)<<"is this position is executing?";//这句话没输出
-          
+      //LOG(ERROR)<<"is this position is executing?";//这句话没输出   
       } 
     //gaoxuan --这中间是广度优先遍历添加新的元数据项
   } 
