@@ -18,6 +18,16 @@
 #include "machine/machine.h"
 #include <stack>
 using std::make_pair;
+string ParentDir(const string& path) {
+  // Root dir is a special case.
+  if (path.empty()) {
+    LOG(FATAL) << "root dir has no parent";
+  }
+  uint32 offset = path.rfind('/');
+  CHECK_NE(string::npos, offset);     // at least 1 slash required
+  CHECK_NE(path.size() - 1, offset);  // filename cannot be empty
+  return string(path, 0, offset);
+}
 class CalvinFSClientApp : public App {
  public:
   CalvinFSClientApp()
@@ -727,7 +737,7 @@ void LatencyExperimentAppend() {
     
 
     //gaoxuan --In this part I want to get all path to check if we rename successfully
-    metadata_->getLOOKUP("");
+    metadata_->getLOOKUP(ParentDir("/a" + IntToString(rand() % machine()->config().size()) + "/b" + IntToString(a2) + "/d" + IntToString(machine()->GetGUID())));
  
 
 
