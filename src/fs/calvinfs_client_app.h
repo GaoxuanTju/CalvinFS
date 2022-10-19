@@ -695,13 +695,13 @@ void LatencyExperimentAppend() {
       while (a2 == a1) {
         a2 = rand() % 1000;
       }
-      /*BackgroundRenameFile("/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1) + "/c" + IntToString(j),
-                           "/a" + IntToString(rand() % machine()->config().size()) + "/b" + IntToString(a2) + "/d" + IntToString(machine()->GetGUID())); */
+      BackgroundRenameFile("/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1) + "/c" + IntToString(j),
+                           "/a" + IntToString(rand() % machine()->config().size()) + "/b" + IntToString(a2) + "/d" + IntToString(machine()->GetGUID())); 
                            
-      string from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1) ;
+      /*string from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1) ;
       string to_path = "/a" + IntToString((machine()->machine_id()+1)%2) + "/d" + IntToString(a2+machine()->machine_id());
       LOG(ERROR)<<from_path <<"  renamed to   "<<to_path;
-      BackgroundRenameFile(from_path,to_path) ;
+      BackgroundRenameFile(from_path,to_path) ;*/
       // contention-free workload
       /**BackgroundRenameFile("/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(j) + "/c" + IntToString(j),
                              "/a" + IntToString((machine()->machine_id()+1)%9) + "/b" + IntToString(j+250) + "/d" + IntToString(machine()->GetGUID()));**/
@@ -763,7 +763,7 @@ void LatencyExperimentAppend() {
         {
           string full_path =top + "/" + out.entry().dir_contents(i);
           stack1.push(full_path);
-          if(top.substr(0,5)=="/a0/d"||top.substr(0,4)=="/a1/d")
+          if(full_path.find(d))
           {
             LOG(ERROR)<<"full path is: "<<full_path;
           }
