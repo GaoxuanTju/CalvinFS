@@ -1013,8 +1013,8 @@ void MetadataStore::Rename_Internal(
   // Update to_parent (add new dir content)
   parent_to_entry.add_dir_contents(to_filename);//gaoxuan --这一步不用循环
   context->PutEntry(parent_to_path, parent_to_entry);
- // LOG(ERROR)<<"this part is executing";
- LOG(ERROR)<<(from_entry.type()==DIR)<<";"<<from_entry.dir_contents_size();
+ 
+// LOG(ERROR)<<(from_entry.type()==DIR)<<";"<<from_entry.dir_contents_size();
   if((from_entry.type()==DIR)&&(from_entry.dir_contents_size()!=0))//gaoxuan --only if the object we want to rename is DIR we need to loop,if its a file we don't need loop
   {
   //使用广度优先的方式来一层层添加新的entry
@@ -1024,7 +1024,6 @@ void MetadataStore::Rename_Internal(
       string root = in.to_path();
       queue1.push(root); //将根节点加入队列
       string from_path =in.from_path();//用于从中copyEntry，每次循环后要更新
-      int len = from_path.size();//获取一下字符串大小
       while (!queue1.empty()) { //队列不空执行逻辑
 
           string front = queue1.front();//获取队首元素
@@ -1048,7 +1047,7 @@ void MetadataStore::Rename_Internal(
               queue1.push(full_path);
             }  
           }
-          from_path = in.from_path() + queue1.front().substr(len);
+          from_path = in.from_path() + queue1.front().substr(in.to_path().size());
             
       //LOG(ERROR)<<"is this position is executing?";//这句话没输出
           
