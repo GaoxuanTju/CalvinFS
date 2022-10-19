@@ -689,7 +689,7 @@ void LatencyExperimentAppend() {
 
     double start = GetTime();
 
-    for (int j = 0; j < 250; j++) {//gaoxuan --改成了2次便于观察，原本是250次
+    for (int j = 0; j < 1; j++) {//gaoxuan --改成了1次便于观察Rename结果，原本是250次
       int a1 = rand() % 1000;
       int a2 = rand() % 1000;
       while (a2 == a1) {
@@ -763,7 +763,7 @@ void LatencyExperimentAppend() {
         {
           string full_path =top + "/" + out.entry().dir_contents(i);
           stack1.push(full_path);
-          if(top.substr(0,4)=="/a0/"||top.substr(0,4)=="/a1/")
+          if(top.substr(0,5)=="/a0/d"||top.substr(0,4)=="/a1/d")
           {
             LOG(ERROR)<<"full path is: "<<full_path;
           }
