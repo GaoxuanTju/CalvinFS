@@ -506,13 +506,14 @@ void MetadataStore::getLOOKUP(string path)
       out.ParseFromString(b.output());
       if (out.success() && out.entry().type() == DIR)
       {
-        // gaoxuan --目录的话才取子目录或文件
-        for (int i = 0; i < out.entry().dir_contents_size(); i++)
-        {
-          if(top.find("d") != std::string::npos)//只输出第一层，不输出下面更细节的了
+        if(top.find("d") != std::string::npos)//只输出第一层，不输出下面更细节的了
           {
             LOG(ERROR)<<"full path is: "<<top;
           }
+        // gaoxuan --目录的话才取子目录或文件
+        for (int i = 0; i < out.entry().dir_contents_size(); i++)
+        {
+          
           string full_path =top + "/" + out.entry().dir_contents(i);
           stack1.push(full_path);
           
