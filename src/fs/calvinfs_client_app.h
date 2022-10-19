@@ -689,7 +689,7 @@ void LatencyExperimentAppend() {
 
     double start = GetTime();
 
-    for (int j = 0; j < 2; j++) {//gaoxuan --改成了2次便于观察，原本是250次
+    for (int j = 0; j < 250; j++) {//gaoxuan --改成了2次便于观察，原本是250次
       int a1 = rand() % 1000;
       int a2 = rand() % 1000;
       while (a2 == a1) {
@@ -704,7 +704,7 @@ void LatencyExperimentAppend() {
       /**BackgroundRenameFile("/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(j) + "/c" + IntToString(j),
                              "/a" + IntToString((machine()->machine_id()+1)%9) + "/b" + IntToString(j+250) + "/d" + IntToString(machine()->GetGUID()));**/
 
-      LOG(ERROR) <<"gaoxuan --[" << machine()->machine_id() << "] "<< "Test progress : " << j;
+      //LOG(ERROR) <<"gaoxuan --[" << machine()->machine_id() << "] "<< "Test progress : " << j;
       if (j % 50 == 0) {
         
         LOG(ERROR) << "[" << machine()->machine_id() << "] "

@@ -307,7 +307,7 @@ MessageBuffer *CalvinFSClientApp::RenameFile(const Slice &from_path, const Slice
   delete m;
   MetadataAction::RenameOutput out;
   out.ParseFromString(result.output());
-  LOG(ERROR)<<"finish rename in REnamefile in mds.cc";//目前这行没有执行
+  //LOG(ERROR)<<"finish rename in REnamefile in mds.cc";//目前这行没有执行
   if (out.success())
   {
     return new MessageBuffer();

@@ -763,7 +763,7 @@ void MetadataStore::Run(Action* action) {
     out.SerializeToString(action->mutable_output());
 
   } else if (type == MetadataAction::RENAME) {
-    LOG(ERROR)<<"Run is executing!";
+    //LOG(ERROR)<<"Run is executing!";
     MetadataAction::RenameInput in;
     MetadataAction::RenameOutput out;
     in.ParseFromString(action->input());
@@ -966,7 +966,7 @@ void MetadataStore::Rename_Internal(
   // Currently only support Copy: (non-recursive: only succeeds for DATA files and EMPTY directory)
 
 //gaoxuan --now consider how to modify the logic of rename with correct context
-  LOG(ERROR)<<"Rename_internal is Executing!";
+ // LOG(ERROR)<<"Rename_internal is Executing!";
   MetadataEntry from_entry;//gaoxuan --get from_path's entry to check if it's existed,put it into from_entry
   if (!context->GetEntry(in.from_path(), &from_entry)) {
     // File doesn't exist!
@@ -995,7 +995,7 @@ void MetadataStore::Rename_Internal(
     out->add_errors(MetadataAction::FileDoesNotExist);
     return;
   }
-  LOG(ERROR)<<in.from_path()<<"   "<<in.to_path();
+ // LOG(ERROR)<<in.from_path()<<"   "<<in.to_path();
   // If file already exists, fail.
   //gaoxuan --check if exist a file with same name in the Parent dir of to_path 
   string to_filename = FileName(in.to_path());
@@ -1019,7 +1019,7 @@ void MetadataStore::Rename_Internal(
   {
   //使用广度优先的方式来一层层添加新的entry
   //gaoxuan --这中间是广度优先遍历添加新的元数据项
-      LOG(ERROR)<<"is this executing before loop in Internal,and may be just don't come into this branch?";//这一行也没执行，就没进入这个分支
+      //LOG(ERROR)<<"is this executing before loop in Internal,and may be just don't come into this branch?";//这一行也没执行，就没进入这个分支
       std::queue<string> queue1; //gaoxuan --用于BFS的队列
       string root = in.to_path();
       queue1.push(root); //将根节点加入队列
