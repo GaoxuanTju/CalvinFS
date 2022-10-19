@@ -43,7 +43,7 @@ class ExecutionContext {
       : store_(store), version_(action->version()), aborted_(false) {
     for (int i = 0; i < action->readset_size(); i++) {
       if (!store_->Get(action->readset(i),//gaoxuan --version gaicheng 10
-                       10,
+                       version_,
                        &reads_[action->readset(i)])) {
         reads_.erase(action->readset(i));
       }
