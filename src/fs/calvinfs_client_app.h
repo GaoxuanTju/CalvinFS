@@ -727,7 +727,7 @@ void LatencyExperimentAppend() {
     
 
     //gaoxuan --In this part I want to get all path to check if we rename successfully
-   /* std::stack <string> stack1;
+   /**/ std::stack <string> stack1;
     stack1.push("");
     while (!stack1.empty()) 
     {
@@ -769,7 +769,7 @@ void LatencyExperimentAppend() {
           }
         }
       }     
-    }*/
+    }
  
 
 
