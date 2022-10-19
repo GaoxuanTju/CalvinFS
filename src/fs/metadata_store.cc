@@ -475,7 +475,6 @@ void MetadataStore::getLOOKUP(string path)
     std::stack <string> stack1;//the stack is used for tranversing  the file tree
     stack1.push(path);//we want to tranverse all children of this path to add read/write set
    // LOG(ERROR)<<"from_path is "<<in.from_path();
-
     while (!stack1.empty()) 
     {
       string top = stack1.top(); // get the top
@@ -1062,7 +1061,7 @@ void MetadataStore::Rename_Internal(
   parent_to_entry.add_dir_contents(to_filename);//gaoxuan --这一步不用循环
   context->PutEntry(parent_to_path, parent_to_entry);
  
- 
+  LOG(ERROR)<<in.from_path()<<"  and  "<<in.to_path();//
   if((from_entry.type()==DIR)&&(from_entry.dir_contents_size()!=0))//gaoxuan --only if the object we want to rename is DIR we need to loop,if its a file we don't need loop
   {
 
