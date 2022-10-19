@@ -42,7 +42,7 @@ class ExecutionContext {
   ExecutionContext(VersionedKVStore* store, Action* action)
       : store_(store), version_(action->version()), aborted_(false) {
     for (int i = 0; i < action->readset_size(); i++) {
-      if (!store_->Get(action->readset(i),//gaoxuan --version gaicheng 10
+      if (!store_->Get(action->readset(i),//gaoxuan --version is changed to 10
                        version_,
                        &reads_[action->readset(i)])) {
         reads_.erase(action->readset(i));
@@ -159,7 +159,7 @@ class DistributedExecutionContext : public ExecutionContext {
       if (machine == machine_->machine_id()) {//gaoxuan --if the path in read/write set is local,put it's metadataentry into map reads_,key is path,value is entry
         // Local read.
         if (!store_->Get(action->readset(i),//gaoxuan --第二个参数我改一下，原本是version_
-                         10,
+                         version_,
                          &reads_[action->readset(i)])) {
           reads_.erase(action->readset(i));
         }
@@ -671,7 +671,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
     //gaoxuan --add read/write set in the way of DFS
     MetadataAction::RenameInput in;
     in.ParseFromString(action->input());
-    LOG(ERROR)<<"in GetRWs :: "<<in.from_path()<<" and "<<in.to_path();
+    //LOG(ERROR)<<"in GetRWs :: "<<in.from_path()<<" and "<<in.to_path();
     std::stack <string> stack1;//the stack is used for tranversing  the file tree
     stack1.push(in.from_path());//we want to tranverse all children of this path to add read/write set
    // LOG(ERROR)<<"from_path is "<<in.from_path();
@@ -738,7 +738,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
    // LOG(ERROR)<<"Remote machine is looking up metadata "<<machine_->machine_id()<<"  "<<in.path();//gaoxuan --在这里看看是那台机器取什么路径
     action->add_readset(in.path());
     //gaoxuan --下面那一行是我加的，这里可能是作者的问题？没这个Run根本不会跑，更不用说里面的LOOKUP逻辑了
-    action->add_writeset(in.path());
+    //action->add_writeset(in.path());
 
   } else if (type == MetadataAction::RESIZE) {
     MetadataAction::ResizeInput in;
@@ -816,7 +816,7 @@ void MetadataStore::Run(Action* action) {
     MetadataAction::RenameInput in;
     MetadataAction::RenameOutput out;
     in.ParseFromString(action->input());
-    LOG(ERROR)<<"In Run :: "<<in.from_path()<<" and "<<in.to_path();
+    //LOG(ERROR)<<"In Run :: "<<in.from_path()<<" and "<<in.to_path();
     Rename_Internal(context, in, &out);
     out.SerializeToString(action->mutable_output());
 
@@ -1063,7 +1063,7 @@ void MetadataStore::Rename_Internal(
   parent_to_entry.add_dir_contents(to_filename);//gaoxuan --这一步不用循环
   context->PutEntry(parent_to_path, parent_to_entry);
  
-  LOG(ERROR)<<"in Rename_internal :: "<<in.from_path()<<"  and  "<<in.to_path();//
+  //LOG(ERROR)<<"in Rename_internal :: "<<in.from_path()<<"  and  "<<in.to_path();//
   if((from_entry.type()==DIR)&&(from_entry.dir_contents_size()!=0))//gaoxuan --only if the object we want to rename is DIR we need to loop,if its a file we don't need loop
   {
 

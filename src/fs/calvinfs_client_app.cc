@@ -277,7 +277,7 @@ MessageBuffer *CalvinFSClientApp::RenameFile(const Slice &from_path, const Slice
   string channel_name = "action-result-" + UInt64ToString(distinct_id);
   auto channel = machine()->DataChannel(channel_name);
   CHECK(!channel->Pop(NULL));
-  LOG(ERROR)<<"in RenameFile brfore:: "<<from_path.data()<<" and "<<to_path.data();
+ // LOG(ERROR)<<"in RenameFile brfore:: "<<from_path.data()<<" and "<<to_path.data();
   Action *a = new Action();
   a->set_client_machine(machine()->machine_id());
   a->set_client_channel(channel_name);        // gaoxuan --这个channel应该指的是一个行为的数据通路吧
@@ -292,10 +292,7 @@ MessageBuffer *CalvinFSClientApp::RenameFile(const Slice &from_path, const Slice
   metadata_->GetRWSets(a);
  // LOG(ERROR)<<"after GetRW in mds.cc";
   log_->Append(a);
-  //LOG(ERROR)<<"after log_->Append(a) in mds.cc";
-  // gaoxuan --这里把Rename操作确定后加入元数据日志，等待scheduler进行调度！结果就是执行metadata_store.cc中的Run函数，Run函数再去调用这个文件里面的Rename_Internal()
-  // gaoxuan --Rename_Internal()才是Rename的真正逻辑所在
-  LOG(ERROR)<<"in RenameFile after :: "<<from_path.data()<<" and "<<to_path.data();
+
   MessageBuffer *m = NULL;
   while (!channel->Pop(&m))
   {
