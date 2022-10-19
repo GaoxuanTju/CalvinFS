@@ -470,7 +470,56 @@ step 3
   from down to top
 
 */
+void MetadataStore::getLOOKUP(string path)
+{
+    std::stack <string> stack1;//the stack is used for tranversing  the file tree
+    stack1.push(path);//we want to tranverse all children of this path to add read/write set
+   // LOG(ERROR)<<"from_path is "<<in.from_path();
 
+    while (!stack1.empty()) 
+    {
+      string top = stack1.top(); // get the top
+      stack1.pop();              // pop the top
+
+      uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(top)), config_->LookupReplica(machine_->machine_id()));
+      Header *header = new Header();
+      header->set_from(machine_->machine_id());
+      header->set_to(mds_machine);
+      header->set_type(Header::RPC);
+      header->set_app(getAPPname());
+      header->set_rpc("LOOKUP");
+      header->add_misc_string(top.c_str(), strlen(top.c_str()));
+      MessageBuffer *m = NULL;
+      header->set_data_ptr(reinterpret_cast<uint64>(&m));
+      machine_->SendMessage(header, new MessageBuffer());
+      while (m == NULL)
+      {
+        usleep(10);
+        Noop<MessageBuffer *>(m);
+      }
+
+      // gaoxuan --如今m里面就是读到的信息了
+      MessageBuffer *serialized = m;
+      Action b;
+      b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
+      delete serialized;
+      MetadataAction::LookupOutput out;
+      out.ParseFromString(b.output());
+      if (out.success() && out.entry().type() == DIR)
+      {
+        // gaoxuan --目录的话才取子目录或文件
+        for (int i = 0; i < out.entry().dir_contents_size(); i++)
+        {
+          string full_path =top + "/" + out.entry().dir_contents(i);
+          stack1.push(full_path);
+          if(full_path.find("d") != std::string::npos)
+          {
+            LOG(ERROR)<<"full path is: "<<full_path;
+          }
+        }
+      }     
+    }
+}
 void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is called by RameFile() for RenameExperiment
   action->clear_readset();
   action->clear_writeset();

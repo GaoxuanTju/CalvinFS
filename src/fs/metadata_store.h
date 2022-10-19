@@ -27,7 +27,7 @@ class MetadataStore : public Store {
   // Inherited from Store, defined in fs/metadata_store.cc:
   virtual void GetRWSets(Action* action);
   virtual void Run(Action* action);
-
+  void getLOOKUP(string path);
   void SetMachine(Machine* m);
   void Init();
   void InitSmall();

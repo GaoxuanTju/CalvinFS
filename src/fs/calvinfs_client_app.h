@@ -727,49 +727,7 @@ void LatencyExperimentAppend() {
     
 
     //gaoxuan --In this part I want to get all path to check if we rename successfully
-   /**/ std::stack <string> stack1;
-    stack1.push("");
-    while (!stack1.empty()) 
-    {
-      string top = stack1.top(); // get the top
-      stack1.pop();              // pop the top
-      Header *header = new Header();
-      header->set_from(machine()->machine_id());
-      header->set_to(machine()->machine_id());
-      header->set_type(Header::RPC);
-      header->set_app(name());
-      header->set_rpc("LOOKUP");
-      header->add_misc_string(top.c_str(), strlen(top.c_str()));
-      MessageBuffer *m = NULL;
-      header->set_data_ptr(reinterpret_cast<uint64>(&m));
-      machine()->SendMessage(header, new MessageBuffer());
-      while (m == NULL)
-      {
-        usleep(10);
-        Noop<MessageBuffer *>(m);
-      }
-
-      // gaoxuan --如今m里面就是读到的信息了
-      MessageBuffer *serialized = m;
-      Action b;
-      b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
-      delete serialized;
-      MetadataAction::LookupOutput out;
-      out.ParseFromString(b.output());
-      if (out.success() && out.entry().type() == DIR)
-      {
-        // gaoxuan --目录的话才取子目录或文件
-        for (int i = 0; i < out.entry().dir_contents_size(); i++)
-        {
-          string full_path =top + "/" + out.entry().dir_contents(i);
-          stack1.push(full_path);
-          if(full_path.find("d") != std::string::npos)
-          {
-            LOG(ERROR)<<"full path is: "<<full_path;
-          }
-        }
-      }     
-    }
+    metadata_->getLOOKUP("");
  
 
 
