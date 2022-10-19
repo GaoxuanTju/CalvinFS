@@ -698,15 +698,16 @@ void LatencyExperimentAppend() {
     Spin(1);
 
     double start = GetTime();
-
+    string to_path;
     for (int j = 0; j < 1; j++) {//gaoxuan --改成了1次便于观察Rename结果，原本是250次
       int a1 = rand() % 1000;
       int a2 = rand() % 1000;
       while (a2 == a1) {
         a2 = rand() % 1000;
       }
+      to_path = "/a" + IntToString(rand() % machine()->config().size()) + "/b" + IntToString(a2) + "/d" + IntToString(machine()->GetGUID());
       BackgroundRenameFile("/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1) + "/c" + IntToString(j),
-                           "/a" + IntToString(rand() % machine()->config().size()) + "/b" + IntToString(a2) + "/d" + IntToString(machine()->GetGUID())); 
+                           to_path); 
                            
       /*string from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1) ;
       string to_path = "/a" + IntToString((machine()->machine_id()+1)%2) + "/d" + IntToString(a2+machine()->machine_id());
@@ -737,7 +738,7 @@ void LatencyExperimentAppend() {
     
 
     //gaoxuan --In this part I want to get all path to check if we rename successfully
-    metadata_->getLOOKUP(ParentDir("/a" + IntToString(rand() % machine()->config().size()) + "/b" + IntToString(a2) + "/d" + IntToString(machine()->GetGUID())));
+    metadata_->getLOOKUP(ParentDir(to_path));
  
 
 
