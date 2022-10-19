@@ -18,7 +18,7 @@
 #include "machine/machine.h"
 #include <stack>
 using std::make_pair;
-string ParentDir(const string& path) {
+string PDir(const string& path) {
   // Root dir is a special case.
   if (path.empty()) {
     LOG(FATAL) << "root dir has no parent";
@@ -738,7 +738,7 @@ void LatencyExperimentAppend() {
     
 
     //gaoxuan --In this part I want to get all path to check if we rename successfully
-    metadata_->getLOOKUP(ParentDir(to_path));
+    metadata_->getLOOKUP(PDir(to_path));
  
 
 
