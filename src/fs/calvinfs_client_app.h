@@ -689,7 +689,7 @@ void LatencyExperimentAppend() {
 
     double start = GetTime();
 
-    for (int j = 0; j < 2; j++) {//gaoxuan --改成了2次便于观察，原本是250次
+    for (int j = 0; j < 1; j++) {//gaoxuan --改成了2次便于观察，原本是250次
       int a1 = rand() % 1000;
       int a2 = rand() % 1000;
       while (a2 == a1) {
@@ -697,6 +697,7 @@ void LatencyExperimentAppend() {
       }
       /*BackgroundRenameFile("/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1) + "/c" + IntToString(j),
                            "/a" + IntToString(rand() % machine()->config().size()) + "/b" + IntToString(a2) + "/d" + IntToString(machine()->GetGUID())); */
+                           
       string from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1) ;
       string to_path = "/a" + IntToString(rand() % machine()->config().size()) + "/d" + IntToString(a2);
       LOG(ERROR)<<from_path <<"  renamed to   "<<to_path;
