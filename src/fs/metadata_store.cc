@@ -511,7 +511,7 @@ void MetadataStore::getLOOKUP(string path)
         {
           if(top.find("d") != std::string::npos)//只输出第一层，不输出下面更细节的了
           {
-            LOG(ERROR)<<"full path is: "<<full_path;
+            LOG(ERROR)<<"full path is: "<<top;
           }
           string full_path =top + "/" + out.entry().dir_contents(i);
           stack1.push(full_path);
