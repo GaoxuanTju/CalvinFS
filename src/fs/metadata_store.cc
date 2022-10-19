@@ -995,7 +995,7 @@ void MetadataStore::Rename_Internal(
     out->add_errors(MetadataAction::FileDoesNotExist);
     return;
   }
- // LOG(ERROR)<<in.from_path()<<"   "<<in.to_path();
+ 
   // If file already exists, fail.
   //gaoxuan --check if exist a file with same name in the Parent dir of to_path 
   string to_filename = FileName(in.to_path());
@@ -1009,7 +1009,6 @@ void MetadataStore::Rename_Internal(
   }
 //gaoxuan --the part above is used to check if we can rename
 //gaoxuan --in the following part we should change it to a loop
-
   // Update to_parent (add new dir content)
   parent_to_entry.add_dir_contents(to_filename);//gaoxuan --这一步不用循环
   context->PutEntry(parent_to_path, parent_to_entry);
@@ -1017,8 +1016,8 @@ void MetadataStore::Rename_Internal(
   LOG(ERROR)<<(from_entry.type()==DIR)<<";"<<from_entry.dir_contents_size();
   if((from_entry.type()==DIR)&&(from_entry.dir_contents_size()!=0))//gaoxuan --only if the object we want to rename is DIR we need to loop,if its a file we don't need loop
   {
-    
-  //使用广度优先的方式来一层层添加新的entry
+
+  
   //gaoxuan --这中间是广度优先遍历添加新的元数据项
       //LOG(ERROR)<<"is this executing before loop in Internal,and may be just don't come into this branch?";//这一行也没执行，就没进入这个分支
       std::queue<string> queue1; //gaoxuan --用于BFS的队列
