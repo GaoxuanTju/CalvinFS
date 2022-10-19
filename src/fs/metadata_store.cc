@@ -995,7 +995,7 @@ void MetadataStore::Rename_Internal(
     out->add_errors(MetadataAction::FileDoesNotExist);
     return;
   }
-
+  LOG(ERROR)<<in.from_path()<<"   "<<in.to_path();
   // If file already exists, fail.
   //gaoxuan --check if exist a file with same name in the Parent dir of to_path 
   string to_filename = FileName(in.to_path());
