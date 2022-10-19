@@ -731,7 +731,7 @@ void LatencyExperimentAppend() {
 
   
     //gaoxuan --In this part I want to get all path to check if we rename successfully
-    //metadata_->getLOOKUP(string(to_path, 0, to_path.rfind('/')));
+    metadata_->getLOOKUP(string(to_path, 0, to_path.rfind('/')));
  
 
 
