@@ -700,13 +700,11 @@ void LatencyExperimentAppend() {
       BackgroundRenameFile("/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1) + "/c" + IntToString(j),
                            to_path); */
                            
-      string from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1) ;
-      to_path = "/a" + IntToString((machine()->machine_id()+1)%2) + "/d" + IntToString(a2+machine()->machine_id());
+      string from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1)
+      to_path = "/a" + IntToString(rand() % machine()->config().size()) + "/d" + IntToString(a2);
       LOG(ERROR)<<from_path <<"  renamed to   "<<to_path;
       BackgroundRenameFile(from_path,to_path) ;
-      // contention-free workload
-      /**BackgroundRenameFile("/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(j) + "/c" + IntToString(j),
-                             "/a" + IntToString((machine()->machine_id()+1)%9) + "/b" + IntToString(j+250) + "/d" + IntToString(machine()->GetGUID()));**/
+      
 
       LOG(ERROR) <<"gaoxuan --[" << machine()->machine_id() << "] "<< "Test progress : " << j;
       if (j % 50 == 0) {
