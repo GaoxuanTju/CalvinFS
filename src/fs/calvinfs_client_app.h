@@ -737,7 +737,7 @@ void LatencyExperimentAppend() {
       header->add_misc_string(root.c_str(), strlen(root.c_str()));
       MessageBuffer *m = NULL;
       header->set_data_ptr(reinterpret_cast<uint64>(&m));
-      machine().SendMessage(header, new MessageBuffer());
+      machine()->SendMessage(header, new MessageBuffer());
       while (m == NULL)
       {
         usleep(10);
