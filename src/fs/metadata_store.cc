@@ -671,6 +671,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
     //gaoxuan --add read/write set in the way of DFS
     MetadataAction::RenameInput in;
     in.ParseFromString(action->input());
+    LOG(ERROR)<<"in GetRWs :: "<<in.from_path()<<" and "<<in.to_path();
     std::stack <string> stack1;//the stack is used for tranversing  the file tree
     stack1.push(in.from_path());//we want to tranverse all children of this path to add read/write set
    // LOG(ERROR)<<"from_path is "<<in.from_path();
@@ -815,6 +816,7 @@ void MetadataStore::Run(Action* action) {
     MetadataAction::RenameInput in;
     MetadataAction::RenameOutput out;
     in.ParseFromString(action->input());
+    LOG(ERROR)<<"In Run :: "<<in.from_path()<<" and "<<in.to_path();
     Rename_Internal(context, in, &out);
     out.SerializeToString(action->mutable_output());
 
@@ -1061,7 +1063,7 @@ void MetadataStore::Rename_Internal(
   parent_to_entry.add_dir_contents(to_filename);//gaoxuan --这一步不用循环
   context->PutEntry(parent_to_path, parent_to_entry);
  
-  LOG(ERROR)<<in.from_path()<<"  and  "<<in.to_path();//
+  LOG(ERROR)<<"in Rename_internal :: "<<in.from_path()<<"  and  "<<in.to_path();//
   if((from_entry.type()==DIR)&&(from_entry.dir_contents_size()!=0))//gaoxuan --only if the object we want to rename is DIR we need to loop,if its a file we don't need loop
   {
 

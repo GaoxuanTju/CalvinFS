@@ -709,7 +709,7 @@ void LatencyExperimentAppend() {
       BackgroundRenameFile(from_path,to_path) ;
       
 
-      LOG(ERROR) <<"gaoxuan --[" << machine()->machine_id() << "] "<< "Test progress : " << j;
+      //LOG(ERROR) <<"gaoxuan --[" << machine()->machine_id() << "] "<< "Test progress : " << j;
       if (j % 50 == 0) {
         
         LOG(ERROR) << "[" << machine()->machine_id() << "] "
@@ -731,7 +731,7 @@ void LatencyExperimentAppend() {
 
   
     //gaoxuan --In this part I want to get all path to check if we rename successfully
-    metadata_->getLOOKUP(string(to_path, 0, to_path.rfind('/')));
+    //metadata_->getLOOKUP(string(to_path, 0, to_path.rfind('/')));
  
 
 
@@ -939,7 +939,7 @@ void LatencyExperimentAppend() {
   void BackgroundRenameFile (const Slice& from_path, const Slice& to_path) {
     
     Header* header = new Header();
-  
+    LOG(ERROR)<<"in backgroundrename :: "<<from_path.data()<<" and "<<to_path.data();
     header->set_from(machine()->machine_id());
     header->set_to(machine()->machine_id());
     header->set_type(Header::RPC);
