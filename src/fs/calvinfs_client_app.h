@@ -696,14 +696,14 @@ void LatencyExperimentAppend() {
       while (a2 == a1) {
         a2 = rand() % 1000;
       }
-      to_path = "/a" + IntToString(rand() % machine()->config().size()) + "/b" + IntToString(a2) + "/d" + IntToString(machine()->GetGUID());
+      /*to_path = "/a" + IntToString(rand() % machine()->config().size()) + "/b" + IntToString(a2) + "/d" + IntToString(machine()->GetGUID());
       BackgroundRenameFile("/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1) + "/c" + IntToString(j),
-                           to_path); 
+                           to_path); */
                            
-      /*string from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1) ;
-      string to_path = "/a" + IntToString((machine()->machine_id()+1)%2) + "/d" + IntToString(a2+machine()->machine_id());
+      string from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1) ;
+      to_path = "/a" + IntToString((machine()->machine_id()+1)%2) + "/d" + IntToString(a2+machine()->machine_id());
       LOG(ERROR)<<from_path <<"  renamed to   "<<to_path;
-      BackgroundRenameFile(from_path,to_path) ;*/
+      BackgroundRenameFile(from_path,to_path) ;
       // contention-free workload
       /**BackgroundRenameFile("/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(j) + "/c" + IntToString(j),
                              "/a" + IntToString((machine()->machine_id()+1)%9) + "/b" + IntToString(j+250) + "/d" + IntToString(machine()->GetGUID()));**/
