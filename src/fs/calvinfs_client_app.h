@@ -20,9 +20,7 @@
 using std::make_pair;
 string PDir(const string& path) {
 
-  uint32 offset = path.rfind('/');
 
-  return string(path, 0, offset);
 }
 class CalvinFSClientApp : public App {
  public:
@@ -733,8 +731,9 @@ void LatencyExperimentAppend() {
                << (GetTime() - start) << " seconds";
     
 
+  
     //gaoxuan --In this part I want to get all path to check if we rename successfully
-    metadata_->getLOOKUP(PDir(to_path));
+    metadata_->getLOOKUP(string(to_path, 0, to_path.rfind('/')));
  
 
 
