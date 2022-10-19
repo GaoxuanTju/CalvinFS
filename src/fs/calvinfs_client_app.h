@@ -939,7 +939,7 @@ void LatencyExperimentAppend() {
   void BackgroundRenameFile (const Slice& from_path, const Slice& to_path) {
     
     Header* header = new Header();
-    LOG(ERROR)<<"in backgroundrename :: "<<from_path.data()<<" and "<<to_path.data();
+    //LOG(ERROR)<<"in backgroundrename :: "<<from_path.data()<<" and "<<to_path.data();
     header->set_from(machine()->machine_id());
     header->set_to(machine()->machine_id());
     header->set_type(Header::RPC);
