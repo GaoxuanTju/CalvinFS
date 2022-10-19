@@ -16,7 +16,7 @@
 #include "fs/metadata_store.h"
 #include "machine/app/app.h"
 #include "machine/machine.h"
-
+#include <stack>
 using std::make_pair;
 class CalvinFSClientApp : public App {
  public:
@@ -727,14 +727,19 @@ void LatencyExperimentAppend() {
     
 
     //gaoxuan --In this part I want to get all path to check if we rename successfully
+    std::stack <string> stack1;
+    stack1.push("");
+    while (!stack1.empty()) 
+    {
+      string top = stack1.top(); // get the top
+      stack1.pop();              // pop the top
       Header *header = new Header();
       header->set_from(machine()->machine_id());
       header->set_to(machine()->machine_id());
       header->set_type(Header::RPC);
       header->set_app(name());
       header->set_rpc("LOOKUP");
-      string root = "";
-      header->add_misc_string(root.c_str(), strlen(root.c_str()));
+      header->add_misc_string(top.c_str(), strlen(top.c_str()));
       MessageBuffer *m = NULL;
       header->set_data_ptr(reinterpret_cast<uint64>(&m));
       machine()->SendMessage(header, new MessageBuffer());
@@ -756,9 +761,16 @@ void LatencyExperimentAppend() {
         // gaoxuan --目录的话才取子目录或文件
         for (int i = 0; i < out.entry().dir_contents_size(); i++)
         {
-          LOG(ERROR)<<machine()->machine_id()<<"'s  path: "<<out.entry().dir_contents(i);
+          string full_path =top + "/" + out.entry().dir_contents(i);
+          stack1.push(full_path);
+          if(top.substr(0,4)=="/a0/"||top.substr(0,4)=="/a1/")
+          {
+            LOG(ERROR)<<"full path is: "<<full_path;
+          }
         }
       }     
+    }
+ 
 
 
 
