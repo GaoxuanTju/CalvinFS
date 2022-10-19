@@ -697,14 +697,14 @@ void LatencyExperimentAppend() {
         a2 = rand() % 1000;
       }
       
-      string from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1) + "/c" + IntToString(j);
+      /*string from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1) + "/c" + IntToString(j);
       to_path = "/a" + IntToString(rand() % machine()->config().size()) + "/b" + IntToString(a2) + "/d" + IntToString(machine()->GetGUID());
-      /*BackgroundRenameFile(from_path,
+      BackgroundRenameFile(from_path,
                            to_path); 
       LOG(ERROR)<<from_path <<"  renamed to   "<<to_path; */                 
-      /*
+      /**/
       string from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1);
-      to_path = "/a" + IntToString((machine()->machine_id()+1)%2) + "/d" + IntToString(machine()->GetGUID());*/
+      to_path = "/a" + IntToString((machine()->machine_id()+1)%2) + "/d" + IntToString(machine()->GetGUID());
       LOG(ERROR)<<from_path <<"  renamed to   "<<to_path;
       BackgroundRenameFile(from_path,to_path) ;
       
