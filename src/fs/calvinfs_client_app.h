@@ -700,7 +700,7 @@ void LatencyExperimentAppend() {
       BackgroundRenameFile("/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1) + "/c" + IntToString(j),
                            to_path); */
                            
-      string from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1)
+      string from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1);
       to_path = "/a" + IntToString(rand() % machine()->config().size()) + "/d" + IntToString(a2);
       LOG(ERROR)<<from_path <<"  renamed to   "<<to_path;
       BackgroundRenameFile(from_path,to_path) ;
