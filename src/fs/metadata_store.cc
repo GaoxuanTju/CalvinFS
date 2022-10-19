@@ -738,7 +738,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
    // LOG(ERROR)<<"Remote machine is looking up metadata "<<machine_->machine_id()<<"  "<<in.path();//gaoxuan --在这里看看是那台机器取什么路径
     action->add_readset(in.path());
     //gaoxuan --下面那一行是我加的，这里可能是作者的问题？没这个Run根本不会跑，更不用说里面的LOOKUP逻辑了
-    //action->add_writeset(in.path());
+    action->add_writeset(in.path());
 
   } else if (type == MetadataAction::RESIZE) {
     MetadataAction::ResizeInput in;
