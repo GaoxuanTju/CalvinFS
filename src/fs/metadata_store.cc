@@ -634,6 +634,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
     // LOG(ERROR)<<"top is "<<top;
       action->add_readset(top);
       action->add_writeset(top);
+      
       string s = top.substr(in.from_path().size());//s是去除from_path的后半段路径
       To_path = in.to_path()+s;//To_path就是to_path加上去除from_path的路径
       action->add_writeset(To_path);
