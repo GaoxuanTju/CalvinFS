@@ -966,7 +966,7 @@ void MetadataStore::Rename_Internal(
   // Currently only support Copy: (non-recursive: only succeeds for DATA files and EMPTY directory)
 
 //gaoxuan --now consider how to modify the logic of rename with correct context
- // LOG(ERROR)<<"Rename_internal is Executing!";
+  LOG(ERROR)<<"Rename_internal is Executing!";
   MetadataEntry from_entry;//gaoxuan --get from_path's entry to check if it's existed,put it into from_entry
   if (!context->GetEntry(in.from_path(), &from_entry)) {
     // File doesn't exist!
