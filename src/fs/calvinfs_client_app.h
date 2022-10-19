@@ -763,7 +763,7 @@ void LatencyExperimentAppend() {
         {
           string full_path =top + "/" + out.entry().dir_contents(i);
           stack1.push(full_path);
-          if(full.find("d") != std::string::npos)
+          if(full_path.find("d") != std::string::npos)
           {
             LOG(ERROR)<<"full path is: "<<full_path;
           }
