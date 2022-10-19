@@ -725,7 +725,42 @@ void LatencyExperimentAppend() {
                << "Renamed " <<  "250 files. Elapsed time:"
                << (GetTime() - start) << " seconds";
     
-    
+
+    //gaoxuan --In this part I want to get all path to check if we rename successfully
+      Header *header = new Header();
+      header->set_from(machine()->machine_id());
+      header->set_to(machine()->machine_id());
+      header->set_type(Header::RPC);
+      header->set_app(name());
+      header->set_rpc("LOOKUP");
+      string root = "";
+      header->add_misc_string(root.c_str(), strlen(root.c_str()));
+      MessageBuffer *m = NULL;
+      header->set_data_ptr(reinterpret_cast<uint64>(&m));
+      machine_->SendMessage(header, new MessageBuffer());
+      while (m == NULL)
+      {
+        usleep(10);
+        Noop<MessageBuffer *>(m);
+      }
+
+      // gaoxuan --如今m里面就是读到的信息了
+      MessageBuffer *serialized = m;
+      Action b;
+      b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
+      delete serialized;
+      MetadataAction::LookupOutput out;
+      out.ParseFromString(b.output());
+      if (out.success() && out.entry().type() == DIR)
+      {
+        // gaoxuan --目录的话才取子目录或文件
+        for (int i = 0; i < out.entry().dir_contents_size(); i++)
+        {
+          LOG(ERROR)<<machine()->machine_id()<<"'s  path: "<<out.entry().dir_contents(i);
+        }
+      }     
+
+
 
   }
 
