@@ -479,7 +479,10 @@ void MetadataStore::getLOOKUP(string path)
     {
       string top = stack1.top(); // get the top
       stack1.pop();              // pop the top
-
+      if(top.find("d") != std::string::npos)//只输出第一层，不输出下面更细节的了
+      {
+            LOG(ERROR)<<"renamed file is: "<<top;
+      }
       uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(top)), config_->LookupReplica(machine_->machine_id()));
       Header *header = new Header();
       header->set_from(machine_->machine_id());
@@ -513,10 +516,7 @@ void MetadataStore::getLOOKUP(string path)
           
           string full_path =top + "/" + out.entry().dir_contents(i);
           stack1.push(full_path);
-          if(full_path.find("d") != std::string::npos)//只输出第一层，不输出下面更细节的了
-          {
-            LOG(ERROR)<<"full path is: "<<full_path;
-          }
+          
           
         }
       }     
