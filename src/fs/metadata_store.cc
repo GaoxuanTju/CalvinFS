@@ -554,7 +554,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
     action->add_readset(ParentDir(in.to_path()));
     action->add_writeset(ParentDir(in.to_path()));
 
-  }/**/else if (type == MetadataAction::RENAME) {// the version of gaoxuan
+  }/*else if (type == MetadataAction::RENAME) {// the version of gaoxuan
     MetadataAction::RenameInput in;
     in.ParseFromString(action->input());
     action->add_readset(in.from_path());
@@ -566,7 +566,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
     action->add_readset(ParentDir(in.to_path()));
     action->add_writeset(ParentDir(in.to_path()));
 
-  } /*else if (type == MetadataAction::RENAME) {
+  }*/ /*else if (type == MetadataAction::RENAME) {
     MetadataAction::RenameInput in;
     in.ParseFromString(action->input());
     action->add_readset(in.from_path());
@@ -627,7 +627,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
     }
     //gaoxuan --test
   }*/
- /*else if (type == MetadataAction::RENAME) {// the version of gaoxuan
+ /**/else if (type == MetadataAction::RENAME) {// the version of gaoxuan
     //gaoxuan --this part is rewrited by gaoxuan
     //gaoxuan --add read/write set in the way of DFS
     MetadataAction::RenameInput in;
@@ -692,7 +692,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
     action->add_readset(ParentDir(in.to_path()));
     action->add_writeset(ParentDir(in.to_path()));
    // LOG(ERROR)<<"Is this position is executing?";//如果这里执行了，就说明这里的循环正常终止
-  }*/
+  }
   else if (type == MetadataAction::LOOKUP) {
     MetadataAction::LookupInput in;
     in.ParseFromString(action->input());
