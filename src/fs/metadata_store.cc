@@ -562,7 +562,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
     action->add_readset(ParentDir(in.from_path()));
     action->add_writeset(ParentDir(in.from_path()));
     action->add_writeset(in.to_path());
-    action->add_readset(in.to_path());//gaoxuan --用不用给它添加读集
+   // action->add_readset(in.to_path());//gaoxuan --用不用给它添加读集,填了没解决问题
     action->add_readset(ParentDir(in.to_path()));
     action->add_writeset(ParentDir(in.to_path()));
 
