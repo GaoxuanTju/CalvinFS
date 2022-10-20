@@ -690,24 +690,24 @@ void LatencyExperimentAppend() {
 
     double start = GetTime();
     string to_path;
-    for (int j = 0; j < 250; j++) {//gaoxuan --改成了3次便于观察Rename结果，原本是250次
+    for (int j = 0; j < 1; j++) {//gaoxuan --改成了3次便于观察Rename结果，原本是250次
       int a1 = rand() % 1000;
       int a2 = rand() % 1000;
       while (a2 == a1) {
         a2 = rand() % 1000;
       }
       
-      /**/string from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1) + "/c" + IntToString(j);
+      /*string from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1) + "/c" + IntToString(j);
       to_path = "/a" + IntToString(rand() % machine()->config().size()) + "/b" + IntToString(a2) + "/d" + IntToString(machine()->GetGUID());
       LOG(ERROR)<<from_path <<"  renamed to   "<<to_path;
       BackgroundRenameFile(from_path,
-                           to_path); 
+                           to_path);*/ 
                         
-      /*
+      /**/
       string from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1+1);
       to_path = "/a" + IntToString((machine()->machine_id()+1)%2) + "/d" + IntToString(machine()->GetGUID());
       LOG(ERROR)<<from_path <<"  renamed to   "<<to_path;
-      BackgroundRenameFile(from_path,to_path) ;*/
+      BackgroundRenameFile(from_path,to_path) ;
       /*
       string from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1+1);
       to_path = "/a" + IntToString(rand() % machine()->config().size()) + "/d" + IntToString(machine()->GetGUID());
