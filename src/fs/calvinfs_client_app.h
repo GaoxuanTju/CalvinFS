@@ -690,7 +690,7 @@ void LatencyExperimentAppend() {
 
     double start = GetTime();
     string to_path;
-    for (int j = 0; j < 6; j++) {//gaoxuan --改成了3次便于观察Rename结果，原本是250次
+    for (int j = 0; j < 10; j++) {//gaoxuan --改成了3次便于观察Rename结果，原本是250次
       int a1 = rand() % 1000;
       int a2 = rand() % 1000;
       while (a2 == a1) {
