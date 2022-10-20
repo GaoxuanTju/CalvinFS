@@ -690,7 +690,7 @@ void LatencyExperimentAppend() {
 
     double start = GetTime();
     string to_path;
-    for (int j = 0; j < 10; j++) {//gaoxuan --改成了10次便于观察Rename结果，原本是250次
+    for (int j = 0; j < 5; j++) {//gaoxuan --改成了10次便于观察Rename结果，原本是250次
       int a1 = rand() % 1000;
       int a2 = rand() % 1000;
       while (a2 == a1) {
@@ -732,7 +732,7 @@ void LatencyExperimentAppend() {
 
   
     //gaoxuan --In this part I want to get all path to check if we rename successfully
-    metadata_->getLOOKUP(string(to_path, 0, to_path.rfind('/')));
+    metadata_->getLOOKUP("");
  
 
 

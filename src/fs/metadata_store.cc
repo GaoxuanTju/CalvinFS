@@ -775,7 +775,7 @@ void MetadataStore::Run(Action* action) {
     MetadataAction::RenameInput in;
     MetadataAction::RenameOutput out;
     in.ParseFromString(action->input());
-    LOG(ERROR)<<"In Run :: "<<in.from_path()<<" and "<<in.to_path();
+    //LOG(ERROR)<<"In Run :: "<<in.from_path()<<" and "<<in.to_path();
     Rename_Internal(context, in, &out);
     out.SerializeToString(action->mutable_output());
 
