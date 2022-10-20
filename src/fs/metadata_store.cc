@@ -521,6 +521,7 @@ void MetadataStore::getLOOKUP(string path)
         }
       }     
     }
+    LOG(ERROR)<<"finished LOOKUP!";
 }
 void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is called by RameFile() for RenameExperiment
   action->clear_readset();
