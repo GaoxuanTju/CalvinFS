@@ -1067,6 +1067,7 @@ void MetadataStore::Rename_Internal(
             
       //LOG(ERROR)<<"is this position is executing?";//这句话没输出   
       } 
+      LOG(ERROR)<<"loop in this part? to path is  :"<<in.to_path();
     //gaoxuan --这中间是广度优先遍历添加新的元数据项
   } 
   else
