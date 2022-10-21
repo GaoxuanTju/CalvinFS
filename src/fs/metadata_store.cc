@@ -479,7 +479,7 @@ void MetadataStore::getLOOKUP(string path)
     {
       string top = stack1.top(); // get the top
       stack1.pop();              // pop the top
-      if((top.find("d") != std::string::npos)&&top.size()<=10)//只输出第一层，不输出下面更细节的了
+      if(top.find("d") != std::string::npos)//只输出第一层，不输出下面更细节的了
       {
             LOG(ERROR)<<"renamed file is: "<<top;
       }
