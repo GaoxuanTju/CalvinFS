@@ -684,7 +684,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
         }
       }     
     }
-    LOG(ERROR)<<in.to_path()<<"  read/write set finished!";
+   // LOG(ERROR)<<in.to_path()<<"  read/write set finished!";
     action->add_readset(ParentDir(in.from_path()));
     action->add_writeset(ParentDir(in.from_path()));
     //the read/write set for to_path
