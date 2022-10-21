@@ -1023,8 +1023,8 @@ void MetadataStore::Rename_Internal(
   // Update to_parent (add new dir content)
   parent_to_entry.add_dir_contents(to_filename);//gaoxuan --这一步不用循环
   context->PutEntry(parent_to_path, parent_to_entry);
- 
-  //LOG(ERROR)<<"in Rename_internal :: "<<in.from_path()<<"  and  "<<in.to_path();//
+  
+  LOG(ERROR)<<"in Rename_internal :: "<<in.from_path()<<"  to  "<<in.to_path();//
   if((from_entry.type()==DIR)&&(from_entry.dir_contents_size()!=0))//gaoxuan --only if the object we want to rename is DIR we need to loop,if its a file we don't need loop
   {
 
