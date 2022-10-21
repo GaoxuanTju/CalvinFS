@@ -684,7 +684,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
         }
       }     
     }
-
+    LOG(ERROR)<<in.to_path()<<"  read/write set finished!";
     action->add_readset(ParentDir(in.from_path()));
     action->add_writeset(ParentDir(in.from_path()));
     //the read/write set for to_path
@@ -1024,7 +1024,7 @@ void MetadataStore::Rename_Internal(
   parent_to_entry.add_dir_contents(to_filename);//gaoxuan --这一步不用循环
   context->PutEntry(parent_to_path, parent_to_entry);
   
-  LOG(ERROR)<<"in Rename_internal :: "<<in.from_path()<<"  to  "<<in.to_path();//
+  //LOG(ERROR)<<"in Rename_internal :: "<<in.from_path()<<"  to  "<<in.to_path();//
   if((from_entry.type()==DIR)&&(from_entry.dir_contents_size()!=0))//gaoxuan --only if the object we want to rename is DIR we need to loop,if its a file we don't need loop
   {
 
@@ -1067,7 +1067,7 @@ void MetadataStore::Rename_Internal(
             
       //LOG(ERROR)<<"is this position is executing?";//这句话没输出   
       } 
-      LOG(ERROR)<<"loop in this part? to path is  :"<<in.to_path();
+     // LOG(ERROR)<<"loop in this part? to path is  :"<<in.to_path();
     //gaoxuan --这中间是广度优先遍历添加新的元数据项
   } 
   else
