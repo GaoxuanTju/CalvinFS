@@ -30,7 +30,7 @@ MessageBuffer *CalvinFSClientApp::GetMetadataEntry(const Slice &path)
     in.set_path(path.data(), path.size());
     // gaoxuan --就是上面这小子把路径传错了，看看是不是这里in.path就设置失败了！！！如果是，这里就是症结所在
     // LOG(ERROR)<<"shi bu shi zhe li in.path bu dui jin le :::"<<in.path();//gaoxuan --查过了，不是它，in.path是对的
-    a.set_version(100);//gaoxuan --这一行是我加的
+    a.set_version(1000);//gaoxuan --这一行是我加的
     in.SerializeToString(a.mutable_input());
     metadata_->GetRWSets(&a); //理论上这里都是没有任何问题的
     metadata_->Run(&a);

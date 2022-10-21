@@ -703,16 +703,16 @@ void LatencyExperimentAppend() {
       BackgroundRenameFile(from_path,
                            to_path);*/
                         
-      /*
+      /**/
       string from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1+1);
       to_path = "/a" + IntToString((machine()->machine_id()+1)%2) + "/d" + IntToString(machine()->GetGUID());
       LOG(ERROR)<<from_path <<"  renamed to   "<<to_path;
-      BackgroundRenameFile(from_path,to_path) ;*/
-      /**/
+      BackgroundRenameFile(from_path,to_path) ;
+      /*
       string from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1+1);
       to_path = "/a" + IntToString(rand() % machine()->config().size()) + "/d" + IntToString(machine()->GetGUID());
       LOG(ERROR)<<from_path <<"  renamed to   "<<to_path;
-      BackgroundRenameFile(from_path,to_path) ;
+      BackgroundRenameFile(from_path,to_path) ;*/
 
       if (j % 50 == 0) {
         
@@ -724,7 +724,7 @@ void LatencyExperimentAppend() {
     // Wait for all operations to finish.
     while (capacity_.load() < kMaxCapacity) {
       usleep(10);
-      LOG(ERROR)<<capacity_.load();
+      //LOG(ERROR)<<capacity_.load();
     }
     
     // Report.
