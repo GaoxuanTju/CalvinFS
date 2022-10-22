@@ -684,14 +684,22 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
         }
       }     
     }
-   // LOG(ERROR)<<in.to_path()<<"  read/write set finished!";
-    action->add_readset(ParentDir(in.from_path()));
-    action->add_writeset(ParentDir(in.from_path()));
-    //the read/write set for to_path
-   // action->add_writeset(in.to_path());
-    action->add_readset(ParentDir(in.to_path()));
-    action->add_writeset(ParentDir(in.to_path()));
-   // LOG(ERROR)<<"Is this position is executing?";//如果这里执行了，就说明这里的循环正常终止
+    //gaoxuan --感觉是这里的读写集加重了，如果父目录是一样的话，加了两遍读写集
+    if(ParentDir(in.from_path())==ParentDir(in.to_path()))
+    {
+          action->add_readset(ParentDir(in.from_path()));
+          action->add_writeset(ParentDir(in.from_path()));
+    }
+    else
+    {
+          action->add_readset(ParentDir(in.from_path()));
+          action->add_writeset(ParentDir(in.from_path()));
+      
+          action->add_readset(ParentDir(in.to_path()));
+          action->add_writeset(ParentDir(in.to_path()));
+    }
+
+   
   }
   else if (type == MetadataAction::LOOKUP) {
     MetadataAction::LookupInput in;
