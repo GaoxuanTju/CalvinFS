@@ -697,18 +697,18 @@ void LatencyExperimentAppend() {
         a2 = rand() % 1000;
       }
       
-      /*这里面是重命名文件的路径 
+      /*用于重命名文件的路径 
       string from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1) + "/c" + IntToString(j);
       to_path = "/a" + IntToString(rand() % machine()->config().size()) + "/b" + IntToString(a1) + "/d" + IntToString(machine()->GetGUID());
       LOG(ERROR)<<from_path <<"  renamed to   "<<to_path;
       BackgroundRenameFile(from_path,
                            to_path);*/
                         
-      /*用于测试只在不同目录下重命名的路径*/
+      /*用于测试只在不同目录下重命名的路径
       string from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1+1);
       to_path = "/a" + IntToString((machine()->machine_id()+1)%2) + "/d" + IntToString(machine()->GetGUID());
       LOG(ERROR)<<from_path <<"  renamed to   "<<to_path;
-      BackgroundRenameFile(from_path,to_path) ;
+      BackgroundRenameFile(from_path,to_path) ;*/
 
       /*用于测试只在同一个目录下重命名的路径
       string from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1+1);
@@ -722,6 +722,13 @@ void LatencyExperimentAppend() {
       to_path = "/d" + IntToString(machine()->GetGUID());
       LOG(ERROR)<<from_path <<"  renamed to   "<<to_path;
       BackgroundRenameFile(from_path,to_path) ;*/
+
+      /*用于测试将目录rename到相同目录和不同目录都有的路径*/
+      string from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1) 
+      to_path = "/a" + IntToString(rand() % machine()->config().size()) + "/d" + IntToString(machine()->GetGUID());
+      LOG(ERROR)<<from_path <<"  renamed to   "<<to_path;
+      BackgroundRenameFile(from_path,
+                           to_path);
       
 
       if (j % 50 == 0) {
