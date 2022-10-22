@@ -724,7 +724,7 @@ void LatencyExperimentAppend() {
       BackgroundRenameFile(from_path,to_path) ;*/
 
       /*用于测试将目录rename到相同目录和不同目录都有的路径*/
-      string from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1) 
+      string from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1); 
       to_path = "/a" + IntToString(rand() % machine()->config().size()) + "/d" + IntToString(machine()->GetGUID());
       LOG(ERROR)<<from_path <<"  renamed to   "<<to_path;
       BackgroundRenameFile(from_path,
