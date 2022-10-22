@@ -690,7 +690,7 @@ void LatencyExperimentAppend() {
 
     double start = GetTime();
     string to_path;
-    for (int j = 0; j < 10; j++) {//gaoxuan --改成了3次便于观察Rename结果，原本是250次
+    for (int j = 0; j < 1; j++) {//gaoxuan --改成了3次便于观察Rename结果，原本是250次
       int a1 = rand() % 1000;
       int a2 = rand() % 1000;
       while (a2 == a1) {
@@ -704,19 +704,20 @@ void LatencyExperimentAppend() {
       BackgroundRenameFile(from_path,
                            to_path);*/
                         
-      /*这里面是能够正常执行的不重命名同一个目录的文件的路径，都是目录
+      /*用于测试只在不同目录下重命名的路径*/
       string from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1+1);
       to_path = "/a" + IntToString((machine()->machine_id()+1)%2) + "/d" + IntToString(machine()->GetGUID());
       LOG(ERROR)<<from_path <<"  renamed to   "<<to_path;
-      BackgroundRenameFile(from_path,to_path) ;*/
+      BackgroundRenameFile(from_path,to_path) ;
 
+      /*用于测试只在同一个目录下重命名的路径
       string from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1+1);
       to_path = "/a" + IntToString(machine()->machine_id()) + "/d" + IntToString(machine()->GetGUID());
       LOG(ERROR)<<from_path <<"  renamed to   "<<to_path;
-      BackgroundRenameFile(from_path,to_path) ;
+      BackgroundRenameFile(from_path,to_path) ;*/
       
       
-      /*这里是将目录rename到根目录下面
+      /*用于测试将目录重命名到根目录下的路径
       string from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1+1);
       to_path = "/d" + IntToString(machine()->GetGUID());
       LOG(ERROR)<<from_path <<"  renamed to   "<<to_path;
