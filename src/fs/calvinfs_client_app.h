@@ -688,6 +688,7 @@ void LatencyExperimentAppend() {
     Spin(1);
 
     double start = GetTime();
+    string from_path;
     string to_path;
     for (int j = 0; j < 1; j++) {
       int a1 = rand() % 1000;
@@ -723,7 +724,7 @@ void LatencyExperimentAppend() {
       BackgroundRenameFile(from_path,to_path) ;*/
 
       
-      string from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1); 
+      from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1); 
       to_path = "/a" + IntToString(rand() % machine()->config().size()) + "/d" + IntToString(machine()->GetGUID());
       LOG(ERROR)<<from_path <<"  renamed to   "<<to_path;
       BackgroundRenameFile(from_path,
