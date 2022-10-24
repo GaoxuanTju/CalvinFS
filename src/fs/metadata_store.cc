@@ -943,27 +943,44 @@ void MetadataStore::Rename_Internal(
   
   if((from_entry.type()==DIR)&&(from_entry.dir_contents_size()!=0))//gaoxuan --only if the object we want to rename is DIR we need to loop,if its a file we don't need loop
   {
-
-  
   //gaoxuan --use BFS to add new metadata entry 
-      
       std::queue<string> queue1; 
       string root = in.to_path();
       queue1.push(root); 
       string from_path =in.from_path();//gaoxuan --the path used to copyEntry
       while (!queue1.empty()) { 
-
           string front = queue1.front();//gaoxuan --get the front in queue
-          queue1.pop();
-          
+          queue1.pop();         
           //Add Entry
           MetadataEntry to_entry1;//gaoxuan --the entry which will be added
           MetadataEntry from_entry1;//gaoxuan --the entry which will be used to copy to to_entry
           context->GetEntry(from_path, &from_entry1);
           to_entry1.CopyFrom(from_entry1);
           context->PutEntry(front, to_entry1);
-          
-          
+          //gaoxuan --this part is used to delete the old entry
+          // Update from_parent(Find file and remove it from parent directory.)
+          string from_filename = FileName(from_path);
+          //get the entry of parent of from_path
+          string parent_from_path1 = ParentDir(from_path);
+          MetadataEntry parent_from_entry1;
+          context->GetEntry(parent_from_path1, &parent_from_entry1);
+
+          for (int i = 0; i < parent_from_entry1.dir_contents_size(); i++) {
+            if (parent_from_entry1.dir_contents(i) == from_filename) {
+              // Remove reference to target file entry from dir contents.
+              parent_from_entry1.mutable_dir_contents()
+                  ->SwapElements(i, parent_from_entry1.dir_contents_size() - 1);
+              parent_from_entry1.mutable_dir_contents()->RemoveLast();
+
+              // Write updated parent entry.
+              context->PutEntry(parent_from_path1, parent_from_entry1);
+              break;
+            }
+          }
+          // Erase the from_entry
+          context->DeleteEntry(from_path);
+          //gaoxuan --this part is used to delete the old entry
+
           if (to_entry1.type() == DIR) {
             
             for (int i = 0; i < to_entry1.dir_contents_size(); i++) {
@@ -976,38 +993,33 @@ void MetadataStore::Rename_Internal(
           if(!queue1.empty())
           {
             from_path = in.from_path() + queue1.front().substr(in.to_path().size());
-          }
-          
-            
-       
-      } 
-   
-  } 
-  else
+          } 
+      }
+
+  } else
   {//gaoxuan --empty dir or file RENAME opretaion
       
-  // Add to_entry
-  MetadataEntry to_entry;
-  to_entry.CopyFrom(from_entry);
-  context->PutEntry(in.to_path(), to_entry);
+      // Add to_entry
+      MetadataEntry to_entry;
+      to_entry.CopyFrom(from_entry);
+      context->PutEntry(in.to_path(), to_entry);
 
-  // Update from_parent(Find file and remove it from parent directory.)
-  string from_filename = FileName(in.from_path());
-  for (int i = 0; i < parent_from_entry.dir_contents_size(); i++) {
-    if (parent_from_entry.dir_contents(i) == from_filename) {
-      // Remove reference to target file entry from dir contents.
-      parent_from_entry.mutable_dir_contents()
-          ->SwapElements(i, parent_from_entry.dir_contents_size() - 1);
-      parent_from_entry.mutable_dir_contents()->RemoveLast();
+      // Update from_parent(Find file and remove it from parent directory.)
+      string from_filename = FileName(in.from_path());
+      for (int i = 0; i < parent_from_entry.dir_contents_size(); i++) {
+        if (parent_from_entry.dir_contents(i) == from_filename) {
+          // Remove reference to target file entry from dir contents.
+          parent_from_entry.mutable_dir_contents()
+              ->SwapElements(i, parent_from_entry.dir_contents_size() - 1);
+          parent_from_entry.mutable_dir_contents()->RemoveLast();
 
-      // Write updated parent entry.
-      context->PutEntry(parent_from_path, parent_from_entry);
-      break;
-    }
-  }
-
-  // Erase the from_entry
-  context->DeleteEntry(in.from_path());
+          // Write updated parent entry.
+          context->PutEntry(parent_from_path, parent_from_entry);
+          break;
+        }
+      }
+      // Erase the from_entry
+      context->DeleteEntry(in.from_path());
   }
 
 }
