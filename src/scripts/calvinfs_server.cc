@@ -23,8 +23,6 @@
 #include "fs/metadata.pb.h"
 #include "scripts/script_utils.h"
 
-//gaoxuan --这个DEFINE_bool之类的是gflags这个外部库提供的功能，就是能够从命令行接受一些参数
-//接受一部分启动时传来的参数bin/scripts/cluster --command="start" --experiment=4  --clients=100 --max_active=1000 --max_running=100 --local_percentage=100
 DEFINE_bool(calvin_version, false, "Print Calvin version information");
 DEFINE_string(binary, "calvinfs_server", "Calvin binary executable program");
 DEFINE_string(config, "calvin.conf", "conf file of Calvin cluster");
@@ -39,7 +37,7 @@ int main(int argc, char** argv) {
   google::ParseCommandLineFlags(&argc, &argv, true);
   google::InitGoogleLogging(argv[0]);
   // Print Calvin version
-  if (FLAGS_calvin_version) {//gaoxuan --这个没被执行
+  if (FLAGS_calvin_version) {
     // Check whether Calvin have been running
     if (is_process_exist((char *)FLAGS_binary.c_str()) == true) {
       return -2;
@@ -49,7 +47,7 @@ int main(int argc, char** argv) {
       return 0;
     }
   }
- //gaoxuan --怎么直接输出了，没看到怎么指定machine id的呀，下面才是创建机器，有点奇怪
+ 
   LOG(ERROR) << "Preparing to start CalvinFS node "
              << FLAGS_machine_id << "...";
 
@@ -61,8 +59,8 @@ int main(int argc, char** argv) {
   ClusterConfig cc;
   cc.FromFile(FLAGS_config);
 
-  int replicas = (cc.size() >= 3) ? 3 : 1;//gaoxuan --在这指定副本数量，这里只有两台机器，所以副本数是1
-  int partitions = cc.size() / replicas;//gaoxuan --这个划分也就是划分几份的意思吧，这里就是2/1=2
+  int replicas = (cc.size() >= 3) ? 3 : 1;
+  int partitions = cc.size() / replicas;
 
   LOG(ERROR) << "Starting CalvinFS node " << FLAGS_machine_id
              << " (partition " << (FLAGS_machine_id % partitions)
@@ -70,7 +68,7 @@ int main(int argc, char** argv) {
              << ", replica " << (FLAGS_machine_id / partitions)
              << "/" << replicas << ")";
 
-  Machine m(FLAGS_machine_id, cc);//gaoxuan --对呀，这里才是创建，怎么FLAGS_machine_id那台机器启动他咋就知道呢
+  Machine m(FLAGS_machine_id, cc);
   Spin(1);
 
   string fsconfig;
@@ -79,7 +77,7 @@ int main(int argc, char** argv) {
   Spin(1);
 
   // Start paxos app (maybe).
-  if (FLAGS_machine_id % partitions == 0) {//gaoxuan --这个地方是两台机器第一处不同，paxos Metalog只会在偶数号机器上创建
+  if (FLAGS_machine_id % partitions == 0) {//gaoxuan --paxos Metalog will be created only in even number machine
     StartAppProto sap;
     for (int i = 0; i < replicas; i++) {
       sap.add_participants(i * partitions);
@@ -97,16 +95,14 @@ int main(int argc, char** argv) {
   m.GlobalBarrier();
   Spin(1);
 
-  //gaoxuan --这里元数据存储app在哪，创建怎么创建的，他这里app名字就是metadata，我前面写的传进来的app的name就是client，所以只可能是这两种app？
   // Start metadata store app.
-  //gaoxuan --这里是add_app,也就是说App这个东西是手动创建的
-  //gaoxuan --reinterpret_cast <new_type> (expression)是将expression转换成new_type类型的东西
+
   m.AddApp("MetadataStoreApp", "metadata");
-  //所以说这一步是创建一个MetadataStore,利用里面的SetMachine函数设置一下machine
+
   reinterpret_cast<MetadataStore*>(
       reinterpret_cast<StoreApp*>(m.GetApp("metadata"))->store())
-          ->SetMachine(&m);//gaoxuan --这里回答了泽伟师兄的一个问题，在哪创建了根目录
-  LOG(ERROR) << "[" << FLAGS_machine_id << "] created MetadataStore";//gaoxuan --所以这个MetadataStore还是一个机器只有一个，而不是我们想的，一个client app有一个
+          ->SetMachine(&m);//
+  LOG(ERROR) << "[" << FLAGS_machine_id << "] created MetadataStore";
   m.GlobalBarrier();
   Spin(1);
 
@@ -149,14 +145,14 @@ int main(int argc, char** argv) {
   Spin(1);
 
   // Start client app.
-  //gaoxuan --client app是在这里创建的，main函数里面创建了client app
+  
   m.AddApp("CalvinFSClientApp", "client");
-  //在这里面也是只有一个Client_app,多个client通过这个APP来发送请求
+  
   LOG(ERROR) << "[" << FLAGS_machine_id << "] created CalvinFSClientApp";
   reinterpret_cast<CalvinFSClientApp*>(m.GetApp("client"))
       ->set_start_time(FLAGS_time);
   reinterpret_cast<CalvinFSClientApp*>(m.GetApp("client"))
-      ->set_experiment(FLAGS_experiment, FLAGS_clients); //gaoxuan --在这个地方，设置了clientapp的内容，那么怎么转去执行的呢？？？转到调用RenameFileExperiment()的
+      ->set_experiment(FLAGS_experiment, FLAGS_clients); 
 
   while (!m.Stopped()) {
     usleep(10000);

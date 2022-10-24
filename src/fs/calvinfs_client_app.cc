@@ -22,17 +22,14 @@ MessageBuffer *CalvinFSClientApp::GetMetadataEntry(const Slice &path)
   if (mds_machine == machine()->machine_id())
   {
     Action a;
-    // a.set_version(scheduler_->SafeVersion());
 
-    // LOG(ERROR)<<"li lun shang RPC shi zhe li hui zhi xing!"<<path.data()<<"  size is "<<path.size();
     a.set_action_type(MetadataAction::LOOKUP);
     MetadataAction::LookupInput in;
     in.set_path(path.data(), path.size());
-    // gaoxuan --就是上面这小子把路径传错了，看看是不是这里in.path就设置失败了！！！如果是，这里就是症结所在
-    // LOG(ERROR)<<"shi bu shi zhe li in.path bu dui jin le :::"<<in.path();//gaoxuan --查过了，不是它，in.path是对的
-    a.set_version(1000);//gaoxuan --这一行是我加的
+
+    a.set_version(1000000000);//gaoxuan --this line is very important for LOOKUP
     in.SerializeToString(a.mutable_input());
-    metadata_->GetRWSets(&a); //理论上这里都是没有任何问题的
+    metadata_->GetRWSets(&a); 
     metadata_->Run(&a);
     return new MessageBuffer(a);
 
@@ -271,25 +268,24 @@ MessageBuffer *CalvinFSClientApp::CopyFile(const Slice &from_path, const Slice &
 }
 
 MessageBuffer *CalvinFSClientApp::RenameFile(const Slice &from_path, const Slice &to_path)
-{ // gaoxuan --这里被调用了，应该这里才是rename的逻辑
-  // LOG(ERROR)<<"Is it executed? --calvinfs_client_app.cc's RenameFile()";// gaoxuan --
+{ 
   uint64 distinct_id = machine()->GetGUID();
   string channel_name = "action-result-" + UInt64ToString(distinct_id);
   auto channel = machine()->DataChannel(channel_name);
   CHECK(!channel->Pop(NULL));
- // LOG(ERROR)<<"in RenameFile brfore:: "<<from_path.data()<<" and "<<to_path.data();
+ 
   Action *a = new Action();
   a->set_client_machine(machine()->machine_id());
-  a->set_client_channel(channel_name);        // gaoxuan --这个channel应该指的是一个行为的数据通路吧
-  a->set_action_type(MetadataAction::RENAME); // gaoxuan --这里确定action类型是RENAME
-  //a->set_version(10);//gaoxuan --这里是我加的
+  a->set_client_channel(channel_name);        
+  a->set_action_type(MetadataAction::RENAME); 
+  
   MetadataAction::RenameInput in;
   in.set_from_path(from_path.data(), from_path.size());
   in.set_to_path(to_path.data(), to_path.size());
   in.SerializeToString(a->mutable_input());
-  metadata_->setAPPname(name()); // gaoxuan --这一行是我加的，用于在metadata_store.cc里面获得app name
+  metadata_->setAPPname(name()); // gaoxuan --this line is added by me which is uesd to getAPPname in metadata_store.cc
   metadata_->GetRWSets(a);
- // LOG(ERROR)<<"after GetRW in mds.cc";
+ 
   log_->Append(a);
 
   MessageBuffer *m = NULL;
@@ -304,7 +300,7 @@ MessageBuffer *CalvinFSClientApp::RenameFile(const Slice &from_path, const Slice
   delete m;
   MetadataAction::RenameOutput out;
   out.ParseFromString(result.output());
-  //LOG(ERROR)<<"finish rename in REnamefile in mds.cc";//目前这行没有执行
+  
   if (out.success())
   {
     return new MessageBuffer();

@@ -33,7 +33,7 @@ void StoreApp::HandleMessageBase(Header* header, MessageBuffer* message) {
     Run(action);
     machine()->SendReplyMessage(header, new MessageBuffer(*action));
 
-  } else if (header->rpc() == "RUNLOCAL") {//gaoxuan --StoreApp::RunAsync这个函数发送RPC请求到这里，来执行Run
+  } else if (header->rpc() == "RUNLOCAL") {
     // Parse Action.
     Action* action = reinterpret_cast<Action*>(header->misc_int(0));
 

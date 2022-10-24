@@ -29,10 +29,10 @@ class CalvinFSClientApp : public App {
     while (going_.load()) {}
   }
 
-  virtual void Start() {//gaoxuan --这里会执行具体实验流程
+  virtual void Start() {//gaoxuan --the function for start RenameExperiment
   
     action_count_ = 0;
-    //Random_data是一个字符串类型的，应该就是随便产生一些字符串，放进文件吧
+  
     for (int i = 0; i < 20000000; i++) {
       random_data_.push_back(rand() % 256);
     }
@@ -58,12 +58,12 @@ class CalvinFSClientApp : public App {
     metadata_ =
         reinterpret_cast<MetadataStore*>(
            reinterpret_cast<StoreApp*>(machine()->GetApp("metadata"))->store());
-//gaoxuan --注意，metadata_就是最初创建的那个MetadataStoreApp,他的名字是metadata
+//gaoxuan --metadata_is a MetadataStoreApp that App name is metadata
     Spin(1);
 
-    capacity_ = kMaxCapacity;//gaoxuan --这里指的就是这个App能够最大容纳的client数量
+    capacity_ = kMaxCapacity;//gaoxuan --the amount of client
 
-    switch(experiment) {//gaoxuan --这里正式开始运行实验
+    switch(experiment) {
       case 0:
         FillExperiment();
         break;
@@ -80,8 +80,8 @@ class CalvinFSClientApp : public App {
         CopyExperiment();
         break;
 
-      case 4://gaoxuan --当然是这里被执行，进入RenameExperiment的逻辑
-        //LOG(ERROR)<<"gaoxuan --executing start calcinfs_client app.h";
+      case 4:
+        
         RenameExperiment();
         break;
 
@@ -679,51 +679,50 @@ void LatencyExperimentAppend() {
   }
 
   void RenameExperiment() {
-    //gaoxuan --执行到这里
-  
+
     Spin(1);
-    //gaoxuan --因为在这个里面获取到了metadataStoreAPP，所以也要在这里面进行初始化，所以调用Init函数
-    metadata_->Init();//gaoxuan --这里转去执行metadat_store.cc中的Init()函数去了，对元数据存储进行一个初始化
+    //gaoxuan --function Init() is used to initialize the metadata of dir and file which used for Rename 
+    metadata_->Init();//gaoxuan --Init() is in metadat_store.cc
     Spin(1);
     machine()->GlobalBarrier();
     Spin(1);
 
     double start = GetTime();
     string to_path;
-    for (int j = 0; j < 10; j++) {//gaoxuan --改成了3次便于观察Rename结果，原本是250次
+    for (int j = 0; j < 250; j++) {
       int a1 = rand() % 1000;
       int a2 = rand() % 1000;
       while (a2 == a1) {
         a2 = rand() % 1000;
       }
       
-      /*用于重命名文件的路径 
+      /*gaoxuan --the path used for testing if we can only rename file correctly
       string from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1) + "/c" + IntToString(j);
       to_path = "/a" + IntToString(rand() % machine()->config().size()) + "/b" + IntToString(a1) + "/d" + IntToString(machine()->GetGUID());
       LOG(ERROR)<<from_path <<"  renamed to   "<<to_path;
       BackgroundRenameFile(from_path,
                            to_path);*/
                         
-      /*用于测试只在不同目录下重命名的路径
+      /*gaoxuan --the path used for testing if we can rename dir in different parent dir
       string from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1+1);
       to_path = "/a" + IntToString((machine()->machine_id()+1)%2) + "/d" + IntToString(machine()->GetGUID());
       LOG(ERROR)<<from_path <<"  renamed to   "<<to_path;
       BackgroundRenameFile(from_path,to_path) ;*/
 
-      /*用于测试只在同一个目录下重命名的路径
+      /*gaoxuan --the path used for testing if we can rename dir in same parent dir
       string from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1+1);
       to_path = "/a" + IntToString(machine()->machine_id()) + "/d" + IntToString(machine()->GetGUID());
       LOG(ERROR)<<from_path <<"  renamed to   "<<to_path;
       BackgroundRenameFile(from_path,to_path) ;*/
       
       
-      /*用于测试将目录重命名到根目录下的路径
+      /*gaoxuan --the path used for testing if we can rename dir to root dir
       string from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1+1);
       to_path = "/d" + IntToString(machine()->GetGUID());
       LOG(ERROR)<<from_path <<"  renamed to   "<<to_path;
       BackgroundRenameFile(from_path,to_path) ;*/
 
-      /*用于测试将目录rename到相同目录和不同目录都有的路径*/
+      
       string from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1); 
       to_path = "/a" + IntToString(rand() % machine()->config().size()) + "/d" + IntToString(machine()->GetGUID());
       LOG(ERROR)<<from_path <<"  renamed to   "<<to_path;
@@ -734,7 +733,7 @@ void LatencyExperimentAppend() {
       if (j % 50 == 0) {
         
         LOG(ERROR) << "[" << machine()->machine_id() << "] "
-                   << "Test progress : " << j / 50 << "/" << 5;//将j/100修改成了j/50,应该是代码有错误
+                   << "Test progress : " << j / 50 << "/" << 5;
       }
     }
 
@@ -752,7 +751,7 @@ void LatencyExperimentAppend() {
     
 
   
-    //gaoxuan --In this part I want to get all path to check if we rename successfully
+    //gaoxuan --In this part I want to get all path to check if we rename successfully,in real use,we need to delete it
     metadata_->getLOOKUP("");
  
 
@@ -965,10 +964,10 @@ void LatencyExperimentAppend() {
     header->set_to(machine()->machine_id());
     header->set_type(Header::RPC);
     header->set_app(name());
-    header->set_rpc("RENAME_FILE");//gaoxuan --应该是在这里调用了RenameFile
+    header->set_rpc("RENAME_FILE");//gaoxuan --call RenameFile() in calvinfs_client_app.cc
     header->add_misc_string(from_path.data(), from_path.size());
     header->add_misc_string(to_path.data(), to_path.size());
-    if (reporting_ && rand() % 2 == 0) {//这个条件分支是什么也不太清楚什么意思
+    if (reporting_ && rand() % 2 == 0) {//gaoxuan --this branch will never be executed in RenameExperiment(),reporting_ is false
       header->set_callback_app(name());
       header->set_callback_rpc("CB");
       header->add_misc_string("rename");

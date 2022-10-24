@@ -119,20 +119,20 @@ class BlockLogApp : public App {
 
       // Create batch (iff there are any pending requests).
       int count = queue_.Size();
-      if (count != 0) {//gaoxuan --把挂起的多个请求加入到一个batch中，这个ActionBatch是一个message，里面是多个action
+      if (count != 0) {
         ActionBatch batch;
         for (int i = 0; i < count; i++) {
           Action* a = NULL;
           queue_.Pop(&a);
-          a->set_version_offset(i);//gaoxuan --这里版本不知道有没有影响
+          a->set_version_offset(i);
           batch.mutable_entries()->AddAllocated(a);
         }
 
         // Avoid multiple allocation.
         string* block = new string();
-        batch.SerializeToString(block);//把这个包含多个action的批转成字符串
+        batch.SerializeToString(block);
 
-        // Choose block_id.这里是选择块id，把这个请求存到块存储中
+        // Choose block_id.
         uint64 block_id =
             machine()->GetGUID() * 2 + (block->size() > 1024 ? 1 : 0);
 
@@ -148,7 +148,7 @@ class BlockLogApp : public App {
           header->set_rpc("BATCH");
           header->add_misc_int(block_id);
           machine()->SendMessage(header, new MessageBuffer(Slice(*block)));
-        }//把这些请求存进块里
+        }
 
         // Scheduler block for eventual deallocation.
         to_delete_.Push(block);

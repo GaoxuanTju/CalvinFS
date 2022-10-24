@@ -734,7 +734,7 @@ void LatencyExperimentAppend() {
     double start = GetTime();
     throughput_start_ = start;
 
-    for (int j = 0; j < 5; j++) {//gaoxuan --改成5次便于观察，本来是250次
+    for (int j = 0; j < 250; j++) {
       int seed = rand() % 100;
       
       // Copy operations inside one data center
