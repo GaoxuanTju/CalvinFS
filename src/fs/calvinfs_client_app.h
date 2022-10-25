@@ -690,7 +690,7 @@ void LatencyExperimentAppend() {
     double start = GetTime();
     string from_path;
     string to_path;
-    for (int j = 0; j < 2; j++) {
+    for (int j = 0; j < 250; j++) {
       int a1 = rand() % 1000;
       int a2 = rand() % 1000;
       while (a2 == a1) {
@@ -724,7 +724,7 @@ void LatencyExperimentAppend() {
       BackgroundRenameFile(from_path,to_path) ;*/
 
       
-      from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(100); 
+      from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1); 
       to_path = "/a" + IntToString(rand() % machine()->config().size()) + "/d" + IntToString(machine()->GetGUID());
       LOG(ERROR)<<from_path <<"  renamed to   "<<to_path;
       BackgroundRenameFile(from_path,
@@ -753,7 +753,7 @@ void LatencyExperimentAppend() {
 
   
     //gaoxuan --In this part I want to get all path to check if we rename successfully,in real use,we need to delete it
-    metadata_->getLOOKUP("");
+    //metadata_->getLOOKUP("");
  
 
 
