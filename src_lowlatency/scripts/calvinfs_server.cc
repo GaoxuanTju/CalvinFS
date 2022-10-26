@@ -61,7 +61,7 @@ int main(int argc, char** argv) {
   ClusterConfig cc;
   cc.FromFile(FLAGS_config);
 
-  uint32 replicas = (cc.size() >= 3) ? 3 : 1;
+  uint32 replicas = (cc.size() >= 3) ? 3 : 1;//gaoxuan --感觉可以从这里入手，副本数设置为1，partition设置为1
   uint32 partitions = cc.size() / replicas;
 
   LOG(ERROR) << "Starting CalvinFS node " << FLAGS_machine_id
@@ -74,7 +74,7 @@ int main(int argc, char** argv) {
   Spin(1);
 
   string fsconfig;
-  MakeCalvinFSConfig(partitions, replicas).SerializeToString(&fsconfig);
+  MakeCalvinFSConfig(partitions, replicas).SerializeToString(&fsconfig);//gaoxuan --这里面可以再仔细看看，涉及到怎么初始化集群的mds
   m.AppData()->Put("calvinfs-config", fsconfig);
   Spin(1);
 

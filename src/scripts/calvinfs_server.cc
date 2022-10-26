@@ -57,10 +57,10 @@ int main(int argc, char** argv) {
 
   // Create machine.
   ClusterConfig cc;
-  cc.FromFile(FLAGS_config);
+  cc.FromFile(FLAGS_config);//gaoxuan --这个地方是获得集群中机器的ip地址，从calvin.conf
 
-  int replicas = (cc.size() >= 3) ? 3 : 1;
-  int partitions = cc.size() / replicas;
+  int replicas = (cc.size() >= 3) ? 3 : 1;//gaoxuan --在这里cc.size根据上面的ip地址就能确定是2了,replicas是1
+  int partitions = cc.size() / replicas;//gaoxuan --partions是2，就代表划分到两台机器上了
 
   LOG(ERROR) << "Starting CalvinFS node " << FLAGS_machine_id
              << " (partition " << (FLAGS_machine_id % partitions)
@@ -68,16 +68,18 @@ int main(int argc, char** argv) {
              << ", replica " << (FLAGS_machine_id / partitions)
              << "/" << replicas << ")";
 
-  Machine m(FLAGS_machine_id, cc);
+  Machine m(FLAGS_machine_id, cc);//gaoxuan --创建实际的机器对象
   Spin(1);
-
+  
   string fsconfig;
-  MakeCalvinFSConfig(partitions, replicas).SerializeToString(&fsconfig);
-  m.AppData()->Put("calvinfs-config", fsconfig);
+  //MakeCalvinFSConfig有三个函数，想改就得改这里面的函数，他可以影响到hash范围，通过设置mds_count
+  //一个参数的MakeCalvinFSConfig函数现在代表n台机器，每台机器上一个副本，一个mds，需要改成，只有一台机器上有mds和副本即可
+  MakeCalvinFSConfig(partitions, replicas).SerializeToString(&fsconfig);//gaoxuan --这个里面就是具体设置，这一台机器的mds，块存储
+  m.AppData()->Put("calvinfs-config", fsconfig);//gaoxuan --通过machine()->getAppData("calvinfs-config")可以得到刚刚设置的东西
   Spin(1);
 
   // Start paxos app (maybe).
-  if (FLAGS_machine_id % partitions == 0) {//gaoxuan --paxos Metalog will be created only in even number machine
+  if (FLAGS_machine_id % partitions == 0) {//gaoxuan --如果上面改动的话，这里也要改一下逻辑
     StartAppProto sap;
     for (int i = 0; i < replicas; i++) {
       sap.add_participants(i * partitions);
@@ -95,6 +97,7 @@ int main(int argc, char** argv) {
   m.GlobalBarrier();
   Spin(1);
 
+  //下面的东西可以没必要改，全创建也没关系，用不到闲着呗
   // Start metadata store app.
 
   m.AddApp("MetadataStoreApp", "metadata");

@@ -117,14 +117,15 @@ CalvinFSConfig MakeCalvinFSConfig(int n) {
   return c;
 }
 
-CalvinFSConfig MakeCalvinFSConfig(int n, int r) {
+CalvinFSConfig MakeCalvinFSConfig(int n, int r) {//gaoxuan --这个函数用于设定该台机器的相关存储
+//gaoxuan --n是partions，r是replicas；如果不加改变的话，n=2，r=1
   CalvinFSConfig c;
   c.set_block_replication_factor(r);
   c.set_metadata_replication_factor(r);
   c.set_blucket_count(n);
   c.set_metadata_shard_count(n);
 
-  for (int i = 0; i < r; i++) {
+  for (int i = 0; i < r; i++) {//gaoxuan --如果我把n和r全都改成1，拿着里面就会有1个机器的mds相关信息，其中一台专门用来发请求？
     for (int j = 0; j < n; j++) {
       int m = i*n+j;  // machine id
       c.add_replicas()->set_machine(m);
