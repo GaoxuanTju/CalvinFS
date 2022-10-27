@@ -466,7 +466,7 @@ void MetadataStore::getLOOKUP(string path)
     {
       string top = stack1.top(); // gaoxuan --get the top
       stack1.pop();              // gaoxuan --pop the top
-      if(top.find("d") != std::string::npos)//gaoxuan --this 10 is used to limit output.Because it will be too many output without limitation 
+      if((top.find("d") != std::string::npos)&&top.size()<=10)//gaoxuan --this 10 is used to limit output.Because it will be too many output without limitation 
       {
             LOG(ERROR)<<"renamed file is: "<<top;
       }
