@@ -690,7 +690,7 @@ void LatencyExperimentAppend() {
     double start = GetTime();
     string from_path;
     string to_path;
-    for (int j = 0; j < 250; j++) {
+    for (int j = 0; j < 10; j++) {
       int a1 = rand() % 1000;
       int a2 = rand() % 1000;
       while (a2 == a1) {
@@ -755,7 +755,7 @@ void LatencyExperimentAppend() {
 
   
     //gaoxuan --In this part I want to get all path to check if we rename successfully,in real use,we need to delete it
-    //metadata_->getLOOKUP("");
+    metadata_->getLOOKUP("");
  
 
 
