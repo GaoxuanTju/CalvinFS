@@ -475,7 +475,7 @@ void MetadataStore::getLOOKUP(string path)
       header->set_from(machine_->machine_id());
       header->set_to(mds_machine);
       header->set_type(Header::RPC);
-      header->set_app(getAPPname());
+      header->set_app("client");
       header->set_rpc("LOOKUP");
       header->add_misc_string(top.c_str(), strlen(top.c_str()));
       MessageBuffer *m = NULL;
