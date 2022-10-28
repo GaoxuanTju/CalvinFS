@@ -998,7 +998,7 @@ void MetadataStore::Rename_Internal(
 
   } else
   {//gaoxuan --empty dir or file RENAME opretaion
-      LOG(ERROR)<<in.from_path()<<" gaoxuan to "<<in.to_path();
+     // LOG(ERROR)<<in.from_path()<<" gaoxuan to "<<in.to_path(); gaoxuan --这里之前都执行了，只能是下面的错误
       // Add to_entry
       MetadataEntry to_entry;
       to_entry.CopyFrom(from_entry);
