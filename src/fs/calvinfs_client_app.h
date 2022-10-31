@@ -726,9 +726,12 @@ void LatencyExperimentAppend() {
       
       /*from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1); 
       to_path = "/a" + IntToString(rand() % machine()->config().size()) + "/d" + IntToString(machine()->GetGUID());*/
+
       string from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1) + "/c" + IntToString(j);
       string to_path = "/a" + IntToString(rand() % machine()->config().size()) + "/b" + IntToString(a1) + "/d" + IntToString(machine()->GetGUID());
-      LOG(ERROR)<<from_path <<"  renamed to   "<<to_path;
+      uint64 from_id = config_->LookupMetadataShard(config_->HashFileName(from_path),config_->LookupReplica(machine()->machine_id()));
+      uint64 to_id = config_->LookupMetadataShard(config_->HashFileName(to_path),config_->LookupReplica(machine()->machine_id()));
+      LOG(ERROR)<<from_path <<" in machine["<<from_id<<"]  renamed to   "<<to_path<<" in machine["<<to_id<<"]";
       BackgroundRenameFile(from_path,
                            to_path);
       
