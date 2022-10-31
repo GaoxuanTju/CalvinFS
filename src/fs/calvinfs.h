@@ -57,6 +57,7 @@ class CalvinFSConfigMap {
   map<pair<uint64, uint64>, uint64> metadata_shards_;
 };
 
+CalvinFSConfig MakeCalvinFSConfig_by_gaoxuan(int n);
 // One machine, one replica, one blucket, one mds.
 CalvinFSConfig MakeCalvinFSConfig();
 

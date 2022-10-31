@@ -116,6 +116,28 @@ CalvinFSConfig MakeCalvinFSConfig(int n) {
   }
   return c;
 }
+CalvinFSConfig MakeCalvinFSConfig_by_gaoxuan(int n)
+{
+  CalvinFSConfig c;
+  c.set_block_replication_factor(1);
+  c.set_metadata_replication_factor(1);
+  c.set_blucket_count(n);
+  c.set_metadata_shard_count(n-1);
+
+  for (int i = 0; i < n; i++) {
+    c.add_replicas()->set_machine(i);
+    c.mutable_replicas(i)->set_replica(0);
+    c.add_bluckets()->set_id(i);
+    c.mutable_bluckets(i)->set_machine(i);
+
+  }
+  for(int i=0;i<n-1;i++)
+  {
+    c.add_metadata_shards()->set_id(i);
+    c.mutable_metadata_shards(i)->set_machine(i);
+  }
+  return c;
+}
 
 CalvinFSConfig MakeCalvinFSConfig(int n, int r) {//gaoxuan --这个函数用于设定该台机器的相关存储
 //gaoxuan --n是partions，r是replicas；如果不加改变的话，n=2，r=1

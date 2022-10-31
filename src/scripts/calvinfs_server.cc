@@ -72,9 +72,10 @@ int main(int argc, char** argv) {
   Spin(1);
   
   string fsconfig;
-  //MakeCalvinFSConfig有三个函数，想改就得改这里面的函数，他可以影响到hash范围，通过设置mds_count
-  //一个参数的MakeCalvinFSConfig函数现在代表n台机器，每台机器上一个副本，一个mds，需要改成，只有一台机器上有mds和副本即可
-  MakeCalvinFSConfig(partitions, replicas).SerializeToString(&fsconfig);//gaoxuan --这个里面就是具体设置，这一台机器的mds，块存储
+  //gaoxuan --MakeCalvinFSConfig有三个函数，想改就得改这里面的函数，他可以影响到hash范围，通过设置mds_count
+  //gaoxuan --一个参数的MakeCalvinFSConfig函数现在代表n台机器，每台机器上一个副本，一个mds，需要改成，只有一台机器上有mds和副本即可
+  LOG(ERROR)<<"the num of machine is "<<cc.size();
+  MakeCalvinFSConfig_by_gaoxuan(cc.size()).SerializeToString(&fsconfig);//gaoxuan --这个里面就是具体设置，这一台机器的mds，块存储
   m.AppData()->Put("calvinfs-config", fsconfig);//gaoxuan --通过machine()->getAppData("calvinfs-config")可以得到刚刚设置的东西
   Spin(1);
 
@@ -97,7 +98,7 @@ int main(int argc, char** argv) {
   m.GlobalBarrier();
   Spin(1);
 
-  //下面的东西可以没必要改，全创建也没关系，用不到闲着呗
+ 
   // Start metadata store app.
 
   m.AddApp("MetadataStoreApp", "metadata");
