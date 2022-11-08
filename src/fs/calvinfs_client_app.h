@@ -690,7 +690,7 @@ void LatencyExperimentAppend() {
     double start = GetTime();
     string from_path;
     string to_path;
-    for (int j = 0; j < 10; j++) {
+    for (int j = 0; j < 250; j++) {
       int a1 = rand() % 1000;
       int a2 = rand() % 1000;
       while (a2 == a1) {
@@ -751,8 +751,7 @@ void LatencyExperimentAppend() {
     
     // Report.
     
-    LOG(ERROR) << "[" << machine()->machine_id() << "] "
-               << "Renamed " <<  "250 files. Elapsed time:"
+    LOG(ERROR) << "Renamed " <<  "250 files. Elapsed time:"
                << (GetTime() - start) << " seconds";
     
 
