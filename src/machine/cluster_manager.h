@@ -32,7 +32,7 @@ class ClusterManager {
   ClusterManager(const string& config_file, const string& calvin_path,
                  const string& binary, const string& ssh_key)
       : config_file_(config_file), calvin_path_(calvin_path), binary_(binary),
-        ssh_username_("ubuntu"), ssh_key_(ssh_key) {
+        ssh_username_("root"), ssh_key_(ssh_key) {
     config_.FromFile(config_file_);
     external_connection_ = new ExternalConnection(10090, config_);
   }
@@ -40,7 +40,7 @@ class ClusterManager {
                  const string& binary, const string& ssh_key1,
                  const string& ssh_key2, const string& ssh_key3)
       : config_file_(config_file), calvin_path_(calvin_path), binary_(binary),
-        ssh_username_("ubuntu"),
+        ssh_username_("root"),
         ssh_key_(ssh_key1), ssh_key2_(ssh_key2), ssh_key3_(ssh_key3) {
     config_.FromFile(config_file_);
     external_connection_ = new ExternalConnection(10090, config_);
