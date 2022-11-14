@@ -757,7 +757,7 @@ void LatencyExperimentAppend() {
 
   
     //gaoxuan --In this part I want to get all path to check if we rename successfully,in real use,we need to delete it
-    metadata_->getLOOKUP("");
+    //metadata_->getLOOKUP("");
  
 
 
