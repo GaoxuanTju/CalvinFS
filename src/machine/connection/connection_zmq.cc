@@ -131,7 +131,7 @@ void ConnectionZMQ::SendMessage(uint64 recipient, MessageBuffer* message) {
     header_contents =  header_contents + data;
   }
   //gaoxuan -如果不出意外，现在header——contents里面应该是内容
-
+  LOG(ERROR)<<"header is  ::"<<header_contents;
 //gaoxuan --这之前都是我
   
 
