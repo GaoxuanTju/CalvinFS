@@ -123,12 +123,35 @@ void ConnectionZMQ::SendMessage(uint64 recipient, MessageBuffer* message) {
   }
 
   Lock l(mutexes_[recipient]);
+  //gaoxuan --我想办法在这里把整个messageBuffer输出来，看看是啥样的
+  MessageBuffer *serialized = m;
+  Header b;
+  b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
+  delete serialized;
+  LOG(ERROR)<<b.output();
+  /*
+  Header out;
+  //gaoxuan --这里我能够推断出b.output就是个string，所以呢！直接输出看看是啥！
+  out.ParseFromString(b.output());
+  if (out.success() && out.entry().type() == DIR)
+  {
+
+    for (int i = 0; i < out.entry().dir_contents_size(); i++)
+    {
+
+      string full_path = top + "/" + out.entry().dir_contents(i);
+      stack1.push(full_path);
+    }
+  }
+*/
+//gaoxuan --这之前都是我写的
   for (uint32 i = 0; i < message->size(); i++) {
     // Create message.
     void* data = reinterpret_cast<void*>(const_cast<char*>(
                          (*message)[i].data()));
-    //gaoxuan --这里想看一下要发的message的part到底是什么样子的
-    LOG(ERROR)<<"message part is "<<(*message)[i].data();
+    //gaoxuan --这里想看一下要发的message的part到底是什么样子的,输出不出来，全是空白的，怪不得我看不到
+    //而且不能像下面这样，一个part一个part的发，太多了
+    //LOG(ERROR)<<"message part is "<<(*message)[i].data();
     int size = (*message)[i].size();
     MessagePart* part = message->StealPart(i);
     zmq::message_t msg(data, size,
