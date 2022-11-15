@@ -731,7 +731,7 @@ void LatencyExperimentAppend() {
       string to_path = "/a" + IntToString(rand() % machine()->config().size()) + "/b" + IntToString(a1) + "/d" + IntToString(machine()->GetGUID());
       uint64 from_id = config_->LookupMetadataShard(config_->HashFileName(from_path),config_->LookupReplica(machine()->machine_id()));
       uint64 to_id = config_->LookupMetadataShard(config_->HashFileName(to_path),config_->LookupReplica(machine()->machine_id()));
-    //  LOG(ERROR)<<from_path <<" in machine["<<from_id<<"]  renamed to   "<<to_path<<" in machine["<<to_id<<"]";
+      LOG(ERROR)<<from_path <<" in machine["<<from_id<<"]  renamed to   "<<to_path<<" in machine["<<to_id<<"]";
       BackgroundRenameFile(from_path,
                            to_path);
       
@@ -987,20 +987,18 @@ void LatencyExperimentAppend() {
     }
     //gaoxuan --在sendMessage里输出不行，我们就在调用它之前输出！
   //gaoxuan --我想办法在这里把整个messageBuffer输出来，看看是啥样的
-  MessageBuffer *m = new MessageBuffer();
-  m->Append(*header);
-  for (uint32 i = 0; i < m->size(); i++) {
-    // Create message.
-    void* data = reinterpret_cast<void*>(const_cast<char*>(
-                         (*m)[i].data()));
-    //gaoxuan --这里想看一下要发的message的part到底是什么样子的,输出不出来，全是空白的，怪不得我看不到
-    //而且不能像下面这样，一个part一个part的发，太多了
-    LOG(ERROR)<<"message part is "<<(*m)[i].data();
-    int size = (*m)[i].size();
-
-
+  //在这里把Header输出来
+  LOG(ERROR)<<header->app();
+  LOG(ERROR)<<header->rpc();
+  if(header->misc_string_size()!=0)
+  {
+    for(int i=0;i<misc_string_size();i++)
+    {
+      LOG(ERROR)<<header->misc_string(i);
+    }
   }
-  delete m;
+
+
 //gaoxuan --这之前都是我
 
     machine()->SendMessage(header, new MessageBuffer());
