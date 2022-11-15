@@ -14,7 +14,7 @@
 #include "common/types.h"
 #include "common/utils.h"
 #include "proto/header.pb.h"
-
+#include <string>
 using std::map;
 
 // Per-process zmq context.
@@ -124,27 +124,19 @@ void ConnectionZMQ::SendMessage(uint64 recipient, MessageBuffer* message) {
 
   Lock l(mutexes_[recipient]);
   //gaoxuan --我想办法在这里把整个messageBuffer输出来，看看是啥样的
-  MessageBuffer *serialized = m;
-  Header b;
-  b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
-  delete serialized;
-  LOG(ERROR)<<b.output();
-  /*
-  Header out;
-  //gaoxuan --这里我能够推断出b.output就是个string，所以呢！直接输出看看是啥！
-  out.ParseFromString(b.output());
-  if (out.success() && out.entry().type() == DIR)
+  string header_contents = "";
+  for (uint32 i = 0; i < message->size(); i++)
   {
-
-    for (int i = 0; i < out.entry().dir_contents_size(); i++)
-    {
-
-      string full_path = top + "/" + out.entry().dir_contents(i);
-      stack1.push(full_path);
-    }
+    string data = (*message)[i].data()
+    header_contents =  header_contents + data;
   }
-*/
-//gaoxuan --这之前都是我写的
+  //gaoxuan -如果不出意外，现在header——contents里面应该是内容
+
+//gaoxuan --这之前都是我
+  
+
+
+
   for (uint32 i = 0; i < message->size(); i++) {
     // Create message.
     void* data = reinterpret_cast<void*>(const_cast<char*>(
