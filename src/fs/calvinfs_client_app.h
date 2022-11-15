@@ -985,6 +985,21 @@ void LatencyExperimentAppend() {
       }
       --capacity_;
     }
+    //gaoxuan --在sendMessage里输出不行，我们就在调用它之前输出！
+  //gaoxuan --我想办法在这里把整个messageBuffer输出来，看看是啥样的
+  string header_contents = "";
+  MessageBuffer *message;
+  message->Append(*header);
+  for (uint32 i = 0; i < message->size(); i++)
+  {
+    string data = (*message)[i].data();
+    header_contents =  header_contents + data;
+  }
+  //gaoxuan -如果不出意外，现在header——contents里面应该是内容
+  LOG(ERROR)<<"header is  ::"<<header_contents;
+//gaoxuan --这之前都是我
+
+    //
     machine()->SendMessage(header, new MessageBuffer());
   }
 

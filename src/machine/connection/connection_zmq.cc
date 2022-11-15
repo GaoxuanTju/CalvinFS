@@ -123,16 +123,7 @@ void ConnectionZMQ::SendMessage(uint64 recipient, MessageBuffer* message) {
   }
 
   Lock l(mutexes_[recipient]);
-  //gaoxuan --我想办法在这里把整个messageBuffer输出来，看看是啥样的
-  string header_contents = "";
-  for (uint32 i = 0; i < message->size(); i++)
-  {
-    string data = (*message)[i].data();
-    header_contents =  header_contents + data;
-  }
-  //gaoxuan -如果不出意外，现在header——contents里面应该是内容
-  LOG(ERROR)<<"header is  ::"<<header_contents;
-//gaoxuan --这之前都是我
+
   
 
 
