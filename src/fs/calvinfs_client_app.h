@@ -1014,7 +1014,7 @@ struct Metadata {
 ::google::protobuf::Metadata meta = header->GetMetadata();
 for(int i=0;i<meta.descriptor->field_count();i++)
 {
-  FieldDescriptor* f_d = meta.descriptor->field(i);//每个fiedld获取一下
+  google::protobuf::FieldDescriptor* f_d = meta.descriptor->field(i);//每个fiedld获取一下
   LOG(ERROR)<<f_d->DebugString();
 }
 
