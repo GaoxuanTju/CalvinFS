@@ -147,9 +147,6 @@ void ConnectionZMQ::Init() {
   // Bind port for incoming socket.
   char endpoint[256];
   snprintf(endpoint, sizeof(endpoint), "tcp://*:%d", port_);
-
-    //gaoxuan --check port
-  LOG(ERROR)<<"port is "<<port_;
   socket_in_ = new zmq::socket_t(*GetZMQContext(), ZMQ_PULL);
   socket_in_->bind(endpoint);
 
