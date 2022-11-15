@@ -992,7 +992,7 @@ void LatencyExperimentAppend() {
   LOG(ERROR)<<header->rpc();
   if(header->misc_string_size()!=0)
   {
-    for(int i=0;i<misc_string_size();i++)
+    for(int i=0;i<header->misc_string_size();i++)
     {
       LOG(ERROR)<<header->misc_string(i);
     }
