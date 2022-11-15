@@ -127,6 +127,8 @@ void ConnectionZMQ::SendMessage(uint64 recipient, MessageBuffer* message) {
     // Create message.
     void* data = reinterpret_cast<void*>(const_cast<char*>(
                          (*message)[i].data()));
+    //gaoxuan --这里想看一下要发的message的part到底是什么样子的
+    LOG(ERROR)<<"message part is "<<(*message)[i].data();
     int size = (*message)[i].size();
     MessagePart* part = message->StealPart(i);
     zmq::message_t msg(data, size,
@@ -147,6 +149,12 @@ void ConnectionZMQ::Init() {
   // Bind port for incoming socket.
   char endpoint[256];
   snprintf(endpoint, sizeof(endpoint), "tcp://*:%d", port_);
+
+
+  //gaoxuan --这里想看一下端口是什么样的
+  LOG(ERROR)<<"port is "<<port_;
+
+
   socket_in_ = new zmq::socket_t(*GetZMQContext(), ZMQ_PULL);
   socket_in_->bind(endpoint);
 
