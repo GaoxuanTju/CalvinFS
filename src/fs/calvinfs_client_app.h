@@ -1009,9 +1009,10 @@ struct Metadata {
 };
 */
 //gaoxuan --这是我第二种想法，好像是这个东西有一个自己的Descriptor
+//std::string s = meta.descriptor->DebugString();使用这个函数得到的是message Header的原始格式，没有内容
 ::google::protobuf::Metadata meta = header->GetMetadata();
-std::string s = meta.descriptor->DebugString();
-LOG(ERROR)<<s;
+int f_count = meta.descriptor->field_count();
+LOG(ERROR)<<f_count;
 
 
 //gaoxuan --这之前都是我
