@@ -124,10 +124,6 @@ void ConnectionZMQ::SendMessage(uint64 recipient, MessageBuffer* message) {
 
   Lock l(mutexes_[recipient]);
 
-  
-
-
-
   for (uint32 i = 0; i < message->size(); i++) {
     // Create message.
     void* data = reinterpret_cast<void*>(const_cast<char*>(

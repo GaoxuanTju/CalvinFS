@@ -987,19 +987,22 @@ void LatencyExperimentAppend() {
     }
     //gaoxuan --在sendMessage里输出不行，我们就在调用它之前输出！
   //gaoxuan --我想办法在这里把整个messageBuffer输出来，看看是啥样的
-  string header_contents = "";
   MessageBuffer *m = new MessageBuffer();
   m->Append(*header);
-  for (uint32 i = 0; i < m->size(); i++)
-  {
-    string data = (*m)[i].data();
-    header_contents =  header_contents + data;
+  for (uint32 i = 0; i < m->size(); i++) {
+    // Create message.
+    void* data = reinterpret_cast<void*>(const_cast<char*>(
+                         (*m)[i].data()));
+    //gaoxuan --这里想看一下要发的message的part到底是什么样子的,输出不出来，全是空白的，怪不得我看不到
+    //而且不能像下面这样，一个part一个part的发，太多了
+    LOG(ERROR)<<"message part is "<<(*m)[i].data();
+    int size = (*m)[i].size();
+
+
   }
-  //gaoxuan -如果不出意外，现在header——contents里面应该是内容
-  LOG(ERROR)<<"header is  ::"<<header_contents;
+  delete m;
 //gaoxuan --这之前都是我
 
-    //
     machine()->SendMessage(header, new MessageBuffer());
   }
 
