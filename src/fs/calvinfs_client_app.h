@@ -1023,7 +1023,7 @@ for(int i=0;i<meta.descriptor->field_count();i++)
 
 //gaoxuan --这之前都是我
     MessageBuffer *m = new MessageBuffer();
-    m->Append(header);
+    m->Append(*header);
     LOG(ERROR)<<"the size of messagebuffer is "<<m->size();
     machine()->SendMessage(header, new MessageBuffer());
   }
