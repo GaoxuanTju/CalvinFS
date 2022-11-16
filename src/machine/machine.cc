@@ -155,6 +155,13 @@ Machine::~Machine() {
 void Machine::SendMessage(Header* header, MessageBuffer* message) {
   // TODO(agt): Check header validity.
   message->Append(*header);
+
+  //gaoxuan --这个message里面就是需要传递的header了
+  MessagePart *part = message->StealPart(0);
+  LOG(ERROR)<<"content of header is   "<<part->buffer()->data();
+
+
+  //
   connection_->SendMessage(header->to(), message);
   delete header;
 }
