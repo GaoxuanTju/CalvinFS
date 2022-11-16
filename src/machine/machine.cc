@@ -158,7 +158,7 @@ void Machine::SendMessage(Header* header, MessageBuffer* message) {
 
   //gaoxuan --这个message里面就是需要传递的header了
   MessagePart *part = message->StealPart(0);
-  LOG(ERROR)<<"content of header is   "<<part->buffer()->data();
+  LOG(ERROR)<<"content of header is   "<<part->buffer().data();
 
 
   //
