@@ -1001,31 +1001,15 @@ void LatencyExperimentAppend() {
   }
  */
 
-
-/*
-// A container to hold message metadata.
-struct Metadata {
-  const Descriptor* descriptor;
-  const Reflection* reflection;
-};
-
-//gaoxuan --这是我第二种想法，好像是这个东西有一个自己的Descriptor
-//std::string s = meta.descriptor->DebugString();使用这个函数得到的是message Header的原始格式，没有具体内容
-//int f_count = meta.descriptor->field_count();  为什么是18不太明白
-::google::protobuf::Metadata meta = header->GetMetadata();
-for(int i=0;i<meta.descriptor->field_count();i++)
-{
-  const google::protobuf::FieldDescriptor* f_d = meta.descriptor->field(i);//每个fiedld获取一下
-  LOG(ERROR)<<f_d->DebugString();
-}
-*/
-
-
 //gaoxuan --这之前都是我
     MessageBuffer *m = new MessageBuffer();
     m->Append(*header);
     LOG(ERROR)<<"the size of messagebuffer is "<<m->size();
-    LOG(ERROR)<<"the content of header is "<<(*m)[0].data();
+    LOG(ERROR)<<"the content of header is "<<(*m)[0].data()<<"  size is ::"<<strlen((*m)[0].data());
+    delete m;
+
+
+
     machine()->SendMessage(header, new MessageBuffer());
   }
 
