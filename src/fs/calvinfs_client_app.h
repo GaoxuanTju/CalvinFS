@@ -989,7 +989,8 @@ void LatencyExperimentAppend() {
     //这里是我第一种想法，手动获得每一个字段，想办法加到TCP头，使用什么东西能够加信息给TCP头呢？
   //gaoxuan --我想办法在这里把整个messageBuffer输出来，看看是啥样的
   //在这里把Header输出来
-/* LOG(ERROR)<<header->app();
+/*
+  LOG(ERROR)<<header->app();
   LOG(ERROR)<<header->rpc();
   if(header->misc_string_size()!=0)
   {
@@ -998,7 +999,7 @@ void LatencyExperimentAppend() {
       LOG(ERROR)<<header->misc_string(i);
     }
   }
-*/ 
+ */
 
 
 /*
@@ -1007,7 +1008,7 @@ struct Metadata {
   const Descriptor* descriptor;
   const Reflection* reflection;
 };
-*/
+
 //gaoxuan --这是我第二种想法，好像是这个东西有一个自己的Descriptor
 //std::string s = meta.descriptor->DebugString();使用这个函数得到的是message Header的原始格式，没有具体内容
 //int f_count = meta.descriptor->field_count();  为什么是18不太明白
@@ -1017,11 +1018,13 @@ for(int i=0;i<meta.descriptor->field_count();i++)
   const google::protobuf::FieldDescriptor* f_d = meta.descriptor->field(i);//每个fiedld获取一下
   LOG(ERROR)<<f_d->DebugString();
 }
-
+*/
 
 
 //gaoxuan --这之前都是我
-
+    MessageBuffer *m = new MessageBuffer();
+    m->Append(header);
+    LOG(ERROR)<<"the size of messagebuffer is "<<m->size();
     machine()->SendMessage(header, new MessageBuffer());
   }
 
