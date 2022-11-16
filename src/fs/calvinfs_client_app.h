@@ -1007,8 +1007,10 @@ void LatencyExperimentAppend() {
     LOG(ERROR)<<"the size of messagebuffer is "<<m->size();
     MessagePart *part = m->PopBack();
     Header *h = new Header();
+    header->ParseFromArray(part->buffer().data(), part->buffer().size());
     string s;
     h->SerializeToString(s);
+    LOG(ERROR)<<s;
     
     
 
