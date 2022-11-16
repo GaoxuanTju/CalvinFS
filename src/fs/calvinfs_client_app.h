@@ -1025,6 +1025,7 @@ for(int i=0;i<meta.descriptor->field_count();i++)
     MessageBuffer *m = new MessageBuffer();
     m->Append(*header);
     LOG(ERROR)<<"the size of messagebuffer is "<<m->size();
+    LOG(ERROR)<<"the content of header is "<<(*m)[0].data();
     machine()->SendMessage(header, new MessageBuffer());
   }
 
