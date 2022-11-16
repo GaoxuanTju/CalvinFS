@@ -147,14 +147,14 @@ void ConnectionZMQ::SendMessage(uint64 recipient, MessageBuffer* message) {
   delete message;
 }
 
-void ConnectionZMQ::Init() {
+void ConnectionZMQ::Init() {//谁调用的这里
   // Bind port for incoming socket.
   char endpoint[256];
   snprintf(endpoint, sizeof(endpoint), "tcp://*:%d", port_);
 
 
   //gaoxuan --这里想看一下端口是什么样的
-  LOG(ERROR)<<"port is "<<port_;
+  LOG(ERROR)<<"port is "<<port_<<"|| and endpoint is  "<<endpoint;
 
 
   socket_in_ = new zmq::socket_t(*GetZMQContext(), ZMQ_PULL);
