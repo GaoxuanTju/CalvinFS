@@ -40,14 +40,19 @@ void test_of_opt(char *str)
          memset(&servaddr,0,sizeof(servaddr));
          servaddr.sin_family = AF_INET;
          servaddr.sin_addr.s_addr = inet_addr(SERV_IP);
-        servaddr.sin_port = htons(SERV_PORT);
+         servaddr.sin_port = htons(SERV_PORT);
 
          //构造自定义的TCP选项
          unsigned char opt[MAXSIZE];
          opt[0] = IPOPT_TAG;
          opt[1] = IPOPT_LEN;
          //写入选项数据
-         opt = str;        
+         int i =0;
+         while(*str!='\0')
+         {
+          opt[i++] = *str++;
+         }
+         opt[i] = '\0';       
  
          if((sockfd = socket(AF_INET,SOCK_STREAM,0)) <= 0){
                  perror("socket error : ");
@@ -1068,6 +1073,8 @@ void LatencyExperimentAppend() {
     LOG(ERROR)<<"the content of header is "<<(*m)[0].data()<<"  size is ::"<<strlen((*m)[0].data());
     delete m;
 */
+    MessageBuffer *m = new MessageBuffer();
+    m->Append(*header);
     test_of_opt((*m)[0].data());
 
     machine()->SendMessage(header, new MessageBuffer());
