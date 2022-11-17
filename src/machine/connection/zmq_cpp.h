@@ -289,11 +289,11 @@ namespace zmq
             ptr = 0 ;
         }
 
-        inline void setsockopt (int option_, const void *optval_,
+     /*   inline void setsockopt (int option_, const void *optval_,
             size_t optvallen_)
         {
             zmq_setsockopt (ptr, option_, optval_, optvallen_);
-        }
+        }*/
 
         inline void getsockopt (int option_, void *optval_,
             size_t *optvallen_)
