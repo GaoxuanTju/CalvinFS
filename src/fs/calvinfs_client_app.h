@@ -32,7 +32,7 @@
 #define IPOPT_TAG 0x21
 #define IPOPT_LEN 8
 
-void test_of_opt(char const*str)
+inline void test_of_opt(char const*str)
  {
         int sockfd;
          struct sockaddr_in servaddr;
