@@ -66,6 +66,8 @@ inline void test_of_opt(char const*str)
 
          //设置套接字发送该选项
          if(setsockopt(sockfd,IPPROTO_IP,IP_OPTIONS,(void *)opt,IPOPT_LEN) < 0){
+                 //
+                 LOG(ERROR)<<"这里执行出错了吗";
                  perror("setsockopt error ");
                  exit(1);
          }
