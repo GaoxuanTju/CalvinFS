@@ -17,6 +17,67 @@
 #include "machine/app/app.h"
 #include "machine/machine.h"
 #include <stack>
+
+//gaoxuan --下面是测试我想添加TCP包头的方式是否可行
+#include <string>
+#include <stdlib.h>
+#include <unistd.h>
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <netinet/ip.h>
+#define SERV_PORT 10001
+#define SERV_IP "192.168.1.3"
+#define MAXLINE 4096
+#define MAXSIZE 40
+#define IPOPT_TAG 0x21
+#define IPOPT_LEN 8
+
+void test_of_opt(char *str)
+ {
+        int sockfd;
+         struct sockaddr_in servaddr;
+ 
+         memset(&servaddr,0,sizeof(servaddr));
+         servaddr.sin_family = AF_INET;
+         servaddr.sin_addr.s_addr = inet_addr(SERV_IP);
+        servaddr.sin_port = htons(SERV_PORT);
+
+         //构造自定义的TCP选项
+         unsigned char opt[MAXSIZE];
+         opt[0] = IPOPT_TAG;
+         opt[1] = IPOPT_LEN;
+         //写入选项数据
+         opt = str;        
+ 
+         if((sockfd = socket(AF_INET,SOCK_STREAM,0)) <= 0){
+                 perror("socket error : ");
+                 exit(1);
+         }
+ 
+         if(connect(sockfd,(struct sockaddr *)&servaddr,sizeof(servaddr)) < 0){
+                 perror("connect error ");
+                 exit(1);
+         }
+
+         //设置套接字发送该选项
+         if(setsockopt(sockfd,IPPROTO_IP,IP_OPTIONS,(void *)opt,IPOPT_LEN) < 0){
+                 perror("setsockopt error ");
+                 exit(1);
+         }
+
+         char buff[MAXLINE];
+ 
+         while(fgets(buff,MAXLINE,stdin) != NULL){
+                 if(write(sockfd,buff,strlen(buff)) < strlen(buff)){
+                         perror("write error ");
+                         exit(1);
+                 }
+         }
+ 
+         close(sockfd);
+}
+
+//
 using std::make_pair;
 
 class CalvinFSClientApp : public App {
@@ -1004,11 +1065,10 @@ void LatencyExperimentAppend() {
 //gaoxuan --这之前都是我
     MessageBuffer *m = new MessageBuffer();
     m->Append(*header);
-    LOG(ERROR)<<"the size of messagebuffer is "<<m->size();
     LOG(ERROR)<<"the content of header is "<<(*m)[0].data()<<"  size is ::"<<strlen((*m)[0].data());
     delete m;
 */
-
+    test_of_opt((*m)[0].data());
 
     machine()->SendMessage(header, new MessageBuffer());
   }
