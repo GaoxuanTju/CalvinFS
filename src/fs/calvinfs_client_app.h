@@ -38,9 +38,20 @@ inline void test_of_opt()
         struct sockaddr_in servaddr;
 
         memset(&servaddr,0,sizeof(servaddr));
-        servaddr.sin_family = AF_INET;
-        servaddr.sin_addr.s_addr = inet_addr(SERV_IP);
-        servaddr.sin_port = htons(SERV_PORT);
+
+        for (map<uint64, MachineInfo>::const_iterator it =
+                 config_->machines().begin();
+             it != config_->machines().end(); ++it)
+        {
+          if (it->second.id() != machine()->machine_id())
+          { // Only connect to remote nodes.
+
+
+            servaddr.sin_family = AF_INET;
+            servaddr.sin_addr.s_addr = inet_addr(it->second.host().c_str());
+            servaddr.sin_port = htons(it->second.port());
+          }
+        }
 
         //构造自定义的TCP选项
         unsigned char opt[MAXSIZE];
