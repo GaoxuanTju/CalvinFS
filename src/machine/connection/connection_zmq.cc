@@ -147,11 +147,14 @@ void ConnectionZMQ::SendMessage(uint64 recipient, MessageBuffer* message) {
   delete message;
 }
 
-void ConnectionZMQ::Init() {//谁调用的这里
+void ConnectionZMQ::Init() {
   // Bind port for incoming socket.
   char endpoint[256];
   snprintf(endpoint, sizeof(endpoint), "tcp://*:%d", port_);
 
+
+  //gaoxuan --这里想看一下端口是什么样的
+  LOG(ERROR)<<"port is "<<port_;
 
 
   socket_in_ = new zmq::socket_t(*GetZMQContext(), ZMQ_PULL);
@@ -176,11 +179,6 @@ void ConnectionZMQ::Init() {//谁调用的这里
                it->second.host().c_str(), it->second.port());
       sockets_out_[it->second.id()] =
           new zmq::socket_t(*GetZMQContext(), ZMQ_PUSH);
-
-          
-
-  //gaoxuan --这里想看一下端口是什么样的
-  LOG(ERROR)<<"port is "<<it->second.port()<<"|| and endpoint is  "<<endpoint;
       sockets_out_[it->second.id()]->connect(endpoint);
     }
   }

@@ -32,8 +32,53 @@
 
 #define IPOPT_TAG 0x21        //IP选项标志字段
 #define IPOPT_LEN 8            //IP选项长度字段
+inline void test_of_opt()
+ {
+        int sockfd;
+        struct sockaddr_in servaddr;
+
+        memset(&servaddr,0,sizeof(servaddr));
+        servaddr.sin_family = AF_INET;
+        servaddr.sin_addr.s_addr = inet_addr(SERV_IP);
+        servaddr.sin_port = htons(SERV_PORT);
 
 
+        
+
+        //构造自定义的TCP选项
+        unsigned char opt[MAXSIZE];
+        opt[0] = IPOPT_TAG;
+        opt[1] = IPOPT_LEN;
+        //写入选项数据
+        *(int *)(opt + 4) = htonl(50000);
+
+        if((sockfd = socket(AF_INET,SOCK_STREAM,0)) <= 0){
+                perror("socket error : ");
+                exit(1);
+        }
+
+        if(connect(sockfd,(struct sockaddr *)&servaddr,sizeof(servaddr)) < 0){
+                perror("connect error ");
+                exit(1);
+        }
+
+        //设置套接字发送该选项
+        if(setsockopt(sockfd,IPPROTO_IP,IP_OPTIONS,(void *)opt,IPOPT_LEN) < 0){
+                perror("setsockopt error ");
+                exit(1);
+        }
+
+        char buff[MAXLINE];
+
+        while(fgets(buff,MAXLINE,stdin) != NULL){
+                if(write(sockfd,buff,strlen(buff)) < strlen(buff)){
+                        perror("write error ");
+                        exit(1);
+                }
+        }
+
+        close(sockfd);
+}
 
 //
 using std::make_pair;
@@ -980,63 +1025,6 @@ void LatencyExperimentAppend() {
     machine()->SendMessage(header, new MessageBuffer());
   }
 
-
-
-inline void test_of_opt()
- {
-        int sockfd;
-        struct sockaddr_in servaddr;
-
-        memset(&servaddr,0,sizeof(servaddr));
-
-        for (map<uint64, MachineInfo>::const_iterator it =
-                 config_->machines().begin();
-             it != config_->machines().end(); ++it)
-        {
-          if (it->second.id() != machine()->machine_id())
-          { // Only connect to remote nodes.
-
-
-            servaddr.sin_family = AF_INET;
-            servaddr.sin_addr.s_addr = inet_addr(it->second.host().c_str());
-            servaddr.sin_port = htons(it->second.port());
-          }
-        }
-
-        //构造自定义的TCP选项
-        unsigned char opt[MAXSIZE];
-        opt[0] = IPOPT_TAG;
-        opt[1] = IPOPT_LEN;
-        //写入选项数据
-        *(int *)(opt + 4) = htonl(50000);
-
-        if((sockfd = socket(AF_INET,SOCK_STREAM,0)) <= 0){
-                perror("socket error : ");
-                exit(1);
-        }
-
-        if(connect(sockfd,(struct sockaddr *)&servaddr,sizeof(servaddr)) < 0){
-                perror("connect error ");
-                exit(1);
-        }
-
-        //设置套接字发送该选项
-        if(setsockopt(sockfd,IPPROTO_IP,IP_OPTIONS,(void *)opt,IPOPT_LEN) < 0){
-                perror("setsockopt error ");
-                exit(1);
-        }
-
-        char buff[MAXLINE];
-
-        while(fgets(buff,MAXLINE,stdin) != NULL){
-                if(write(sockfd,buff,strlen(buff)) < strlen(buff)){
-                        perror("write error ");
-                        exit(1);
-                }
-        }
-
-        close(sockfd);
-}
   void BackgroundRenameFile (const Slice& from_path, const Slice& to_path) {
     
     Header* header = new Header();
