@@ -25,7 +25,7 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <netinet/ip.h>
-#define SERV_PORT 1234
+#define SERV_PORT 10001
 #define SERV_IP "127.0.0.1"
 #define MAXLINE 4096
 #define MAXSIZE 40
