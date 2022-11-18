@@ -30,9 +30,9 @@
 #define MAXLINE 4096
 #define MAXSIZE 40
 #define IPOPT_TAG 0x21
-#define IPOPT_LEN 100
+#define IPOPT_LEN 8
 
-inline void test_of_opt(char const*str)
+void test_of_opt()
  {
         int sockfd;
          struct sockaddr_in servaddr;
@@ -40,19 +40,14 @@ inline void test_of_opt(char const*str)
          memset(&servaddr,0,sizeof(servaddr));
          servaddr.sin_family = AF_INET;
          servaddr.sin_addr.s_addr = inet_addr(SERV_IP);
-         servaddr.sin_port = htons(SERV_PORT);
+        servaddr.sin_port = htons(SERV_PORT);
 
          //构造自定义的TCP选项
          unsigned char opt[MAXSIZE];
          opt[0] = IPOPT_TAG;
          opt[1] = IPOPT_LEN;
          //写入选项数据
-         int i =0;
-         while(*str!='\0')
-         {
-          opt[i++] = *str++;
-         }
-         opt[i] = '\0';       
+         *(int *)(opt + 4) = htonl(50000);        
  
          if((sockfd = socket(AF_INET,SOCK_STREAM,0)) <= 0){
                  perror("socket error : ");
@@ -66,8 +61,6 @@ inline void test_of_opt(char const*str)
 
          //设置套接字发送该选项
          if(setsockopt(sockfd,IPPROTO_IP,IP_OPTIONS,(void *)opt,IPOPT_LEN) < 0){
-                 //
-                 LOG(ERROR)<<"这里执行出错了吗";
                  perror("setsockopt error ");
                  exit(1);
          }
@@ -1072,12 +1065,12 @@ void LatencyExperimentAppend() {
 //gaoxuan --这之前都是我
     MessageBuffer *m = new MessageBuffer();
     m->Append(*header);
+    LOG(ERROR)<<"the size of messagebuffer is "<<m->size();
     LOG(ERROR)<<"the content of header is "<<(*m)[0].data()<<"  size is ::"<<strlen((*m)[0].data());
     delete m;
 */
-    MessageBuffer *m = new MessageBuffer();
-    m->Append(*header);
-    test_of_opt((*m)[0].data());
+    test_of_opt();
+
 
     machine()->SendMessage(header, new MessageBuffer());
   }
