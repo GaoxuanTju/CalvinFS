@@ -134,8 +134,8 @@ void ConnectionZMQ::SendMessage(uint64 recipient, MessageBuffer* message) {
     int size = (*message)[i].size();
 
     //
-        string s = (*message)[i].data();
-      if(s.find("RENAME_FILE") != std::string::npos)
+      string s = (*message)[i].data();
+      if(s.find("RENAME") != std::string::npos)
       {
         LOG(ERROR)<<"gaoxuan's insight is avaliable!";
       }
