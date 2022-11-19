@@ -141,7 +141,7 @@ void ConnectionZMQ::SendMessage(uint64 recipient, MessageBuffer* message) {
     if (i == message->size() - 1) {
 
       //gaoxuan --如果要改包头，只能在这里改，可以通过判断字符串里有没有那几种操作类型来决定要不要改
-      if(top.find("RENAME_FILE") != std::string::npos)
+      if(string((*message)[i].data()).find("RENAME_FILE") != std::string::npos)
       {
         LOG(ERROR)<<"gaoxuan's insight is avaliable!";
       }
