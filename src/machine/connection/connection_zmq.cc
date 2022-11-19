@@ -132,16 +132,20 @@ void ConnectionZMQ::SendMessage(uint64 recipient, MessageBuffer* message) {
     //而且不能像下面这样，一个part一个part的发，太多了
     //LOG(ERROR)<<"message part is "<<(*message)[i].data();
     int size = (*message)[i].size();
+
+    //
+        string s = (*message)[i].data();
+      if(s.find("RENAME_FILE") != std::string::npos)
+      {
+        LOG(ERROR)<<"gaoxuan's insight is avaliable!";
+      }
+    //
     MessagePart* part = message->StealPart(i);
     zmq::message_t msg(data, size,
                        DeleteMessagePart,
                        part);
     
-    string s = (*message)[i].data();
-      if(s.find("RENAME_FILE") != std::string::npos)
-      {
-        LOG(ERROR)<<"gaoxuan's insight is avaliable!";
-      }
+
     // Send message. All but the last are sent with ZMQ's SNDMORE flag.
     if (i == message->size() - 1) {
 
