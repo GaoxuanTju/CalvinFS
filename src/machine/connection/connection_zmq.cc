@@ -98,7 +98,7 @@ void ConnectionZMQ::SendMessageExternal(
 
     //gaoxuan --这里才是具体发出包的地方
     string s  = (*message)[i].data();
-    LOG(ERROR)<<s;
+    LOG(ERROR)<<"this place :"<<s;
 
     //
 
