@@ -134,12 +134,19 @@ void ConnectionZMQ::SendMessage(uint64 recipient, MessageBuffer* message) {
   Lock l(mutexes_[recipient]);
 
 
-  string s = message->GetPart(0).buffer().ToString();
-  if(s.find("RENAME")!= std::string::npos)
-  {
 
-    LOG(ERROR)<<"content of msg is :"<<s;
+
+  string s1 = message->GetPart(0).buffer().ToString();
+  if(s1.find("RENAME")!= std::string::npos)
+  {
+    //gaoxuan --只获取想要的东西
+    MessagePart *p = message->GetPart(0);
+    Header *h = new Header();
+    h->ParseFromArray(p->buffer().data(), p->buffer().size());
+    string s = h->rpc()+","+h->misc_string(0)+","+h->misc_string(1);
   }
+
+
   for (uint32 i = 0; i < message->size(); i++) {
     // Create message.
     void* data = reinterpret_cast<void*>(const_cast<char*>(
