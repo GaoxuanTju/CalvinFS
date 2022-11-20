@@ -134,7 +134,7 @@ void ConnectionZMQ::SendMessage(uint64 recipient, MessageBuffer* message) {
   Lock l(mutexes_[recipient]);
 
 
-  string s = message.GetPart(0).buffer().ToString();
+  string s = message->GetPart(0).buffer().ToString();
   if(s.find("RENAME")!= std::string::npos)
   {
 
