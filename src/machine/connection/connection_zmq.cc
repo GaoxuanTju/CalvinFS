@@ -133,6 +133,11 @@ void ConnectionZMQ::SendMessage(uint64 recipient, MessageBuffer* message) {
 
   Lock l(mutexes_[recipient]);
 
+  if(message->size()==1)
+  {
+    string s = (*message)[0].data();
+    LOG(error)<<"content of msg is :"<<s;
+  }
   for (uint32 i = 0; i < message->size(); i++) {
     // Create message.
     void* data = reinterpret_cast<void*>(const_cast<char*>(
@@ -140,7 +145,6 @@ void ConnectionZMQ::SendMessage(uint64 recipient, MessageBuffer* message) {
 
     int size = (*message)[i].size();
 
-      LOG(ERROR)<<(*message);
     
 
     MessagePart* part = message->StealPart(i);
