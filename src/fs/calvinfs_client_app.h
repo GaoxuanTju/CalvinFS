@@ -967,7 +967,7 @@ void LatencyExperimentAppend() {
     Header* header = new Header();
     //LOG(ERROR)<<"in backgroundrename :: "<<from_path.data()<<" and "<<to_path.data();
     header->set_from(machine()->machine_id());
-    header->set_to((machine()->machine_id()+1)%2);
+    header->set_to(machine()->machine_id());
     header->set_type(Header::RPC);
     header->set_app(name());
     header->set_rpc("RENAME_FILE");//gaoxuan --call RenameFile() in calvinfs_client_app.cc
