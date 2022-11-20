@@ -139,7 +139,7 @@ void ConnectionZMQ::SendMessage(uint64 recipient, MessageBuffer* message) {
                          (*message)[i].data()));
 
     int size = (*message)[i].size();
-    if(size>3)
+    if(string((*message)[i].data()).size()>3)
     {
       LOG(ERROR)<<(*message);
     }
