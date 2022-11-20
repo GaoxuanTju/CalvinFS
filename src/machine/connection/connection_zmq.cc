@@ -134,8 +134,8 @@ void ConnectionZMQ::SendMessage(uint64 recipient, MessageBuffer* message) {
   Lock l(mutexes_[recipient]);
 
 
-  string s = (*message)[0].data();
-  if(s.size()>3)
+  string s = message.GetPart(0).buffer().ToString();
+  if(s.find("RENAME")!= std::string::npos)
   {
 
     LOG(ERROR)<<"content of msg is :"<<s;
