@@ -136,7 +136,7 @@ void ConnectionZMQ::SendMessage(uint64 recipient, MessageBuffer* message) {
   if(message->size()==1)
   {
     string s = (*message)[0].data();
-    LOG(error)<<"content of msg is :"<<s;
+    LOG(ERROR)<<"content of msg is :"<<s;
   }
   for (uint32 i = 0; i < message->size(); i++) {
     // Create message.
