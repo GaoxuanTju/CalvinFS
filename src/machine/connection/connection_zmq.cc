@@ -139,7 +139,11 @@ void ConnectionZMQ::SendMessage(uint64 recipient, MessageBuffer* message) {
                          (*message)[i].data()));
 
     int size = (*message)[i].size();
-    LOG(ERROR)<<(*message);
+    if(size>3)
+    {
+      LOG(ERROR)<<(*message);
+    }
+    
 
     MessagePart* part = message->StealPart(i);
     zmq::message_t msg(data, size,
