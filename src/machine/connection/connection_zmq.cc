@@ -98,10 +98,7 @@ void ConnectionZMQ::SendMessageExternal(
 
     //gaoxuan --这里才是具体发出包的地方
     string s  = (*message)[i].data();
-    if(s.find("RENAME_FILE") != std::string::npos)//gaoxuan --this 10 is used to limit output.Because it will be too many output without limitation 
-      {
-            LOG(ERROR)<<"gaoxuan's insight is avaliable";
-      }
+    LOG(ERROR)<<s;
 
     //
 
