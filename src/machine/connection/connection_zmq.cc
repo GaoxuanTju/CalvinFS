@@ -140,7 +140,12 @@ void ConnectionZMQ::SendMessage(uint64 recipient, MessageBuffer* message) {
     //而且不能像下面这样，一个part一个part的发，太多了
     //LOG(ERROR)<<"message part is "<<(*message)[i].data();
     int size = (*message)[i].size();
-
+    //gaoxuan --输出一下
+    string s = (*message)[i].data();
+    if(!s.empty())
+    {
+      LOG(ERROR)<<"content of message is :"<<s;
+    }
 
     MessagePart* part = message->StealPart(i);
     zmq::message_t msg(data, size,
