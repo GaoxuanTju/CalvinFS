@@ -137,20 +137,9 @@ void ConnectionZMQ::SendMessage(uint64 recipient, MessageBuffer* message) {
     // Create message.
     void* data = reinterpret_cast<void*>(const_cast<char*>(
                          (*message)[i].data()));
-    //gaoxuan --这里想看一下要发的message的part到底是什么样子的,输出不出来，全是空白的，怪不得我看不到
-    //而且不能像下面这样，一个part一个part的发，太多了
-    //LOG(ERROR)<<"message part is "<<(*message)[i].data();
+
     int size = (*message)[i].size();
-    Header* h = new Header();
-    MessagePart* p = (*message)[i];
-    h->ParseFromArray(p->buffer().data(), p->buffer().size());
-    //gaoxuan --输出一下
-    string s ;
-    h->SerializeToString(&s);
-    if(s.size()>3)
-    {
-      LOG(ERROR)<<"content of message is :"<<s;
-    }
+    LOG(ERROR)<<(*message);
 
     MessagePart* part = message->StealPart(i);
     zmq::message_t msg(data, size,
