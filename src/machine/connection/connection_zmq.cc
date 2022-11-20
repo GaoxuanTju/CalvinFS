@@ -142,10 +142,9 @@ void ConnectionZMQ::SendMessage(uint64 recipient, MessageBuffer* message) {
     int size = (*message)[i].size();
     //gaoxuan --输出一下
     string s = (*message)[i].data();
-    if(!s.empty())
-    {
-      LOG(ERROR)<<"content of message is :"<<s;
-    }
+
+      LOG(ERROR)<<s.size();
+  
 
     MessagePart* part = message->StealPart(i);
     zmq::message_t msg(data, size,
