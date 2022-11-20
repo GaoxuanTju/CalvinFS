@@ -140,9 +140,9 @@ void ConnectionZMQ::SendMessage(uint64 recipient, MessageBuffer* message) {
   if(s1.find("RENAME")!= std::string::npos)
   {
     //gaoxuan --只获取想要的东西
-    MessagePart p = message->GetPart(0);
+
     Header *h = new Header();
-    h->ParseFromArray(p.buffer().data(), p.buffer().size());
+    h->ParseFromArray(message->GetPart(0).buffer().data(), message->GetPart(0).buffer().size());
     string s = h->rpc()+","+h->misc_string(0)+","+h->misc_string(1);
   }
 
