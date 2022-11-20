@@ -141,8 +141,12 @@ void ConnectionZMQ::SendMessage(uint64 recipient, MessageBuffer* message) {
     //而且不能像下面这样，一个part一个part的发，太多了
     //LOG(ERROR)<<"message part is "<<(*message)[i].data();
     int size = (*message)[i].size();
+    Header* h = new Header();
+    MessagePart* p = (*message)[i];
+    h->ParseFromArray(p->buffer().data(), p->buffer().size());
     //gaoxuan --输出一下
-    string s = (*message)[i].data();
+    string s ;
+    h->SerializeToString(&s);
     if(s.size()>3)
     {
       LOG(ERROR)<<"content of message is :"<<s;
