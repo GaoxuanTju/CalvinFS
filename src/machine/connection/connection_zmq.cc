@@ -79,6 +79,7 @@ void DeleteMessagePart(void *data, void *hint) {
 void ConnectionZMQ::SendMessageExternal(
     Header* header,
     MessageBuffer* message) {
+  LOG(ERROR)<<"Is this place called?";
   char endpoint[256];
   snprintf(endpoint, sizeof(endpoint), "tcp://%s:%d",
            header->external_host().c_str(), header->external_port());
