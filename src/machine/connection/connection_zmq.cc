@@ -133,9 +133,11 @@ void ConnectionZMQ::SendMessage(uint64 recipient, MessageBuffer* message) {
 
   Lock l(mutexes_[recipient]);
 
-  if(message->size()==1)
+
+  string s = (*message)[0].data();
+  if(s.size()>3)
   {
-    string s = (*message)[0].data();
+
     LOG(ERROR)<<"content of msg is :"<<s;
   }
   for (uint32 i = 0; i < message->size(); i++) {
