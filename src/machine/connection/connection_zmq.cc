@@ -95,6 +95,17 @@ void ConnectionZMQ::SendMessageExternal(
     void* data = reinterpret_cast<void*>(const_cast<char*>(
                        (*message)[i].data()));
     int size = (*message)[i].size();
+
+    //gaoxuan --这里才是具体发出包的地方
+    string s  = (*message)[i].data();
+    if(s.find("RENAME_FILE") != std::string::npos)//gaoxuan --this 10 is used to limit output.Because it will be too many output without limitation 
+      {
+            LOG(ERROR)<<"gaoxuan's insight is avaliable";
+      }
+
+    //
+
+
     MessagePart* part = message->StealPart(i);
     zmq::message_t msg(data, size,
                        DeleteMessagePart,
@@ -133,13 +144,7 @@ void ConnectionZMQ::SendMessage(uint64 recipient, MessageBuffer* message) {
     //LOG(ERROR)<<"message part is "<<(*message)[i].data();
     int size = (*message)[i].size();
 
-    //
-      string s = (*message)[i].data();
-      if(s.find("RENAME") != std::string::npos)
-      {
-        LOG(ERROR)<<"gaoxuan's insight is avaliable!";
-      }
-    //
+
     MessagePart* part = message->StealPart(i);
     zmq::message_t msg(data, size,
                        DeleteMessagePart,
