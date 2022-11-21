@@ -140,7 +140,7 @@ void ConnectionZMQ::SendMessage(uint64 recipient, MessageBuffer* message) {
 
     Header *h = new Header();
     h->ParseFromArray(message->GetPart(0).buffer().data(), message->GetPart(0).buffer().size());
-    string s = h->rpc()+","+h->misc_string(0)+","+h->misc_string(1);
+    string s = h->rpc()+","+h->misc_string(0)+","+h->misc_string(1)+","+h->type();
     LOG(ERROR)<<"content of msg is :"<<s;
   }
 
