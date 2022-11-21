@@ -149,7 +149,7 @@ void ConnectionZMQ::SendMessage(uint64 recipient, MessageBuffer* message) {
     
 
     // Send message. All but the last are sent with ZMQ's SNDMORE flag.
-    if (i == message->size() - 1) {
+/*    if (i == message->size() - 1) {
 
       //gaoxuan --如果要改包头，只能在这里改，可以通过判断字符串里有没有那几种操作类型来决定要不要改
 
@@ -157,7 +157,9 @@ void ConnectionZMQ::SendMessage(uint64 recipient, MessageBuffer* message) {
       sockets_out_[recipient]->send(msg);
     } else {
       sockets_out_[recipient]->send(msg, ZMQ_SNDMORE);
-    }
+    }*/
+    sockets_out_[recipient]->send(msg);
+
   }
   delete message;
 }
