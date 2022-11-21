@@ -144,6 +144,10 @@ void ConnectionZMQ::SendMessage(uint64 recipient, MessageBuffer* message) {
     LOG(ERROR)<<"content of msg is :"<<s;
   }
 */
+  if(message->size()!=1)
+  {
+    LOG(ERROR)<<*message;
+  }
 
   for (uint32 i = 0; i < message->size(); i++) {
     // Create message.
