@@ -22,8 +22,8 @@ message Header {
   required Type type = 3;
 
   // Required for both RPC requests and CALLBACK invocations:
-  optional string app = 11;
-  optional string rpc = 12;
+  optional string app = 4;
+  optional string rpc = 5;
 
   // RPCs and callbacks may specify priority at which the requested procedure
   // should run.
@@ -31,7 +31,7 @@ message Header {
     LOW = 0;
     HIGH = 1;
   }
-  optional Priority priority = 13 [default = HIGH];
+  optional Priority priority = 6 [default = HIGH];
 
   // Optional for RPC requests (should NOT appear for CALLBACK invocations):
   //
@@ -39,25 +39,25 @@ message Header {
   // four ways (but a single RPC cannot request multiple responses):
   //
   //    (1) request a callback by setting both callback_app and callback_rpc
-  optional string callback_app = 21;
-  optional string callback_rpc = 22;
+  optional string callback_app = 7;
+  optional string callback_rpc = 8;
   //    (2) request an ack by setting ack_counter to a point to an atomic<int>
-  optional uint64 ack_counter = 23;
+  optional uint64 ack_counter = 9;
   //    (3) request a data response by setting data_ptr to point to a
   //        MessageBuffer*
-  optional uint64 data_ptr = 31;
+  optional uint64 data_ptr = 10;
   //    (4) request a data response by setting data_channel
-  optional string data_channel = 32;
+  optional string data_channel = 11;
 
   // Stick miscellaneous stuff in here if you really want to.
-  repeated bool   misc_bool   = 41;
-  repeated uint64 misc_int    = 42;
-  repeated bytes  misc_string = 43;
-  repeated double misc_double = 44;
-  repeated Scalar misc_scalar = 45;
+  repeated bool   misc_bool   = 12;
+  repeated uint64 misc_int    = 13;
+  repeated bytes  misc_string = 14;
+  repeated double misc_double = 15;
+  repeated Scalar misc_scalar = 16;
 
   // EXTERNAL connection info. (NOT FOR USE BY APPS)
-  optional string external_host = 51;
-  optional int32 external_port = 52;
+  optional string external_host = 17;
+  optional int32 external_port = 18;
 }
 
