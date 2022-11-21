@@ -6,10 +6,10 @@ import "scalar.proto";
 
 message Header {
   // Sender's machine id.
-  required uint64 from = 1;
+  required fixed32 from = 1;
 
   // Destination machine id.
-  required uint64 to = 2;
+  required fixed32 to = 2;
 
   // Type of message.
   enum Type {
