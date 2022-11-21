@@ -271,7 +271,6 @@ MessageBuffer *CalvinFSClientApp::RenameFile(const Slice &from_path, const Slice
 { 
   uint64 distinct_id = machine()->GetGUID();
   string channel_name = "action-result-" + UInt64ToString(distinct_id);
-  LOG(ERROR)<<channel_name;
   auto channel = machine()->DataChannel(channel_name);
   CHECK(!channel->Pop(NULL));
  

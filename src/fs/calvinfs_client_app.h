@@ -691,7 +691,7 @@ void LatencyExperimentAppend() {
     double start = GetTime();
     string from_path;
     string to_path;
-    for (int j = 0; j < 250; j++) {
+    for (int j = 0; j < 10; j++) {
       int a1 = rand() % 1000;
       int a2 = rand() % 1000;
       while (a2 == a1) {
@@ -986,30 +986,7 @@ void LatencyExperimentAppend() {
       }
       --capacity_;
     }
-    //gaoxuan --在sendMessage里输出不行，我们就在调用它之前输出！
-    //这里是我第一种想法，手动获得每一个字段，想办法加到TCP头，使用什么东西能够加信息给TCP头呢？
-  //gaoxuan --我想办法在这里把整个messageBuffer输出来，看看是啥样的
-  //在这里把Header输出来
-/*
-  LOG(ERROR)<<header->app();
-  LOG(ERROR)<<header->rpc();
-  if(header->misc_string_size()!=0)
-  {
-    for(int i=0;i<header->misc_string_size();i++)
-    {
-      LOG(ERROR)<<header->misc_string(i);
-    }
-  }
- */
-/*
-//gaoxuan --这之前都是我
-    MessageBuffer *m = new MessageBuffer();
-    m->Append(*header);
-    LOG(ERROR)<<"the size of messagebuffer is "<<m->size();
-    LOG(ERROR)<<"the content of header is "<<(*m)[0].data()<<"  size is ::"<<strlen((*m)[0].data());
-    delete m;
-*/
-    machine()->GlobalBarrier();
+
     machine()->SendMessage(header, new MessageBuffer());
   }
 
