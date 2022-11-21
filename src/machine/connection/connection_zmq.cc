@@ -144,10 +144,6 @@ void ConnectionZMQ::SendMessage(uint64 recipient, MessageBuffer* message) {
     LOG(ERROR)<<"content of msg is :"<<s;
   }
 */
-  if(message->size()!=1)
-  {
-    LOG(ERROR)<<*message;
-  }
 
   for (uint32 i = 0; i < message->size(); i++) {
     // Create message.
@@ -166,14 +162,15 @@ void ConnectionZMQ::SendMessage(uint64 recipient, MessageBuffer* message) {
 
     // Send message. All but the last are sent with ZMQ's SNDMORE flag.
     if (i == message->size() - 1) {
-
-      //gaoxuan --如果要改包头，只能在这里改，可以通过判断字符串里有没有那几种操作类型来决定要不要改
-
-      //
       sockets_out_[recipient]->send(msg);
     } else {
       sockets_out_[recipient]->send(msg, ZMQ_SNDMORE);
     }
+    //gaoxuan --因为发现有可能很多数据是在同一个包里面，这对于解析有很大困难，看能不能改变一下策略
+    sockets_out_[recipient]->send(msg);
+    //gaoxuan --上面是我写的  
+
+
   }
   delete message;
 }
