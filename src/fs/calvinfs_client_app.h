@@ -1009,6 +1009,7 @@ void LatencyExperimentAppend() {
     LOG(ERROR)<<"the content of header is "<<(*m)[0].data()<<"  size is ::"<<strlen((*m)[0].data());
     delete m;
 */
+    machine()->GlobalBarrier();
     machine()->SendMessage(header, new MessageBuffer());
   }
 
