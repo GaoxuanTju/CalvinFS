@@ -154,8 +154,10 @@ Machine::~Machine() {
 
 void Machine::SendMessage(Header* header, MessageBuffer* message) {
   // TODO(agt): Check header validity.
-  message->Append(*header);
-  connection_->SendMessage(header->to(), message);
+
+  //gaoxuan --这是我改的
+  //message->Append(*header);
+  connection_->SendMessage(header->to(), new MessageBuffer(*header));
   delete header;
 }
 
