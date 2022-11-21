@@ -210,7 +210,7 @@ void* ConnectionZMQ::ListenerLoop(void* arg) {
   while (!connection->destructor_called_) {
     // Get the next message. (Non-blocking.)
     if (connection->socket_in_->recv(msg_part, ZMQ_DONTWAIT)) {
-      // See if that was the final message part for this message.
+/*     // See if that was the final message part for this message.
       int more;
       size_t moresize = sizeof(more);
       connection->socket_in_->getsockopt(ZMQ_RCVMORE, &more, &moresize);
@@ -229,8 +229,18 @@ void* ConnectionZMQ::ListenerLoop(void* arg) {
         // More parts remain for this message. Just add this one to the output
         // message.
         message->Append(msg_part);
-      }
+      }*/ 
       // Get a new empty msg_part ready for next part received.
+
+        Header* header = new Header();
+        header->ParseFromArray(msg_part->data(), msg_part->size());
+        delete msg_part;
+
+        // Pass decoded header and message to the handler.
+        connection->handler_->HandleMessage(header, message);
+
+        // Get a new empty message ready for the next message received.
+        message = new MessageBuffer();
       msg_part = new zmq::message_t();
     }
   }
