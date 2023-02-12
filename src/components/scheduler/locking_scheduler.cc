@@ -28,10 +28,11 @@ void LockingScheduler::MainLoopBody() {
   // Start processing the next incoming action request.
   if (static_cast<int>(active_actions_.size()) < kMaxActiveActions &&
       running_action_count_ < kMaxRunningActions &&
-      action_requests_->Get(&action)) {
+      action_requests_->Get(&action)) {//gaoxuan --在这一步调用了ActionSource里面的Get函数，这样将这一个请求读取到了action里面
     active_actions_.insert(action->version());
     int ungranted_requests = 0;
 
+    //gaoxuan --下一步就是对请求的读写集进行加锁
     // Request write locks. Track requests so we can check that we don't
     // re-request any as read locks.
     set<string> writeset;

@@ -197,7 +197,7 @@ class CalvinFSClientApp : public App {
     return 1000000 / (1 + rand() % 9999);
   }
 
-  void FillExperiment() {
+  void FillExperiment() {//gaoxuan --这个地方就是创建文件的实验
     Spin(1);
     metadata_->Init();
     Spin(1);
@@ -849,6 +849,36 @@ void LatencyExperimentAppend() {
     header->set_rpc("CREATE_FILE");
     header->add_misc_bool(type == DIR);  // DIR = true, DATA = false
     header->add_misc_string(path.data(), path.size());
+    //gaoxuan --在这里发出消息之前，把from_path.data()和to_path.data()拆分一下
+
+    //第一步：将from_path.data()拆分放进split_string里面，拆完后，不够八个格子的，使用四个空格填充上
+    //拆分的算法，遇到一个/就把之前的字符串放进去
+    //将拆分后的元素添加去的方法：header->add_split_string(拆分的字符串)
+    int flag = 0 ;//用来标识此时split_string 里面有多少子串
+    char pattern = '/' ;//根据/进行字符串拆分
+
+    string temp_from = path.data(); 
+    temp_from = temp_from.substr(1,temp_from.size());//这一行是为了去除最前面的/
+    temp_from = temp_from + pattern ; //在最后面添加一个/便于处理
+    int pos = temp_from.find(pattern);//找到第一个/的位置
+    while(pos != temp_from.npos)//循环不断找/，找到一个拆分一次
+    {
+      string temp = temp_from.substr(0,pos);//temp里面就是拆分出来的第一个子串
+      header->add_split_string(temp);//将拆出来的子串加到header里面去
+      flag++;//拆分的字符串数量++
+      temp_from = temp_from.substr(pos+1,temp_from.size());
+      pos = temp_from.find(pattern);
+    }
+
+    while(flag != 8)
+    {
+      string temp = "    ";//用四个空格填充一下
+      header->add_split_string(temp);//将拆出来的子串加到header里面去
+      flag++;//拆分的字符串数量++     
+    }
+
+    //这一行之前是gaoxuan添加的
+
     if (reporting_ && rand() % 2 == 0) {
       header->set_callback_app(name());
       header->set_callback_rpc("CB");
@@ -873,6 +903,36 @@ void LatencyExperimentAppend() {
     header->set_app(name());
     header->set_rpc("APPEND");
     header->add_misc_string(path.data(), path.size());
+    //gaoxuan --在这里发出消息之前，把from_path.data()和to_path.data()拆分一下
+
+    //第一步：将from_path.data()拆分放进split_string里面，拆完后，不够八个格子的，使用四个空格填充上
+    //拆分的算法，遇到一个/就把之前的字符串放进去
+    //将拆分后的元素添加去的方法：header->add_split_string(拆分的字符串)
+    int flag = 0 ;//用来标识此时split_string 里面有多少子串
+    char pattern = '/' ;//根据/进行字符串拆分
+
+    string temp_from = path.data(); 
+    temp_from = temp_from.substr(1,temp_from.size());//这一行是为了去除最前面的/
+    temp_from = temp_from + pattern ; //在最后面添加一个/便于处理
+    int pos = temp_from.find(pattern);//找到第一个/的位置
+    while(pos != temp_from.npos)//循环不断找/，找到一个拆分一次
+    {
+      string temp = temp_from.substr(0,pos);//temp里面就是拆分出来的第一个子串
+      header->add_split_string(temp);//将拆出来的子串加到header里面去
+      flag++;//拆分的字符串数量++
+      temp_from = temp_from.substr(pos+1,temp_from.size());
+      pos = temp_from.find(pattern);
+    }
+
+    while(flag != 8)
+    {
+      string temp = "    ";//用四个空格填充一下
+      header->add_split_string(temp);//将拆出来的子串加到header里面去
+      flag++;//拆分的字符串数量++     
+    }
+
+    //这一行之前是gaoxuan添加的
+
     if (reporting_ && rand() % 2 == 0) {
       header->set_callback_app(name());
       header->set_callback_rpc("CB");
@@ -897,6 +957,36 @@ void LatencyExperimentAppend() {
     header->set_app(name());
     header->set_rpc("READ_FILE");
     header->add_misc_string(path.data(), path.size());
+    //gaoxuan --在这里发出消息之前，把from_path.data()和to_path.data()拆分一下
+
+    //第一步：将from_path.data()拆分放进split_string里面，拆完后，不够八个格子的，使用四个空格填充上
+    //拆分的算法，遇到一个/就把之前的字符串放进去
+    //将拆分后的元素添加去的方法：header->add_split_string(拆分的字符串)
+    int flag = 0 ;//用来标识此时split_string 里面有多少子串
+    char pattern = '/' ;//根据/进行字符串拆分
+
+    string temp_from = path.data(); 
+    temp_from = temp_from.substr(1,temp_from.size());//这一行是为了去除最前面的/
+    temp_from = temp_from + pattern ; //在最后面添加一个/便于处理
+    int pos = temp_from.find(pattern);//找到第一个/的位置
+    while(pos != temp_from.npos)//循环不断找/，找到一个拆分一次
+    {
+      string temp = temp_from.substr(0,pos);//temp里面就是拆分出来的第一个子串
+      header->add_split_string(temp);//将拆出来的子串加到header里面去
+      flag++;//拆分的字符串数量++
+      temp_from = temp_from.substr(pos+1,temp_from.size());
+      pos = temp_from.find(pattern);
+    }
+
+    while(flag != 8)
+    {
+      string temp = "    ";//用四个空格填充一下
+      header->add_split_string(temp);//将拆出来的子串加到header里面去
+      flag++;//拆分的字符串数量++     
+    }
+
+    //这一行之前是gaoxuan添加的
+
     if (reporting_ && rand() % 2 == 0) {
       header->set_callback_app(name());
       header->set_callback_rpc("CB");
@@ -921,6 +1011,36 @@ void LatencyExperimentAppend() {
     header->set_app(name());
     header->set_rpc("LS");
     header->add_misc_string(path.data(), path.size());
+    //gaoxuan --在这里发出消息之前，把from_path.data()和to_path.data()拆分一下
+
+    //第一步：将from_path.data()拆分放进split_string里面，拆完后，不够八个格子的，使用四个空格填充上
+    //拆分的算法，遇到一个/就把之前的字符串放进去
+    //将拆分后的元素添加去的方法：header->add_split_string(拆分的字符串)
+    int flag = 0 ;//用来标识此时split_string 里面有多少子串
+    char pattern = '/' ;//根据/进行字符串拆分
+
+    string temp_from = path.data(); 
+    temp_from = temp_from.substr(1,temp_from.size());//这一行是为了去除最前面的/
+    temp_from = temp_from + pattern ; //在最后面添加一个/便于处理
+    int pos = temp_from.find(pattern);//找到第一个/的位置
+    while(pos != temp_from.npos)//循环不断找/，找到一个拆分一次
+    {
+      string temp = temp_from.substr(0,pos);//temp里面就是拆分出来的第一个子串
+      header->add_split_string(temp);//将拆出来的子串加到header里面去
+      flag++;//拆分的字符串数量++
+      temp_from = temp_from.substr(pos+1,temp_from.size());
+      pos = temp_from.find(pattern);
+    }
+
+    while(flag != 8)
+    {
+      string temp = "    ";//用四个空格填充一下
+      header->add_split_string(temp);//将拆出来的子串加到header里面去
+      flag++;//拆分的字符串数量++     
+    }
+
+    //这一行之前是gaoxuan添加的
+
     if (reporting_ && rand() % 2 == 0) {
       header->set_callback_app(name());
       header->set_callback_rpc("CB");
@@ -946,6 +1066,58 @@ void LatencyExperimentAppend() {
     header->set_rpc("COPY_FILE");
     header->add_misc_string(from_path.data(), from_path.size());
     header->add_misc_string(to_path.data(), to_path.size());
+    //gaoxuan --在这里发出消息之前，把from_path.data()和to_path.data()拆分一下
+
+    //第一步：将from_path.data()拆分放进split_string里面，拆完后，不够八个格子的，使用四个空格填充上
+    //拆分的算法，遇到一个/就把之前的字符串放进去
+    //将拆分后的元素添加去的方法：header->add_split_string(拆分的字符串)
+    int flag = 0 ;//用来标识此时split_string 里面有多少子串
+    char pattern = '/' ;//根据/进行字符串拆分
+
+    string temp_from = from_path.data(); 
+    temp_from = temp_from.substr(1,temp_from.size());//这一行是为了去除最前面的/
+    temp_from = temp_from + pattern ; //在最后面添加一个/便于处理
+    int pos = temp_from.find(pattern);//找到第一个/的位置
+    while(pos != temp_from.npos)//循环不断找/，找到一个拆分一次
+    {
+      string temp = temp_from.substr(0,pos);//temp里面就是拆分出来的第一个子串
+      header->add_split_string(temp);//将拆出来的子串加到header里面去
+      flag++;//拆分的字符串数量++
+      temp_from = temp_from.substr(pos+1,temp_from.size());
+      pos = temp_from.find(pattern);
+    }
+
+    while(flag != 8)
+    {
+      string temp = "    ";//用四个空格填充一下
+      header->add_split_string(temp);//将拆出来的子串加到header里面去
+      flag++;//拆分的字符串数量++     
+    }
+
+    //第二步：将to_path.data()拆分放进split_string里面，拆完后，不够八个格子的，使用四个空格填充上
+    string temp_to = to_path.data(); 
+    temp_to = temp_to.substr(1,temp_to.size());//这一行是为了去除最前面的/
+    temp_to = temp_to + pattern ; //在最后面添加一个/便于处理
+    int pos1 = temp_to.find(pattern);//找到第一个/的位置
+    while(pos1 != temp_to.npos)//循环不断找/，找到一个拆分一次
+    {
+      string temp = temp_to.substr(0,pos1);//temp里面就是拆分出来的第一个子串
+      header->add_split_string(temp);//将拆出来的子串加到header里面去
+      flag++;//拆分的字符串数量++
+      temp_to = temp_to.substr(pos1+1,temp_to.size());
+      pos1 = temp_to.find(pattern);
+    }
+
+    while(flag != 16)
+    {
+      string temp = "    ";//用四个空格填充一下
+      header->add_split_string(temp);//将拆出来的子串加到header里面去
+      flag++;//拆分的字符串数量++     
+    }
+
+
+    //这一行之前是gaoxuan添加的
+
     if (reporting_ && rand() % 2 == 0) {
       header->set_callback_app(name());
       header->set_callback_rpc("CB");
@@ -973,6 +1145,60 @@ void LatencyExperimentAppend() {
     header->set_rpc("RENAME_FILE");//gaoxuan --call RenameFile() in calvinfs_client_app.cc
     header->add_misc_string(from_path.data(), from_path.size());
     header->add_misc_string(to_path.data(), to_path.size());
+
+    //gaoxuan --在这里发出消息之前，把from_path.data()和to_path.data()拆分一下
+
+    //第一步：将from_path.data()拆分放进split_string里面，拆完后，不够八个格子的，使用四个空格填充上
+    //拆分的算法，遇到一个/就把之前的字符串放进去
+    //将拆分后的元素添加去的方法：header->add_split_string(拆分的字符串)
+    int flag = 0 ;//用来标识此时split_string 里面有多少子串
+    char pattern = '/' ;//根据/进行字符串拆分
+
+    string temp_from = from_path.data(); 
+    temp_from = temp_from.substr(1,temp_from.size());//这一行是为了去除最前面的/
+    temp_from = temp_from + pattern ; //在最后面添加一个/便于处理
+    int pos = temp_from.find(pattern);//找到第一个/的位置
+    while(pos != temp_from.npos)//循环不断找/，找到一个拆分一次
+    {
+      string temp = temp_from.substr(0,pos);//temp里面就是拆分出来的第一个子串
+      header->add_split_string(temp);//将拆出来的子串加到header里面去
+      flag++;//拆分的字符串数量++
+      temp_from = temp_from.substr(pos+1,temp_from.size());
+      pos = temp_from.find(pattern);
+    }
+
+    while(flag != 8)
+    {
+      string temp = "    ";//用四个空格填充一下
+      header->add_split_string(temp);//将拆出来的子串加到header里面去
+      flag++;//拆分的字符串数量++     
+    }
+
+    //第二步：将to_path.data()拆分放进split_string里面，拆完后，不够八个格子的，使用四个空格填充上
+    string temp_to = to_path.data(); 
+    temp_to = temp_to.substr(1,temp_to.size());//这一行是为了去除最前面的/
+    temp_to = temp_to + pattern ; //在最后面添加一个/便于处理
+    int pos1 = temp_to.find(pattern);//找到第一个/的位置
+    while(pos1 != temp_to.npos)//循环不断找/，找到一个拆分一次
+    {
+      string temp = temp_to.substr(0,pos1);//temp里面就是拆分出来的第一个子串
+      header->add_split_string(temp);//将拆出来的子串加到header里面去
+      flag++;//拆分的字符串数量++
+      temp_to = temp_to.substr(pos1+1,temp_to.size());
+      pos1 = temp_to.find(pattern);
+    }
+
+    while(flag != 16)
+    {
+      string temp = "    ";//用四个空格填充一下
+      header->add_split_string(temp);//将拆出来的子串加到header里面去
+      flag++;//拆分的字符串数量++     
+    }
+
+
+    //这一行之前是gaoxuan添加的
+
+
     if (reporting_ && rand() % 2 == 0) {//gaoxuan --this branch will never be executed in RenameExperiment(),reporting_ is false
       header->set_callback_app(name());
       header->set_callback_rpc("CB");

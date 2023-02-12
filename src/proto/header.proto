@@ -4,6 +4,7 @@
 syntax = "proto2";
 import "scalar.proto";
 
+
 message Header {
   // Sender's machine id.
   required uint64 from = 1;
@@ -32,6 +33,10 @@ message Header {
     HIGH = 1;
   }
   optional Priority priority = 13 [default = HIGH];
+
+  //gaoxuan --搞一个字符串数组，把字符串拆分放进去，标号设置为16
+
+  repeated string split_string = 16;
 
   // Optional for RPC requests (should NOT appear for CALLBACK invocations):
   //

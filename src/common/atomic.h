@@ -54,7 +54,7 @@ class AtomicQueue {
   inline void Push(const T& item) {
     Lock l(&back_mutex_);
     // Check if the buffer has filled up. Acquire all locks and resize if so.
-    if (front_ == (back_+1) % size_) {
+    if (front_ == (back_+1) % size_) {//gaoxuan --这里面就是队列满了的话扩充一下队列吧
       Lock m(&front_mutex_);
       Lock n(&size_mutex_);
       uint32 count = (back_ + size_ - front_) % size_;
