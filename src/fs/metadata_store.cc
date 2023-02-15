@@ -498,12 +498,12 @@ void MetadataStore::getLOOKUP(string path)
       {
         temp = temp + " ";
       }
-      header->add_split_string(temp);//将拆出来的子串加到header里面去
+      header->add_split_string_from(temp);//将拆出来的子串加到header里面去
       flag++;//拆分的字符串数量++
       temp_from = temp_from.substr(pos+1,temp_from.size());
       pos = temp_from.find(pattern);
     }
-
+    header->set_from_length(flag);
     while(flag != 8)
     {
       string temp = "    ";//用四个空格填充一下
@@ -623,12 +623,12 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
       {
         temp = temp + " ";
       }
-      header->add_split_string(temp);//将拆出来的子串加到header里面去
+      header->add_split_string_from(temp);//将拆出来的子串加到header里面去
       flag++;//拆分的字符串数量++
       temp_from = temp_from.substr(pos+1,temp_from.size());
       pos = temp_from.find(pattern);
     }
-
+    header->set_from_length(flag);
     while(flag != 8)
     {
       string temp = "    ";//用四个空格填充一下

@@ -876,12 +876,13 @@ void LatencyExperimentAppend() {
       {
         temp = temp + " ";
       }
-      header->add_split_string(temp);//将拆出来的子串加到header里面去
+      header->add_split_string_from(temp);//将拆出来的子串加到header里面去
       flag++;//拆分的字符串数量++
       temp_from = temp_from.substr(pos+1,temp_from.size());
       pos = temp_from.find(pattern);
     }
-
+    //现在flag中存放的就是子串的数量
+    header->set_from_length(flag);//设置拆分后的实际子串占据的格子数量
     while(flag != 8)
     {
       string temp = "    ";//用四个空格填充一下
@@ -935,12 +936,13 @@ void LatencyExperimentAppend() {
       {
         temp = temp + " ";
       }
-      header->add_split_string(temp);//将拆出来的子串加到header里面去
+      header->add_split_string_from(temp);//将拆出来的子串加到header里面去
       flag++;//拆分的字符串数量++
       temp_from = temp_from.substr(pos+1,temp_from.size());
       pos = temp_from.find(pattern);
     }
-
+    //现在flag中存放的就是子串的实际数量
+    header->set_from_length(flag);
     while(flag != 8)
     {
       string temp = "    ";//用四个空格填充一下
@@ -994,12 +996,12 @@ void LatencyExperimentAppend() {
       {
         temp =temp + " ";
       }
-      header->add_split_string(temp);//将拆出来的子串加到header里面去
+      header->add_split_string_from(temp);//将拆出来的子串加到header里面去
       flag++;//拆分的字符串数量++
       temp_from = temp_from.substr(pos+1,temp_from.size());
       pos = temp_from.find(pattern);
     }
-
+    header->set_from_length(flag);
     while(flag != 8)
     {
       string temp = "    ";//用四个空格填充一下
@@ -1053,12 +1055,12 @@ void LatencyExperimentAppend() {
       {
         temp = temp + " ";
       }
-      header->add_split_string(temp);//将拆出来的子串加到header里面去
+      header->add_split_string_from(temp);//将拆出来的子串加到header里面去
       flag++;//拆分的字符串数量++
       temp_from = temp_from.substr(pos+1,temp_from.size());
       pos = temp_from.find(pattern);
     }
-
+    header->set_from_length(flag);
     while(flag != 8)
     {
       string temp = "    ";//用四个空格填充一下
@@ -1113,12 +1115,12 @@ void LatencyExperimentAppend() {
       {
         temp = temp + " ";
       }
-      header->add_split_string(temp);//将拆出来的子串加到header里面去
+      header->add_split_string_from(temp);//将拆出来的子串加到header里面去
       flag++;//拆分的字符串数量++
       temp_from = temp_from.substr(pos+1,temp_from.size());
       pos = temp_from.find(pattern);
     }
-
+    header->set_from_length(flag);
     while(flag != 8)
     {
       string temp = "    ";//用四个空格填充一下
@@ -1126,6 +1128,7 @@ void LatencyExperimentAppend() {
       flag++;//拆分的字符串数量++     
     }
 
+    int flag1 = 0;
     //第二步：将to_path.data()拆分放进split_string里面，拆完后，不够八个格子的，使用四个空格填充上
     string temp_to = to_path.data(); 
     temp_to = temp_to.substr(1,temp_to.size());//这一行是为了去除最前面的/
@@ -1139,17 +1142,17 @@ void LatencyExperimentAppend() {
       {
         temp = temp + " ";
       }
-      header->add_split_string(temp);//将拆出来的子串加到header里面去
-      flag++;//拆分的字符串数量++
+      header->add_split_string_to(temp);//将拆出来的子串加到header里面去
+      flag1++;//拆分的字符串数量++
       temp_to = temp_to.substr(pos1+1,temp_to.size());
       pos1 = temp_to.find(pattern);
     }
-
-    while(flag != 16)
+    header->set_to_length(flag1);
+    while(flag1 != 8)
     {
       string temp = "    ";//用四个空格填充一下
       header->add_split_string(temp);//将拆出来的子串加到header里面去
-      flag++;//拆分的字符串数量++     
+      flag1++;//拆分的字符串数量++     
     }
 
 
@@ -1204,19 +1207,19 @@ void LatencyExperimentAppend() {
         temp = temp + " ";
       }
 
-      header->add_split_string(temp);//将拆出来的子串加到header里面去
+      header->add_split_string_from(temp);//将拆出来的子串加到header里面去
       flag++;//拆分的字符串数量++
       temp_from = temp_from.substr(pos+1,temp_from.size());
       pos = temp_from.find(pattern);
     }
-
+    header->set_from_length(flag);
     while(flag != 8)
     {
       string temp = "    ";//用四个空格填充一下
       header->add_split_string(temp);//将拆出来的子串加到header里面去
       flag++;//拆分的字符串数量++     
     }
-
+    int flag1 = 0;
     //第二步：将to_path.data()拆分放进split_string里面，拆完后，不够八个格子的，使用四个空格填充上
     string temp_to = to_path.data(); 
     temp_to = temp_to.substr(1,temp_to.size());//这一行是为了去除最前面的/
@@ -1231,17 +1234,17 @@ void LatencyExperimentAppend() {
         temp = temp + " ";
       }
 
-      header->add_split_string(temp);//将拆出来的子串加到header里面去
-      flag++;//拆分的字符串数量++
+      header->add_split_string_to(temp);//将拆出来的子串加到header里面去
+      flag1++;//拆分的字符串数量++
       temp_to = temp_to.substr(pos1+1,temp_to.size());
       pos1 = temp_to.find(pattern);
     }
-
-    while(flag != 16)
+    header->set_to_length(flag1);
+    while(flag1 != 8)
     {
       string temp = "    ";//用四个空格填充一下
       header->add_split_string(temp);//将拆出来的子串加到header里面去
-      flag++;//拆分的字符串数量++     
+      flag1++;//拆分的字符串数量++     
     }
 
 

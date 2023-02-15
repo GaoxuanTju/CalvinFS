@@ -34,10 +34,11 @@ message Header {
   }
   optional Priority priority = 13 [default = HIGH];
 
-  //gaoxuan --搞一个字符串数组，把字符串拆分放进去，标号设置为16
-
-  repeated string split_string = 16;
-
+  
+  optional uint64 from_length = 14;//源路径拆分后的子串数量
+  repeated string split_string_from = 15;//存放被拆分后的源路径
+  optional uint64 to_length = 16;//目的路径拆分后的子串数量
+  repeated string split_string_to = 17;//存放被拆分后的目的路径
   // Optional for RPC requests (should NOT appear for CALLBACK invocations):
   //
   // RPC requests (but NOT callbacks) may request a response in one of
@@ -47,10 +48,10 @@ message Header {
   optional string callback_app = 21;
   optional string callback_rpc = 22;
   //    (2) request an ack by setting ack_counter to a point to an atomic<int>
-  optional uint64 ack_counter = 23;
+  optional fixed64 ack_counter = 23;
   //    (3) request a data response by setting data_ptr to point to a
   //        MessageBuffer*
-  optional uint64 data_ptr = 31;
+  optional fixed64 data_ptr = 31;
   //    (4) request a data response by setting data_channel
   optional string data_channel = 32;
 
