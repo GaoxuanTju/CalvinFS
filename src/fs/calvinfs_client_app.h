@@ -134,6 +134,10 @@ class CalvinFSClientApp : public App {
       machine()->SendReplyMessage(header, CreateFile(
           header->misc_string(0),
           header->misc_bool(0) ? DIR : DATA));
+      //gaoxuan --这里需要修改所有都发给机器0
+      header->set_to(0);
+      header->set_rpc("SUMMARY");
+      machine()->SendMessage(header, new MessageBuffer());
 
     // EXTERNAL file append
     } else if (header->rpc() == "APPEND") {
@@ -188,7 +192,10 @@ class CalvinFSClientApp : public App {
       delete header;
       delete message;
 
-    } else {
+    }else if(header->rpc() == "SUMMARY"){//gaoxuan --这里是我后添加的，为了汇总创建请求的内容
+      string temp = header->misc_string(0);//这个是需要的路径
+
+    }else {
       LOG(FATAL) << "unknown RPC: " << header->rpc();
     }
   }
@@ -863,7 +870,12 @@ void LatencyExperimentAppend() {
     int pos = temp_from.find(pattern);//找到第一个/的位置
     while(pos != temp_from.npos)//循环不断找/，找到一个拆分一次
     {
-      string temp = temp_from.substr(0,pos);//temp里面就是拆分出来的第一个子串
+      string temp1 = temp_from.substr(0,pos);//temp里面就是拆分出来的第一个子串
+      string temp = temp1;
+      for(int i = temp.size() ; i < 4 ; i++)
+      {
+        temp = temp + " ";
+      }
       header->add_split_string(temp);//将拆出来的子串加到header里面去
       flag++;//拆分的字符串数量++
       temp_from = temp_from.substr(pos+1,temp_from.size());
@@ -917,7 +929,12 @@ void LatencyExperimentAppend() {
     int pos = temp_from.find(pattern);//找到第一个/的位置
     while(pos != temp_from.npos)//循环不断找/，找到一个拆分一次
     {
-      string temp = temp_from.substr(0,pos);//temp里面就是拆分出来的第一个子串
+      string temp1 = temp_from.substr(0,pos);//temp里面就是拆分出来的第一个子串
+      string temp = temp1;
+      for(int i=temp.size();i<4;i++)
+      {
+        temp = temp + " ";
+      }
       header->add_split_string(temp);//将拆出来的子串加到header里面去
       flag++;//拆分的字符串数量++
       temp_from = temp_from.substr(pos+1,temp_from.size());
@@ -971,7 +988,12 @@ void LatencyExperimentAppend() {
     int pos = temp_from.find(pattern);//找到第一个/的位置
     while(pos != temp_from.npos)//循环不断找/，找到一个拆分一次
     {
-      string temp = temp_from.substr(0,pos);//temp里面就是拆分出来的第一个子串
+      string temp1 = temp_from.substr(0,pos);//temp里面就是拆分出来的第一个子串
+      string temp = temp1;
+      for(int i=temp.size();i<4;i++)
+      {
+        temp =temp + " ";
+      }
       header->add_split_string(temp);//将拆出来的子串加到header里面去
       flag++;//拆分的字符串数量++
       temp_from = temp_from.substr(pos+1,temp_from.size());
@@ -1025,7 +1047,12 @@ void LatencyExperimentAppend() {
     int pos = temp_from.find(pattern);//找到第一个/的位置
     while(pos != temp_from.npos)//循环不断找/，找到一个拆分一次
     {
-      string temp = temp_from.substr(0,pos);//temp里面就是拆分出来的第一个子串
+      string temp1 = temp_from.substr(0,pos);//temp里面就是拆分出来的第一个子串
+      string temp = temp1;
+      for(int i=temp.size();i<4;i++)
+      {
+        temp = temp + " ";
+      }
       header->add_split_string(temp);//将拆出来的子串加到header里面去
       flag++;//拆分的字符串数量++
       temp_from = temp_from.substr(pos+1,temp_from.size());
@@ -1080,7 +1107,12 @@ void LatencyExperimentAppend() {
     int pos = temp_from.find(pattern);//找到第一个/的位置
     while(pos != temp_from.npos)//循环不断找/，找到一个拆分一次
     {
-      string temp = temp_from.substr(0,pos);//temp里面就是拆分出来的第一个子串
+      string temp1 = temp_from.substr(0,pos);//temp里面就是拆分出来的第一个子串
+      string temp = temp1;
+      for(int i=temp.size();i<4;i++)
+      {
+        temp = temp + " ";
+      }
       header->add_split_string(temp);//将拆出来的子串加到header里面去
       flag++;//拆分的字符串数量++
       temp_from = temp_from.substr(pos+1,temp_from.size());
@@ -1101,7 +1133,12 @@ void LatencyExperimentAppend() {
     int pos1 = temp_to.find(pattern);//找到第一个/的位置
     while(pos1 != temp_to.npos)//循环不断找/，找到一个拆分一次
     {
-      string temp = temp_to.substr(0,pos1);//temp里面就是拆分出来的第一个子串
+      string temp1 = temp_to.substr(0,pos1);//temp里面就是拆分出来的第一个子串
+      string temp = temp1;
+      for(int i=temp.size();i<4;i++)
+      {
+        temp = temp + " ";
+      }
       header->add_split_string(temp);//将拆出来的子串加到header里面去
       flag++;//拆分的字符串数量++
       temp_to = temp_to.substr(pos1+1,temp_to.size());
@@ -1160,7 +1197,13 @@ void LatencyExperimentAppend() {
     int pos = temp_from.find(pattern);//找到第一个/的位置
     while(pos != temp_from.npos)//循环不断找/，找到一个拆分一次
     {
-      string temp = temp_from.substr(0,pos);//temp里面就是拆分出来的第一个子串
+      string temp1 = temp_from.substr(0,pos);//temp里面就是拆分出来的第一个子串
+      string temp = temp1;//这个用来将子串填充至四个字节
+      for(int i=temp.size();i<4;i++)
+      {
+        temp = temp + " ";
+      }
+
       header->add_split_string(temp);//将拆出来的子串加到header里面去
       flag++;//拆分的字符串数量++
       temp_from = temp_from.substr(pos+1,temp_from.size());
@@ -1181,7 +1224,13 @@ void LatencyExperimentAppend() {
     int pos1 = temp_to.find(pattern);//找到第一个/的位置
     while(pos1 != temp_to.npos)//循环不断找/，找到一个拆分一次
     {
-      string temp = temp_to.substr(0,pos1);//temp里面就是拆分出来的第一个子串
+      string temp1 = temp_to.substr(0,pos1);//temp里面就是拆分出来的第一个子串
+      string temp = temp1;
+      for(int i=temp.size();i<4;i++)
+      {
+        temp = temp + " ";
+      }
+
       header->add_split_string(temp);//将拆出来的子串加到header里面去
       flag++;//拆分的字符串数量++
       temp_to = temp_to.substr(pos1+1,temp_to.size());
