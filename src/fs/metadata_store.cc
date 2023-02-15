@@ -490,7 +490,7 @@ void MetadataStore::getLOOKUP(string path)
     temp_from = temp_from.substr(1,temp_from.size());//这一行是为了去除最前面的/
     temp_from = temp_from + pattern ; //在最后面添加一个/便于处理
     int pos = temp_from.find(pattern);//找到第一个/的位置
-    while(pos != temp_from.npos)//循环不断找/，找到一个拆分一次
+    while(pos != std::string::npos)//循环不断找/，找到一个拆分一次
     {
       string temp1 = temp_from.substr(0,pos);//temp里面就是拆分出来的第一个子串
       string temp = temp1;
@@ -615,7 +615,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
     temp_from = temp_from.substr(1,temp_from.size());//这一行是为了去除最前面的/
     temp_from = temp_from + pattern ; //在最后面添加一个/便于处理
     int pos = temp_from.find(pattern);//找到第一个/的位置
-    while(pos != temp_from.npos)//循环不断找/，找到一个拆分一次
+    while(pos != std::string::npos)//循环不断找/，找到一个拆分一次
     {
       string temp1 = temp_from.substr(0,pos);//temp里面就是拆分出来的第一个子串
       string temp = temp1;
