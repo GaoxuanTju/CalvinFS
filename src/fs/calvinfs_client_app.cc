@@ -73,7 +73,7 @@ MessageBuffer *CalvinFSClientApp::GetMetadataEntry(const Slice &path)
     while(flag != 8)
     {
       string temp = "    ";//用四个空格填充一下
-      header->add_split_string(temp);//将拆出来的子串加到header里面去
+      header->add_split_string_from(temp);//将拆出来的子串加到header里面去
       flag++;//拆分的字符串数量++     
     }
 
