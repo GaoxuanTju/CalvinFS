@@ -157,8 +157,8 @@ class CalvinFSClientApp : public App {
      machine()->SendReplyMessage(header, RenameFile(
          header->misc_string(0),
          header->misc_string(1)));
-      header->set_to(0);
-      header->set_rpc("SUMMARY_RENAME");
+     // header->set_to(0);
+      //header->set_rpc("SUMMARY_RENAME");
      // machine()->SendMessage(header, new MessageBuffer());
     // Callback for recording latency stats
     } else if (header->rpc() == "CB") {
