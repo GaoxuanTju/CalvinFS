@@ -858,7 +858,7 @@ void LatencyExperimentAppend() {
     header->add_misc_string(path.data(), path.size());
     //gaoxuan --在这里发出消息之前，把from_path.data()和to_path.data()拆分一下
 
-    //第一步：将from_path.data()拆分放进split_string里面，拆完后，不够八个格子的，使用四个空格填充上
+    //第一步：将from_path.data()拆分放进split_string里面，拆完后，不够八个格子的，使用五个空格填充上
     //拆分的算法，遇到一个/就把之前的字符串放进去
     //将拆分后的元素添加去的方法：header->add_split_string(拆分的字符串)
     int flag = 0 ;//用来标识此时split_string 里面有多少子串
@@ -872,7 +872,7 @@ void LatencyExperimentAppend() {
     {
       string temp1 = temp_from.substr(0,pos);//temp里面就是拆分出来的第一个子串
       string temp = temp1;
-      for(int i = temp.size() ; i < 4 ; i++)
+      for(int i = temp.size() ; i < 5 ; i++)
       {
         temp = temp + " ";
       }
@@ -885,7 +885,7 @@ void LatencyExperimentAppend() {
     header->set_from_length(flag);//设置拆分后的实际子串占据的格子数量
     while(flag != 8)
     {
-      string temp = "    ";//用四个空格填充一下
+      string temp = "     ";//用五个空格填充一下
       header->add_split_string_from(temp);//将拆出来的子串加到header里面去
       flag++;//拆分的字符串数量++     
     }
@@ -918,7 +918,7 @@ void LatencyExperimentAppend() {
     header->add_misc_string(path.data(), path.size());
     //gaoxuan --在这里发出消息之前，把from_path.data()和to_path.data()拆分一下
 
-    //第一步：将from_path.data()拆分放进split_string里面，拆完后，不够八个格子的，使用四个空格填充上
+    //第一步：将from_path.data()拆分放进split_string里面，拆完后，不够八个格子的，使用五个空格填充上
     //拆分的算法，遇到一个/就把之前的字符串放进去
     //将拆分后的元素添加去的方法：header->add_split_string(拆分的字符串)
     int flag = 0 ;//用来标识此时split_string 里面有多少子串
@@ -932,7 +932,7 @@ void LatencyExperimentAppend() {
     {
       string temp1 = temp_from.substr(0,pos);//temp里面就是拆分出来的第一个子串
       string temp = temp1;
-      for(int i=temp.size();i<4;i++)
+      for(int i=temp.size();i<5;i++)
       {
         temp = temp + " ";
       }
@@ -945,7 +945,7 @@ void LatencyExperimentAppend() {
     header->set_from_length(flag);
     while(flag != 8)
     {
-      string temp = "    ";//用四个空格填充一下
+      string temp = "     ";//用五个空格填充一下
       header->add_split_string_from(temp);//将拆出来的子串加到header里面去
       flag++;//拆分的字符串数量++     
     }
@@ -978,7 +978,7 @@ void LatencyExperimentAppend() {
     header->add_misc_string(path.data(), path.size());
     //gaoxuan --在这里发出消息之前，把from_path.data()和to_path.data()拆分一下
 
-    //第一步：将from_path.data()拆分放进split_string里面，拆完后，不够八个格子的，使用四个空格填充上
+    //第一步：将from_path.data()拆分放进split_string里面，拆完后，不够八个格子的，使用空格填充上
     //拆分的算法，遇到一个/就把之前的字符串放进去
     //将拆分后的元素添加去的方法：header->add_split_string(拆分的字符串)
     int flag = 0 ;//用来标识此时split_string 里面有多少子串
@@ -992,7 +992,7 @@ void LatencyExperimentAppend() {
     {
       string temp1 = temp_from.substr(0,pos);//temp里面就是拆分出来的第一个子串
       string temp = temp1;
-      for(int i=temp.size();i<4;i++)
+      for(int i=temp.size();i<5;i++)
       {
         temp =temp + " ";
       }
@@ -1004,7 +1004,7 @@ void LatencyExperimentAppend() {
     header->set_from_length(flag);
     while(flag != 8)
     {
-      string temp = "    ";//用四个空格填充一下
+      string temp = "     ";//用五个空格填充一下
       header->add_split_string_from(temp);//将拆出来的子串加到header里面去
       flag++;//拆分的字符串数量++     
     }
@@ -1037,7 +1037,7 @@ void LatencyExperimentAppend() {
     header->add_misc_string(path.data(), path.size());
     //gaoxuan --在这里发出消息之前，把from_path.data()和to_path.data()拆分一下
 
-    //第一步：将from_path.data()拆分放进split_string里面，拆完后，不够八个格子的，使用四个空格填充上
+    //第一步：将from_path.data()拆分放进split_string里面，拆完后，不够八个格子的，使用五个空格填充上
     //拆分的算法，遇到一个/就把之前的字符串放进去
     //将拆分后的元素添加去的方法：header->add_split_string(拆分的字符串)
     int flag = 0 ;//用来标识此时split_string 里面有多少子串
@@ -1051,7 +1051,7 @@ void LatencyExperimentAppend() {
     {
       string temp1 = temp_from.substr(0,pos);//temp里面就是拆分出来的第一个子串
       string temp = temp1;
-      for(int i=temp.size();i<4;i++)
+      for(int i=temp.size();i<5;i++)
       {
         temp = temp + " ";
       }
@@ -1063,7 +1063,7 @@ void LatencyExperimentAppend() {
     header->set_from_length(flag);
     while(flag != 8)
     {
-      string temp = "    ";//用四个空格填充一下
+      string temp = "     ";//用五个空格填充一下
       header->add_split_string_from(temp);//将拆出来的子串加到header里面去
       flag++;//拆分的字符串数量++     
     }
@@ -1097,7 +1097,7 @@ void LatencyExperimentAppend() {
     header->add_misc_string(to_path.data(), to_path.size());
     //gaoxuan --在这里发出消息之前，把from_path.data()和to_path.data()拆分一下
 
-    //第一步：将from_path.data()拆分放进split_string里面，拆完后，不够八个格子的，使用四个空格填充上
+    //第一步：将from_path.data()拆分放进split_string里面，拆完后，不够八个格子的，使用五个空格填充上
     //拆分的算法，遇到一个/就把之前的字符串放进去
     //将拆分后的元素添加去的方法：header->add_split_string(拆分的字符串)
     int flag = 0 ;//用来标识此时split_string 里面有多少子串
@@ -1111,7 +1111,7 @@ void LatencyExperimentAppend() {
     {
       string temp1 = temp_from.substr(0,pos);//temp里面就是拆分出来的第一个子串
       string temp = temp1;
-      for(int i=temp.size();i<4;i++)
+      for(int i=temp.size();i<5;i++)
       {
         temp = temp + " ";
       }
@@ -1123,13 +1123,13 @@ void LatencyExperimentAppend() {
     header->set_from_length(flag);
     while(flag != 8)
     {
-      string temp = "    ";//用四个空格填充一下
+      string temp = "     ";//用五个空格填充一下
       header->add_split_string_from(temp);//将拆出来的子串加到header里面去
       flag++;//拆分的字符串数量++     
     }
 
     int flag1 = 0;
-    //第二步：将to_path.data()拆分放进split_string里面，拆完后，不够八个格子的，使用四个空格填充上
+    //第二步：将to_path.data()拆分放进split_string里面，拆完后，不够八个格子的，使用五个空格填充上
     string temp_to = to_path.data(); 
     temp_to = temp_to.substr(1,temp_to.size());//这一行是为了去除最前面的/
     temp_to = temp_to + pattern ; //在最后面添加一个/便于处理
@@ -1138,7 +1138,7 @@ void LatencyExperimentAppend() {
     {
       string temp1 = temp_to.substr(0,pos1);//temp里面就是拆分出来的第一个子串
       string temp = temp1;
-      for(int i=temp.size();i<4;i++)
+      for(int i=temp.size();i<5;i++)
       {
         temp = temp + " ";
       }
@@ -1150,7 +1150,7 @@ void LatencyExperimentAppend() {
     header->set_to_length(flag1);
     while(flag1 != 8)
     {
-      string temp = "    ";//用四个空格填充一下
+      string temp = "     ";//用五个空格填充一下
       header->add_split_string_to(temp);//将拆出来的子串加到header里面去
       flag1++;//拆分的字符串数量++     
     }
@@ -1188,7 +1188,7 @@ void LatencyExperimentAppend() {
 
     //gaoxuan --在这里发出消息之前，把from_path.data()和to_path.data()拆分一下
 
-    //第一步：将from_path.data()拆分放进split_string里面，拆完后，不够八个格子的，使用四个空格填充上
+    //第一步：将from_path.data()拆分放进split_string里面，拆完后，不够八个格子的，使用空格填充上
     //拆分的算法，遇到一个/就把之前的字符串放进去
     //将拆分后的元素添加去的方法：header->add_split_string(拆分的字符串)
     int flag = 0 ;//用来标识此时split_string 里面有多少子串
@@ -1202,7 +1202,7 @@ void LatencyExperimentAppend() {
     {
       string temp1 = temp_from.substr(0,pos);//temp里面就是拆分出来的第一个子串
       string temp = temp1;//这个用来将子串填充至四个字节
-      for(int i=temp.size();i<4;i++)
+      for(int i=temp.size();i<5;i++)
       {
         temp = temp + " ";
       }
@@ -1215,12 +1215,12 @@ void LatencyExperimentAppend() {
     header->set_from_length(flag);
     while(flag != 8)
     {
-      string temp = "    ";//用四个空格填充一下
+      string temp = "     ";//用空格填充一下
       header->add_split_string_from(temp);//将拆出来的子串加到header里面去
       flag++;//拆分的字符串数量++     
     }
     int flag1 = 0;
-    //第二步：将to_path.data()拆分放进split_string里面，拆完后，不够八个格子的，使用四个空格填充上
+    //第二步：将to_path.data()拆分放进split_string里面，拆完后，不够八个格子的，使用空格填充上
     string temp_to = to_path.data(); 
     temp_to = temp_to.substr(1,temp_to.size());//这一行是为了去除最前面的/
     temp_to = temp_to + pattern ; //在最后面添加一个/便于处理
@@ -1229,7 +1229,7 @@ void LatencyExperimentAppend() {
     {
       string temp1 = temp_to.substr(0,pos1);//temp里面就是拆分出来的第一个子串
       string temp = temp1;
-      for(int i=temp.size();i<4;i++)
+      for(int i=temp.size();i<5;i++)
       {
         temp = temp + " ";
       }
@@ -1242,7 +1242,7 @@ void LatencyExperimentAppend() {
     header->set_to_length(flag1);
     while(flag1 != 8)
     {
-      string temp = "    ";//用四个空格填充一下
+      string temp = "     ";//用五个空格填充一下
       header->add_split_string_to(temp);//将拆出来的子串加到header里面去
       flag1++;//拆分的字符串数量++     
     }

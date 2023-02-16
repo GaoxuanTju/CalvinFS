@@ -480,7 +480,7 @@ void MetadataStore::getLOOKUP(string path)
       header->add_misc_string(top.c_str(), strlen(top.c_str()));
     //gaoxuan --在这里发出消息之前，把from_path.data()和to_path.data()拆分一下
 
-    //第一步：将from_path.data()拆分放进split_string里面，拆完后，不够八个格子的，使用四个空格填充上
+    //第一步：将from_path.data()拆分放进split_string里面，拆完后，不够八个格子的，使用空格填充上
     //拆分的算法，遇到一个/就把之前的字符串放进去
     //将拆分后的元素添加去的方法：header->add_split_string(拆分的字符串)
     int flag = 0 ;//用来标识此时split_string 里面有多少子串
@@ -494,7 +494,7 @@ void MetadataStore::getLOOKUP(string path)
     {
       string temp1 = temp_from.substr(0,pos);//temp里面就是拆分出来的第一个子串
       string temp = temp1;
-      for(int i = temp.size() ; i < 4 ; i++)
+      for(int i = temp.size() ; i < 5 ; i++)
       {
         temp = temp + " ";
       }
@@ -506,7 +506,7 @@ void MetadataStore::getLOOKUP(string path)
     header->set_from_length(flag);
     while(flag != 8)
     {
-      string temp = "    ";//用四个空格填充一下
+      string temp = "     ";//用五个空格填充一下
       header->add_split_string_from(temp);//将拆出来的子串加到header里面去
       flag++;//拆分的字符串数量++     
     }
@@ -605,7 +605,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
       header->add_misc_string(top.c_str(), strlen(top.c_str()));
     //gaoxuan --在这里发出消息之前，把from_path.data()和to_path.data()拆分一下
 
-    //第一步：将from_path.data()拆分放进split_string里面，拆完后，不够八个格子的，使用四个空格填充上
+    //第一步：将from_path.data()拆分放进split_string里面，拆完后，不够八个格子的，使用空格填充上
     //拆分的算法，遇到一个/就把之前的字符串放进去
     //将拆分后的元素添加去的方法：header->add_split_string(拆分的字符串)
     int flag = 0 ;//用来标识此时split_string 里面有多少子串
@@ -619,7 +619,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
     {
       string temp1 = temp_from.substr(0,pos);//temp里面就是拆分出来的第一个子串
       string temp = temp1;
-      for(int i = temp.size() ; i < 4 ; i++)
+      for(int i = temp.size() ; i < 5 ; i++)
       {
         temp = temp + " ";
       }
@@ -631,7 +631,7 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
     header->set_from_length(flag);
     while(flag != 8)
     {
-      string temp = "    ";//用四个空格填充一下
+      string temp = "     ";//用空格填充一下
       header->add_split_string_from(temp);//将拆出来的子串加到header里面去
       flag++;//拆分的字符串数量++     
     }
