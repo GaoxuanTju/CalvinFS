@@ -164,6 +164,7 @@ class CalvinFSClientApp : public App {
     temp->set_type(Header::RPC);
     temp->set_app(name());
     temp->set_rpc("SUMMARY_RENAME");
+    /*
     temp->add_misc_string(header->misc_string(0));
     temp->add_misc_string(header->misc_string(1));
     temp->set_from_length(header->from_length());
@@ -176,8 +177,8 @@ class CalvinFSClientApp : public App {
     {
       temp->add_split_string_to(header->split_string_to(i));
     }
-    //machine()->SendMessage(temp , new MessageBuffer());
-
+    machine()->SendMessage(temp , new MessageBuffer());
+*/
 
 
 
