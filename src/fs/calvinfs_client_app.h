@@ -157,9 +157,30 @@ class CalvinFSClientApp : public App {
      machine()->SendReplyMessage(header, RenameFile(
          header->misc_string(0),
          header->misc_string(1)));
-     // header->set_to(0);
-      //header->set_rpc("SUMMARY_RENAME");
-     // machine()->SendMessage(header, new MessageBuffer());
+    //用于发送汇总请求的地方
+    Header * temp = new Header();
+    temp->set_from(header->from());
+    temp->set_to(0);
+    temp->set_type(Header::RPC);
+    temp->set_app(name());
+    temp->set_rpc("SUMMARY_RENAME");
+    temp->add_misc_string(header->misc_string(0));
+    temp->add_misc_string(header->misc_string(1));
+    temp->set_from_length(header->from_length());
+    for(int i = 0; i < 8 ; i++)
+    {
+      temp->add_split_string_from(header->split_string_from(i));
+    }
+    temp->set_to_length(header->to_length());
+    for(int i = 0; i < 8 ; i++)
+    {
+      temp->add_split_string_to(header->split_string_to(i));
+    }
+    machine()->SendMessage(temp , new MessageBuffer());
+
+
+
+
     // Callback for recording latency stats
     } else if (header->rpc() == "CB") {
       double end = GetTime();
@@ -202,7 +223,7 @@ class CalvinFSClientApp : public App {
     }else if(header->rpc() == "SUMMARY_RENAME"){//gaoxuan --这里是我后添加的，为了汇总创建请求的内容
       string temp_from = header->misc_string(0);//这个是需要的源路径
       string temp_to = header->misc_string(1);
-    //  LOG(ERROR)<<machine()->machine_id()<<" SUMMMARY_RENAME: "<<temp_from<<"  to  "<<temp_to;
+      LOG(ERROR)<<machine()->machine_id()<<" SUMMMARY_RENAME: "<<temp_from<<"  to  "<<temp_to;
 
     }else if(header->rpc() == "SUMMARY_COPY"){//gaoxuan --这里是我后添加的，为了汇总创建请求的内容
       string temp_from = header->misc_string(0);//这个是需要的源路径
