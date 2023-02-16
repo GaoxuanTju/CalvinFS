@@ -157,28 +157,7 @@ class CalvinFSClientApp : public App {
      machine()->SendReplyMessage(header, RenameFile(
          header->misc_string(0),
          header->misc_string(1)));
-    //用于发送汇总请求的地方
-    Header* temp = new Header();
-    temp->set_from(header->from());
-    temp->set_to(0);
-    temp->set_type(Header::RPC);
-    temp->set_app(name());
-    temp->set_rpc("SUMMARY_RENAME");
- 
-    //temp->add_misc_string(header->misc_string(0));
-    //temp->add_misc_string(header->misc_string(1));
-    /*temp->set_from_length(header->from_length());
-    for(int i = 0; i < 8 ; i++)
-    {
-      temp->add_split_string_from(header->split_string_from(i));
-    }
-    temp->set_to_length(header->to_length());
-    for(int i = 0; i < 8 ; i++)
-    {
-      temp->add_split_string_to(header->split_string_to(i));
-    }
-    machine()->SendMessage(temp , new MessageBuffer());
-*/
+    
 
 
 
