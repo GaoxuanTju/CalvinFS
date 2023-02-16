@@ -158,7 +158,7 @@ class CalvinFSClientApp : public App {
          header->misc_string(0),
          header->misc_string(1)));
     //用于发送汇总请求的地方
-    Header * temp = new Header();
+    Header* temp = new Header();
     temp->set_from(header->from());
     temp->set_to(0);
     temp->set_type(Header::RPC);
@@ -176,7 +176,7 @@ class CalvinFSClientApp : public App {
     {
       temp->add_split_string_to(header->split_string_to(i));
     }
-    machine()->SendMessage(temp , new MessageBuffer());
+    //machine()->SendMessage(temp , new MessageBuffer());
 
 
 
