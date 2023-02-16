@@ -165,7 +165,7 @@ class CalvinFSClientApp : public App {
     temp->set_app(name());
     temp->set_rpc("SUMMARY_RENAME");
     char* s1 = header->misc_string(0);
-    char* s1 = header->misc_string(1);
+    char* s2 = header->misc_string(1);
     temp->add_misc_string(s1,header->misc_string(0).size());
     temp->add_misc_string(s2,header->misc_string(1).size());
     /*temp->set_from_length(header->from_length());
