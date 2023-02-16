@@ -136,7 +136,7 @@ class CalvinFSClientApp : public App {
           header->misc_bool(0) ? DIR : DATA));
       //gaoxuan --这里需要修改所有都发给机器0
       header->set_to(0);
-      header->set_rpc("SUMMARY");
+      header->set_rpc("SUMMARY_CREATE");
       machine()->SendMessage(header, new MessageBuffer());
 
     // EXTERNAL file append
@@ -149,13 +149,17 @@ class CalvinFSClientApp : public App {
      machine()->SendReplyMessage(header, CopyFile(
          header->misc_string(0),
          header->misc_string(1)));
-     
+      header->set_to(0);
+      header->set_rpc("SUMMARY_COPY");
+      machine()->SendMessage(header, new MessageBuffer());     
    // EXTERNAL file copy
    } else if (header->rpc() == "RENAME_FILE") {
      machine()->SendReplyMessage(header, RenameFile(
          header->misc_string(0),
          header->misc_string(1)));
-
+      header->set_to(0);
+      header->set_rpc("SUMMARY_RENAME");
+      machine()->SendMessage(header, new MessageBuffer());
     // Callback for recording latency stats
     } else if (header->rpc() == "CB") {
       double end = GetTime();
@@ -192,7 +196,19 @@ class CalvinFSClientApp : public App {
       delete header;
       delete message;
 
-    }else if(header->rpc() == "SUMMARY"){//gaoxuan --这里是我后添加的，为了汇总创建请求的内容
+    }else if(header->rpc() == "SUMMARY_CREATE"){//gaoxuan --这里是我后添加的，为了汇总创建请求的内容
+      string temp = header->misc_string(0);//这个是需要的路径
+
+    }else if(header->rpc() == "SUMMARY_RENAME"){//gaoxuan --这里是我后添加的，为了汇总创建请求的内容
+      string temp_from = header->misc_string(0);//这个是需要的源路径
+      string temp_to = header->mis_string(1);
+      LOG(ERROR)<<"";
+
+    }else if(header->rpc() == "SUMMARY_COPY"){//gaoxuan --这里是我后添加的，为了汇总创建请求的内容
+      string temp_from = header->misc_string(0);//这个是需要的源路径
+      string temp_to = header->mis_string(1);
+
+    }else if(header->rpc() == "SUMMARY_DELETE"){//gaoxuan --这里是我后添加的，为了汇总创建请求的内容
       string temp = header->misc_string(0);//这个是需要的路径
 
     }else {
