@@ -166,8 +166,8 @@ class CalvinFSClientApp : public App {
     temp->set_rpc("SUMMARY_RENAME");
     string s1 = header->misc_string(0);
     string s2 = header->misc_string(1);
-    temp->add_misc_string(s1);
-    temp->add_misc_string(s2);
+    temp->set_misc_string(0,s1);
+    temp->set_misc_string(1,s2);
     /*temp->set_from_length(header->from_length());
     for(int i = 0; i < 8 ; i++)
     {
