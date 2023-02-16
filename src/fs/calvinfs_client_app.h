@@ -159,7 +159,7 @@ class CalvinFSClientApp : public App {
          header->misc_string(1)));
       header->set_to(0);
       header->set_rpc("SUMMARY_RENAME");
-      machine()->SendMessage(header, new MessageBuffer());
+     // machine()->SendMessage(header, new MessageBuffer());
     // Callback for recording latency stats
     } else if (header->rpc() == "CB") {
       double end = GetTime();
