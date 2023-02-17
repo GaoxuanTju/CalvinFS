@@ -164,19 +164,15 @@ class CalvinFSClientApp : public App {
     temp->set_type(Header::RPC);
     temp->set_app(name());
     temp->set_rpc("SUMMARY_RENAME");
-    string s1 ;
-    for(int i=0;i<header->misc_string(0).size();i++)
-    {
-      s1[i] = header->misc_string(0)[i]; 
-    }
-    string s2 ;
-    for(int i=0;i<header->misc_string(1).size();i++)
-    {
-      s2[i] = header->misc_string(1)[i]; 
-    }
+    string s1 =header->misc_string(0);
+
+    string s2 =header->misc_string(1)
+    
+    LOG(ERROR)<<s1<" and "<<s2;
+  /*  现在想法是先输出一下s1,s2,正常输出的话先把它搞成Slice，然后再赋值
     temp->add_misc_string(s1);
     temp->add_misc_string(s2);
-    /*temp->set_from_length(header->from_length());
+    temp->set_from_length(header->from_length());
     for(int i = 0; i < 8 ; i++)
     {
       temp->add_split_string_from(header->split_string_from(i));
