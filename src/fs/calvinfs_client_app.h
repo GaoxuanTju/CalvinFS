@@ -166,8 +166,8 @@ class CalvinFSClientApp : public App {
     temp->set_rpc("SUMMARY_RENAME");
 
   
-    const Slice& from_path = s1;
-    const Slice& to_path = s2;
+    const Slice& from_path = header->misc_string(0);
+    const Slice& to_path = header->misc_string(1);
     temp->add_misc_string(from_path.data(),from_path.size());
     temp->add_misc_string(to_path.data(),to_path.size());
   /*   temp->set_from_length(header->from_length());
