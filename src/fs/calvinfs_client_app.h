@@ -167,11 +167,9 @@ class CalvinFSClientApp : public App {
     temp->set_app(name());
     temp->set_rpc("SUMMARY_RENAME");
 
-  
-    LOG(ERROR)<<s1<<" and "<<s2;
-  /*   temp->add_misc_string(from_path.data(),from_path.size());
-    temp->add_misc_string(to_path.data(),to_path.size());
-    temp->set_from_length(header->from_length());
+    temp->add_misc_string(s1);
+    temp->add_misc_string(s2);
+   /* temp->set_from_length(header->from_length());
     for(int i = 0; i < 8 ; i++)
     {
       temp->add_split_string_from(header->split_string_from(i));
@@ -180,9 +178,9 @@ class CalvinFSClientApp : public App {
     for(int i = 0; i < 8 ; i++)
     {
       temp->add_split_string_to(header->split_string_to(i));
-    }
+    }*/
     machine()->SendMessage(temp , new MessageBuffer());
-*/
+
 
 
 
