@@ -168,9 +168,9 @@ class CalvinFSClientApp : public App {
   
     const Slice& from_path = header->misc_string(0);
     const Slice& to_path = header->misc_string(1);
-    temp->add_misc_string(from_path.data(),from_path.size());
+  /*   temp->add_misc_string(from_path.data(),from_path.size());
     temp->add_misc_string(to_path.data(),to_path.size());
-  /*   temp->set_from_length(header->from_length());
+    temp->set_from_length(header->from_length());
     for(int i = 0; i < 8 ; i++)
     {
       temp->add_split_string_from(header->split_string_from(i));
