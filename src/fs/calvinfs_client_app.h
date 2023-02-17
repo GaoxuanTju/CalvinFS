@@ -168,7 +168,7 @@ class CalvinFSClientApp : public App {
     temp->set_rpc("SUMMARY_RENAME");
 
   
-
+    LOG(ERROR)<<s1<<" and "<<s2;
   /*   temp->add_misc_string(from_path.data(),from_path.size());
     temp->add_misc_string(to_path.data(),to_path.size());
     temp->set_from_length(header->from_length());
