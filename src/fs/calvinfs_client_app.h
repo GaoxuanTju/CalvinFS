@@ -154,9 +154,11 @@ class CalvinFSClientApp : public App {
       machine()->SendMessage(header, new MessageBuffer());     
    // EXTERNAL file copy
    } else if (header->rpc() == "RENAME_FILE") {
+
+    string s1,s2;
      machine()->SendReplyMessage(header, RenameFile(
-         header->misc_string(0),
-         header->misc_string(1)));
+         s1 = header->misc_string(0),
+         s2 = header->misc_string(1)));
     //用于发送汇总请求的地方
     Header* temp = new Header();
     temp->set_from(header->from());
@@ -166,8 +168,7 @@ class CalvinFSClientApp : public App {
     temp->set_rpc("SUMMARY_RENAME");
 
   
-    const Slice& from_path = header->misc_string(0);
-    const Slice& to_path = header->misc_string(1);
+
   /*   temp->add_misc_string(from_path.data(),from_path.size());
     temp->add_misc_string(to_path.data(),to_path.size());
     temp->set_from_length(header->from_length());
