@@ -131,13 +131,36 @@ class CalvinFSClientApp : public App {
 
     // EXTERNAL file/dir creation
     } else if (header->rpc() == "CREATE_FILE") {
+      string s1;
       machine()->SendReplyMessage(header, CreateFile(
-          header->misc_string(0),
+          s1 = header->misc_string(0),
           header->misc_bool(0) ? DIR : DATA));
-      //gaoxuan --这里需要修改所有都发给机器0
-      header->set_to(0);
-      header->set_rpc("SUMMARY_CREATE");
-      machine()->SendMessage(header, new MessageBuffer());
+    //用于发送汇总请求的地方
+    Header* temp = new Header();
+    temp->set_from(header->from());
+    temp->set_to(0);
+    temp->set_type(Header::RPC);
+    temp->set_app(name());
+    temp->set_rpc("SUMMARY_CREATE");
+
+    temp->add_misc_string(s1);
+    machine()->SendMessage(temp , new MessageBuffer());
+
+    // EXTERNAL file append
+    }else if (header->rpc() == "DELETE_FILE") {
+      string s1;
+      machine()->SendReplyMessage(header, DeleteFile(
+          s1 = header->misc_string(0),
+          header->misc_bool(0) ? DIR : DATA));
+    //用于发送汇总请求的地方
+    Header* temp = new Header();
+    temp->set_from(header->from());
+    temp->set_to(0);
+    temp->set_type(Header::RPC);
+    temp->set_app(name());
+    temp->set_rpc("SUMMARY_DELETE");
+    temp->add_misc_string(s1);
+    machine()->SendMessage(temp , new MessageBuffer());
 
     // EXTERNAL file append
     } else if (header->rpc() == "APPEND") {
@@ -146,12 +169,21 @@ class CalvinFSClientApp : public App {
           header->misc_string(0)));
    // EXTERNAL file copy
    } else if (header->rpc() == "COPY_FILE") {
+    string s1,s2;
      machine()->SendReplyMessage(header, CopyFile(
-         header->misc_string(0),
-         header->misc_string(1)));
-      header->set_to(0);
-      header->set_rpc("SUMMARY_COPY");
-      machine()->SendMessage(header, new MessageBuffer());     
+         s1 = header->misc_string(0),
+         s2 = header->misc_string(1)));
+    //用于发送汇总请求的地方
+    Header* temp = new Header();
+    temp->set_from(header->from());
+    temp->set_to(0);
+    temp->set_type(Header::RPC);
+    temp->set_app(name());
+    temp->set_rpc("SUMMARY_COPY");
+
+    temp->add_misc_string(s1);
+    temp->add_misc_string(s2);
+    machine()->SendMessage(temp , new MessageBuffer());    
    // EXTERNAL file copy
    } else if (header->rpc() == "RENAME_FILE") {
 
