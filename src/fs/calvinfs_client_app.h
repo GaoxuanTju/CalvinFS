@@ -168,7 +168,7 @@ class CalvinFSClientApp : public App {
 
     string s2 =header->misc_string(1);
     
-    LOG(ERROR)<<s1<" and "<<s2;
+    LOG(ERROR)<<s1<<" and "<<s2;
   /*  现在想法是先输出一下s1,s2,正常输出的话先把它搞成Slice，然后再赋值
     const Slice& from_path = s1;
     const Slice& to_path = s2;
