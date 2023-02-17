@@ -102,6 +102,8 @@ message CreateFileOutput {
 message EraseInput {
   required string path = 1;
   optional Permissions permissions = 2;
+    // Type of file to be deleted.
+  required FileType type = 3 [default = DATA];
 }
 message EraseOutput {
   optional bool success = 1 [default = true];
