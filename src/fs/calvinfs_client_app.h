@@ -66,7 +66,7 @@ class CalvinFSClientApp : public App {
 
     switch(experiment) {
       case 0:
-        FillExperiment();
+        FillExperiment();//create实验
         break;
 
       case 1:
@@ -78,12 +78,12 @@ class CalvinFSClientApp : public App {
         break;
 
       case 3:
-        CopyExperiment();
+        CopyExperiment();//copy实验
         break;
 
       case 4:
         
-        RenameExperiment();
+        RenameExperiment();//rename实验
         break;
 
       case 5:
@@ -108,6 +108,10 @@ class CalvinFSClientApp : public App {
 
       case 10:
         CrashExperiment();
+        break;
+      
+      case 11:
+        DeleteExperiment();
         break;
 
     }
@@ -242,7 +246,7 @@ class CalvinFSClientApp : public App {
     }else if(header->rpc() == "SUMMARY_RENAME"){//gaoxuan --这里是我后添加的，为了汇总创建请求的内容
       string temp_from = header->misc_string(0);//这个是需要的源路径
       string temp_to = header->misc_string(1);
-      LOG(ERROR)<<machine()->machine_id()<<" SUMMMARY_RENAME: "<<temp_from<<"  to  "<<temp_to;
+      LOG(ERROR)<<"machine ["<<machine()->machine_id()<<"] received rename request:"<<temp_from<<"  to  "<<temp_to;
 
     }else if(header->rpc() == "SUMMARY_COPY"){//gaoxuan --这里是我后添加的，为了汇总创建请求的内容
       string temp_from = header->misc_string(0);//这个是需要的源路径
@@ -290,6 +294,8 @@ class CalvinFSClientApp : public App {
                << "Created " << dirs * files << " files. Elapsed time: "
                << (GetTime() - start) << " seconds";
   }
+
+
 
   void ConflictingAppendExperiment() {
     int files = 2;
@@ -761,36 +767,6 @@ void LatencyExperimentAppend() {
         a2 = rand() % 1000;
       }
       
-      /*gaoxuan --the path used for testing if we can only rename file correctly
-      string from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1) + "/c" + IntToString(j);
-      to_path = "/a" + IntToString(rand() % machine()->config().size()) + "/b" + IntToString(a1) + "/d" + IntToString(machine()->GetGUID());
-      LOG(ERROR)<<from_path <<"  renamed to   "<<to_path;
-      BackgroundRenameFile(from_path,
-                           to_path);*/
-                        
-      /*gaoxuan --the path used for testing if we can rename dir in different parent dir
-      string from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1+1);
-      to_path = "/a" + IntToString((machine()->machine_id()+1)%2) + "/d" + IntToString(machine()->GetGUID());
-      LOG(ERROR)<<from_path <<"  renamed to   "<<to_path;
-      BackgroundRenameFile(from_path,to_path) ;*/
-
-      /*gaoxuan --the path used for testing if we can rename dir in same parent dir
-      string from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1+1);
-      to_path = "/a" + IntToString(machine()->machine_id()) + "/d" + IntToString(machine()->GetGUID());
-      LOG(ERROR)<<from_path <<"  renamed to   "<<to_path;
-      BackgroundRenameFile(from_path,to_path) ;*/
-      
-      
-      /*gaoxuan --the path used for testing if we can rename dir to root dir
-      string from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1+1);
-      to_path = "/d" + IntToString(machine()->GetGUID());
-      LOG(ERROR)<<from_path <<"  renamed to   "<<to_path;
-      BackgroundRenameFile(from_path,to_path) ;*/
-
-      
-      /*from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1); 
-      to_path = "/a" + IntToString(rand() % machine()->config().size()) + "/d" + IntToString(machine()->GetGUID());*/
-
       string from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1) + "/c" + IntToString(j);
       string to_path = "/a" + IntToString(rand() % machine()->config().size()) + "/b" + IntToString(a1) + "/d" + IntToString(machine()->GetGUID());
       uint64 from_id = config_->LookupMetadataShard(config_->HashFileName(from_path),config_->LookupReplica(machine()->machine_id()));
@@ -815,7 +791,7 @@ void LatencyExperimentAppend() {
     
     // Report.
     
-    LOG(ERROR) << "Renamed " <<  "250 files. Elapsed time:"
+    LOG(ERROR) << "Renamed " <<  "10 files. Elapsed time:"
                << (GetTime() - start) << " seconds";
     
 
@@ -826,6 +802,33 @@ void LatencyExperimentAppend() {
 
 
   }
+    void DeleteExperiment() {//gaoxuan --删除文件的实验
+    Spin(1);
+    metadata_->Init();
+    Spin(1);
+    machine()->GlobalBarrier();
+    Spin(1);
+
+    double start = GetTime();
+    string from_path;
+    for (int j = 0; j < 10; j++) {
+      int a1 = rand() % 1000;
+      
+      string from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1) + "/c" + IntToString(j);
+      BackgroundDeleteFile(from_path);
+      LOG(ERROR) << "[" << machine()->machine_id() << "] "
+                 << "Deleted file " << from_path ;
+    }
+    // Wait for all operations to finish.
+    while (capacity_.load() < kMaxCapacity) {
+      usleep(10);
+    }
+    // Report.
+    LOG(ERROR) << "[" << machine()->machine_id() << "] "
+               << "Deleted " << 10 << " files. Elapsed time: "
+               << (GetTime() - start) << " seconds";
+  }
+
 
   void LatencyExperimentRenameFile() {
     
@@ -902,6 +905,7 @@ void LatencyExperimentAppend() {
   MessageBuffer* LS(const Slice& path);
   MessageBuffer* CopyFile(const Slice& from_path, const Slice& to_path);
   MessageBuffer* RenameFile(const Slice& from_path, const Slice& to_path);
+  MessageBuffer* DeleteFile(const Slice$ delete_path, FileType type = DATA);
 
   void BackgroundCreateFile(const Slice& path, FileType type = DATA) {
     Header* header = new Header();
@@ -963,6 +967,68 @@ void LatencyExperimentAppend() {
     }
     machine()->SendMessage(header, new MessageBuffer());
   }
+  void BackgroundDeleteFile(const Slice& path, FileType type = DATA) {
+
+    Header* header = new Header();
+    header->set_from(machine()->machine_id());
+    header->set_to(machine()->machine_id());
+    header->set_type(Header::RPC);
+    header->set_app(name());
+    header->set_rpc("DELETE_FILE");
+    header->add_misc_bool(type == DIR);  // DIR = true, DATA = false
+    header->add_misc_string(path.data(), path.size());
+    //gaoxuan --在这里发出消息之前，把from_path.data()和to_path.data()拆分一下
+
+    //第一步：将from_path.data()拆分放进split_string里面，拆完后，不够八个格子的，使用五个空格填充上
+    //拆分的算法，遇到一个/就把之前的字符串放进去
+    //将拆分后的元素添加去的方法：header->add_split_string(拆分的字符串)
+    int flag = 0 ;//用来标识此时split_string 里面有多少子串
+    char pattern = '/' ;//根据/进行字符串拆分
+
+    string temp_from = path.data(); 
+    temp_from = temp_from.substr(1,temp_from.size());//这一行是为了去除最前面的/
+    temp_from = temp_from + pattern ; //在最后面添加一个/便于处理
+    int pos = temp_from.find(pattern);//找到第一个/的位置
+    while(pos != std::string::npos)//循环不断找/，找到一个拆分一次
+    {
+      string temp1 = temp_from.substr(0,pos);//temp里面就是拆分出来的第一个子串
+      string temp = temp1;
+      for(int i = temp.size() ; i < 5 ; i++)
+      {
+        temp = temp + " ";
+      }
+      header->add_split_string_from(temp);//将拆出来的子串加到header里面去
+      flag++;//拆分的字符串数量++
+      temp_from = temp_from.substr(pos+1,temp_from.size());
+      pos = temp_from.find(pattern);
+    }
+    //现在flag中存放的就是子串的数量
+    header->set_from_length(flag);//设置拆分后的实际子串占据的格子数量
+    while(flag != 8)
+    {
+      string temp = "     ";//用五个空格填充一下
+      header->add_split_string_from(temp);//将拆出来的子串加到header里面去
+      flag++;//拆分的字符串数量++     
+    }
+
+    //这一行之前是gaoxuan添加的
+
+    if (reporting_ && rand() % 2 == 0) {
+      header->set_callback_app(name());
+      header->set_callback_rpc("CB");
+      header->add_misc_string((type == DIR) ? "mkdir" : "touch");
+      header->add_misc_double(GetTime());
+    } else {
+      header->set_ack_counter(reinterpret_cast<uint64>(&capacity_));
+      while (capacity_.load() <= 0) {
+        // Wait for some old operations to complete.
+        usleep(100);
+      }
+      --capacity_;
+    }
+    machine()->SendMessage(header, new MessageBuffer());
+  }
+
 
   void BackgroundAppendStringToFile(const Slice& data, const Slice& path) {
     Header* header = new Header();

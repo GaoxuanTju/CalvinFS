@@ -133,6 +133,48 @@ MessageBuffer *CalvinFSClientApp::CreateFile(const Slice &path, FileType type)
     return new MessageBuffer(new string("error creating file/dir\n"));
   }
 }
+MessageBuffer *CalvinFSClientApp::DeleteFile(const Slice &path, FileType type)
+{
+  string channel_name = "action-result-" + UInt64ToString(machine()->GetGUID());
+  auto channel = machine()->DataChannel(channel_name);
+  CHECK(!channel->Pop(NULL));
+
+  Action *a = new Action();
+  a->set_client_machine(machine()->machine_id());
+  a->set_client_channel(channel_name);
+  a->set_action_type(MetadataAction::ERASE);
+  MetadataAction::EraseInput in;
+  in.set_path(path.data(), path.size());
+  in.set_type(type);
+  in.SerializeToString(a->mutable_input());
+  metadata_->GetRWSets(a);
+  log_->Append(a);
+
+  MessageBuffer *m = NULL;
+  while (!channel->Pop(&m))
+  {
+    // Wait for action to complete and be sent back.
+    usleep(100);
+  }
+
+  Action result;
+  result.ParseFromArray((*m)[0].data(), (*m)[0].size());
+  delete m;
+  MetadataAction::AppendOutput out;
+  out.ParseFromString(result.output());
+
+
+  if (out.success())
+  {
+    
+    return new MessageBuffer();
+  }
+  else
+  {
+    return new MessageBuffer(new string("error deleting file/dir\n"));
+  }
+}
+
 
 MessageBuffer *CalvinFSClientApp::AppendStringToFile(
     const Slice &data,
