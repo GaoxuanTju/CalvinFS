@@ -491,7 +491,7 @@ void MetadataStore::Init(BTNode *dir_tree) {
         string file_("c" + IntToString(k));
         BTNode *temp_c = new BTNode;
         temp_c->child = NULL;
-        temp_c->path = file;
+        temp_c->path = file_;
         temp_c->sibling = NULL;
         if(k ==0)
         {
