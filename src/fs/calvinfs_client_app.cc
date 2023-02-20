@@ -386,3 +386,25 @@ MessageBuffer *CalvinFSClientApp::RenameFile(const Slice &from_path, const Slice
     return new MessageBuffer(new string("error creating file/dir\n"));
   }
 }
+void CalvinFSClientApp::rename_dir_tree(BTNode *dir_tree, string from_path,string to_path)
+{
+  //这个函数用于根据from_path和to_path操作一下dir_tree这个目录树
+  /*
+  要写这个逻辑需要干的事：
+  1、找到from_path的位置，如果是第一个孩子，就让父亲节点指向他的兄弟，如果是兄弟，就让上一个兄弟指向下一个兄弟
+  2、找到to_path的位置，突发想到，还是存相对路径吧，如果存绝对路劲，那么他的所有子目录和文件都要重新遍历修改path的值
+  */
+}
+void CalvinFSClientApp::copy_dir_tree(BTNode *dir_tree, string from_path, string to_path)
+{
+
+}
+void CalvinFSClientApp::create_dir_tree(BTNode *dir_tree, string path)
+{
+
+}
+void CalvinFSClientApp::delete_dir_tree(BTNode *dir_tree, string path)
+{
+
+}
+

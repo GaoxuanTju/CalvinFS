@@ -419,10 +419,10 @@ void MetadataStore::Init(BTNode *dir_tree) {
   // Add dirs.
   for (int i = 0; i < asize; i++) {
     string dir("/a" + IntToString(i));
-
+    string dir_("a" + IntToString(i));
     BTNode *temp_a = new BTNode;
     temp_a->child = NULL;
-    temp_a->path = dir;
+    temp_a->path = dir_;
     temp_a->sibling = NULL;
     
     if(i == 0)
@@ -455,9 +455,10 @@ void MetadataStore::Init(BTNode *dir_tree) {
     BTNode* b_level = NULL;//这个就指向该层第二个节点
     for (int j = 0; j < bsize; j++) {
       string subdir(dir + "/b" + IntToString(j));
+      string subdir_("b" + IntToString(j));
       BTNode *temp_b = new BTNode;
       temp_b->child = NULL;
-      temp_b->path = subdir;
+      temp_b->path = subdir_;
       temp_b->sibling = NULL;
 
       if(j == 0)
@@ -487,6 +488,7 @@ void MetadataStore::Init(BTNode *dir_tree) {
       BTNode* c_level = NULL;//这个就指向该层第三个节点
       for (int k = 0; k < csize; k++) {
         string file(subdir + "/c" + IntToString(k));
+        string file_("c" + IntToString(k));
         BTNode *temp_c = new BTNode;
         temp_c->child = NULL;
         temp_c->path = file;

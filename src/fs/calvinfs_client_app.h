@@ -151,6 +151,23 @@ class CalvinFSClientApp : public App {
     machine()->SendMessage(temp , new MessageBuffer());
 
     // EXTERNAL file append
+    } else if (header->rpc() == "DELETE_FILE") {
+      string s1;
+      machine()->SendReplyMessage(header, DeleteFile(
+          s1 = header->misc_string(0),
+          header->misc_bool(0) ? DIR : DATA));
+    //用于发送汇总请求的地方
+    Header* temp = new Header();
+    temp->set_from(header->from());
+    temp->set_to(0);
+    temp->set_type(Header::RPC);
+    temp->set_app(name());
+    temp->set_rpc("SUMMARY_DELETE");
+
+    temp->add_misc_string(s1);
+    machine()->SendMessage(temp , new MessageBuffer());
+
+    // EXTERNAL file append
     }else if (header->rpc() == "APPEND") {
       machine()->SendReplyMessage(header, AppendStringToFile(
           (*message)[0],
@@ -897,6 +914,11 @@ void LatencyExperimentAppend() {
     }
   }
 
+
+  void rename_dir_tree(BTNode *dir_tree, string from_path,string to_path);
+  void copy_dir_tree(BTNode *dir_tree, string from_path, string to_path);
+  void create_dir_tree(BTNode *dir_tree, string path);
+  void delete_dir_tree(BTNode *dir_tree, string path);
   // Caller takes ownership of returned MessageBuffers.
   // Returns serialized MetadataEntry protobuf.
   MessageBuffer* GetMetadataEntry(const Slice& path);
