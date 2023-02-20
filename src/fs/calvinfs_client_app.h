@@ -1407,14 +1407,14 @@ void LatencyExperimentAppend() {
   }
 
   //gaoxuan --这个函数用来输出一下目录树
-  void preorder(BTNode *root,string path)
+  void preorder(BTNode *root, string path)
   {
     if(root != NULL)
     {
-      string s = path + root->path;
+      string s = path + root->path
       LOG(ERROR)<<s;
-      preorder(root->sibling, s);
-      preorder(root->child, s);
+      preorder(root->sibling,path);
+      preorder(root->child,s+"/");
     }
   }
   void print_dir_tree(BTNode *dir_tree)
@@ -1425,7 +1425,7 @@ void LatencyExperimentAppend() {
     }
     else
     {
-      preorder(dir_tree, "/");
+      preorder(dir_tree, "");
     }
     //采用先序遍历就好，不过是先遍历右子树那种方式
   }
