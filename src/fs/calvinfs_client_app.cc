@@ -546,7 +546,7 @@ void CalvinFSClientApp::copy_dir_tree(BTNode *dir_tree, string from_path, string
       {
         return; // 有同名文件
       }
-      check = check->sibling
+      check = check->sibling;
     }
 
     // 经过了上面的筛查，证明下一级没有同名文件，我们接下来需要创建需要拷贝的目录子树
