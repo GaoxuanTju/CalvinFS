@@ -919,7 +919,7 @@ void LatencyExperimentAppend() {
   void copy_dir_tree(BTNode *dir_tree, string from_path, string to_path);
   void create_dir_tree(BTNode *dir_tree, string path);
   void delete_dir_tree(BTNode *dir_tree, string path);
-  void find_path(BTNode *dir_tree, string path, BTNode *pre);
+  BTNode* find_path(BTNode *dir_tree, string path, BTNode *pre);
   // Caller takes ownership of returned MessageBuffers.
   // Returns serialized MetadataEntry protobuf.
   MessageBuffer* GetMetadataEntry(const Slice& path);
@@ -1413,8 +1413,8 @@ void LatencyExperimentAppend() {
     {
       string s = path + root->path;
       LOG(ERROR)<<s;
-      preorder(root->sibling);
-      preorder(root->child);
+      preorder(root->sibling, s);
+      preorder(root->child, s);
     }
   }
   void print_dir_tree(BTNode *dir_tree)

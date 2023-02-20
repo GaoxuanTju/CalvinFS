@@ -454,9 +454,9 @@ void CalvinFSClientApp::rename_dir_tree(BTNode *dir_tree, string from_path, stri
 {
   // 这个函数用于根据from_path和to_path操作一下dir_tree这个目录树
   //  1、找：找到from，to路径的位置
-  BTNode *from_pre;
+  BTNode *from_pre = NULL;
   BTNode *from = find_path(dir_tree, from_path, from_pre);
-  BTNode *to_pre;
+  BTNode *to_pre = NULL;
   //这块不对，不能直接把to_path放进去，因为可能rename到一个新位置，最次也得放ParentDir(to_path)
   int pos = to_path.rfind('/');
   string parent_to_path = to_path.substr(0,pos);
