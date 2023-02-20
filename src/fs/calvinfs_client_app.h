@@ -919,6 +919,7 @@ void LatencyExperimentAppend() {
   void copy_dir_tree(BTNode *dir_tree, string from_path, string to_path);
   void create_dir_tree(BTNode *dir_tree, string path);
   void delete_dir_tree(BTNode *dir_tree, string path);
+  void find_path(BTNode *dir_tree, string path, BTNode *pre);
   // Caller takes ownership of returned MessageBuffers.
   // Returns serialized MetadataEntry protobuf.
   MessageBuffer* GetMetadataEntry(const Slice& path);
@@ -1406,11 +1407,12 @@ void LatencyExperimentAppend() {
   }
 
   //gaoxuan --这个函数用来输出一下目录树
-  void preorder(BTNode *root)
+  void preorder(BTNode *root,string path)
   {
     if(root != NULL)
     {
-      LOG(ERROR)<<root->path;
+      string s = path + root->path;
+      LOG(ERROR)<<s;
       preorder(root->sibling);
       preorder(root->child);
     }
@@ -1423,7 +1425,7 @@ void LatencyExperimentAppend() {
     }
     else
     {
-      preorder(dir_tree);
+      preorder(dir_tree, "/");
     }
     //采用先序遍历就好，不过是先遍历右子树那种方式
   }

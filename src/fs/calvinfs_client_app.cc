@@ -5,8 +5,6 @@
 #include "fs/calvinfs_client_app.h"
 #include "machine/app/app.h"
 
-
-
 REGISTER_APP(CalvinFSClientApp)
 {
   return new CalvinFSClientApp();
@@ -27,9 +25,9 @@ MessageBuffer *CalvinFSClientApp::GetMetadataEntry(const Slice &path)
     MetadataAction::LookupInput in;
     in.set_path(path.data(), path.size());
 
-    a.set_version(1000000000);//gaoxuan --this line is very important for LOOKUP
+    a.set_version(1000000000); // gaoxuan --this line is very important for LOOKUP
     in.SerializeToString(a.mutable_input());
-    metadata_->GetRWSets(&a); 
+    metadata_->GetRWSets(&a);
     metadata_->Run(&a);
     return new MessageBuffer(a);
 
@@ -44,41 +42,40 @@ MessageBuffer *CalvinFSClientApp::GetMetadataEntry(const Slice &path)
     header->set_app(name());
     header->set_rpc("LOOKUP");
     header->add_misc_string(path.data(), path.size());
-    //gaoxuan --在这里发出消息之前，把from_path.data()和to_path.data()拆分一下
+    // gaoxuan --在这里发出消息之前，把from_path.data()和to_path.data()拆分一下
 
-    //第一步：将from_path.data()拆分放进split_string里面，拆完后，不够八个格子的，使用五个空格填充上
-    //拆分的算法，遇到一个/就把之前的字符串放进去
-    //将拆分后的元素添加去的方法：header->add_split_string(拆分的字符串)
-    int flag = 0 ;//用来标识此时split_string 里面有多少子串
-    char pattern = '/' ;//根据/进行字符串拆分
+    // 第一步：将from_path.data()拆分放进split_string里面，拆完后，不够八个格子的，使用五个空格填充上
+    // 拆分的算法，遇到一个/就把之前的字符串放进去
+    // 将拆分后的元素添加去的方法：header->add_split_string(拆分的字符串)
+    int flag = 0;       // 用来标识此时split_string 里面有多少子串
+    char pattern = '/'; // 根据/进行字符串拆分
 
-    string temp_from = path.data(); 
-    temp_from = temp_from.substr(1,temp_from.size());//这一行是为了去除最前面的/
-    temp_from = temp_from + pattern ; //在最后面添加一个/便于处理
-    int pos = temp_from.find(pattern);//找到第一个/的位置
-    while(pos != std::string::npos)//循环不断找/，找到一个拆分一次
+    string temp_from = path.data();
+    temp_from = temp_from.substr(1, temp_from.size()); // 这一行是为了去除最前面的/
+    temp_from = temp_from + pattern;                   // 在最后面添加一个/便于处理
+    int pos = temp_from.find(pattern);                 // 找到第一个/的位置
+    while (pos != std::string::npos)                   // 循环不断找/，找到一个拆分一次
     {
-      string temp1 = temp_from.substr(0,pos);//temp里面就是拆分出来的第一个子串
+      string temp1 = temp_from.substr(0, pos); // temp里面就是拆分出来的第一个子串
       string temp = temp1;
-      for(int i = temp.size() ; i < 5 ; i++)
+      for (int i = temp.size(); i < 5; i++)
       {
         temp = temp + " ";
       }
-      header->add_split_string_from(temp);//将拆出来的子串加到header里面去
-      flag++;//拆分的字符串数量++
-      temp_from = temp_from.substr(pos+1,temp_from.size());
+      header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+      flag++;                              // 拆分的字符串数量++
+      temp_from = temp_from.substr(pos + 1, temp_from.size());
       pos = temp_from.find(pattern);
     }
     header->set_from_length(flag);
-    while(flag != 8)
+    while (flag != 8)
     {
-      string temp = "     ";//用五个空格填充一下
-      header->add_split_string_from(temp);//将拆出来的子串加到header里面去
-      flag++;//拆分的字符串数量++     
+      string temp = "     ";               // 用五个空格填充一下
+      header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+      flag++;                              // 拆分的字符串数量++
     }
 
-    //这一行之前是gaoxuan添加的
-
+    // 这一行之前是gaoxuan添加的
 
     MessageBuffer *m = NULL;
     header->set_data_ptr(reinterpret_cast<uint64>(&m));
@@ -122,10 +119,9 @@ MessageBuffer *CalvinFSClientApp::CreateFile(const Slice &path, FileType type)
   MetadataAction::AppendOutput out;
   out.ParseFromString(result.output());
 
-
   if (out.success())
   {
-    
+
     return new MessageBuffer();
   }
   else
@@ -162,7 +158,7 @@ MessageBuffer *CalvinFSClientApp::DeleteFile(const Slice &path, FileType type)
   out.ParseFromString(result.output());
   if (out.success())
   {
-    
+
     return new MessageBuffer();
   }
   else
@@ -170,7 +166,6 @@ MessageBuffer *CalvinFSClientApp::DeleteFile(const Slice &path, FileType type)
     return new MessageBuffer(new string("error deleting file/dir\n"));
   }
 }
-
 
 MessageBuffer *CalvinFSClientApp::AppendStringToFile(
     const Slice &data,
@@ -344,24 +339,24 @@ MessageBuffer *CalvinFSClientApp::CopyFile(const Slice &from_path, const Slice &
 }
 
 MessageBuffer *CalvinFSClientApp::RenameFile(const Slice &from_path, const Slice &to_path)
-{ 
+{
   uint64 distinct_id = machine()->GetGUID();
   string channel_name = "action-result-" + UInt64ToString(distinct_id);
   auto channel = machine()->DataChannel(channel_name);
   CHECK(!channel->Pop(NULL));
- 
+
   Action *a = new Action();
   a->set_client_machine(machine()->machine_id());
-  a->set_client_channel(channel_name);        
-  a->set_action_type(MetadataAction::RENAME); 
-  
+  a->set_client_channel(channel_name);
+  a->set_action_type(MetadataAction::RENAME);
+
   MetadataAction::RenameInput in;
   in.set_from_path(from_path.data(), from_path.size());
   in.set_to_path(to_path.data(), to_path.size());
   in.SerializeToString(a->mutable_input());
   metadata_->setAPPname(name()); // gaoxuan --this line is added by me which is uesd to getAPPname in metadata_store.cc
   metadata_->GetRWSets(a);
- 
+
   log_->Append(a);
 
   MessageBuffer *m = NULL;
@@ -376,7 +371,7 @@ MessageBuffer *CalvinFSClientApp::RenameFile(const Slice &from_path, const Slice
   delete m;
   MetadataAction::RenameOutput out;
   out.ParseFromString(result.output());
-  
+
   if (out.success())
   {
     return new MessageBuffer();
@@ -386,25 +381,127 @@ MessageBuffer *CalvinFSClientApp::RenameFile(const Slice &from_path, const Slice
     return new MessageBuffer(new string("error creating file/dir\n"));
   }
 }
-void CalvinFSClientApp::rename_dir_tree(BTNode *dir_tree, string from_path,string to_path)
+
+BTNode* CalvinFSClientApp::find_path(BTNode *dir_tree, string path, BTNode *pre)
 {
-  //这个函数用于根据from_path和to_path操作一下dir_tree这个目录树
-  /*
-  要写这个逻辑需要干的事：
-  1、找到from_path的位置，如果是第一个孩子，就让父亲节点指向他的兄弟，如果是兄弟，就让上一个兄弟指向下一个兄弟
-  2、找到to_path的位置，突发想到，还是存相对路径吧，如果存绝对路劲，那么他的所有子目录和文件都要重新遍历修改path的值
-  */
+  BTNode *temp = dir_tree->child;
+  pre = dir_tree;
+
+  char pattern = '/';
+  string split_string = path;
+  split_string = split_string + pattern; // 最后加个/便于处理
+  while (temp != NULL && split_string != "")
+  {
+    split_string = split_string.substr(1, split_string.size()); // 去除最前的/
+    int pos = split_string.find(pattern);
+    string first_substr = split_string.substr(0, pos);
+    split_string = split_string.substr(pos + 1, split_string.size());
+    // 前面是拆分路径的逻辑
+    if (temp->path == first_substr)
+    {
+      if (split_string == "")
+      {
+        break; // 查找到了
+      }
+      pre = temp;
+      temp = temp->child;
+    }
+    else
+    {
+      // 如果没有直接找到，那么就去不断看兄弟，直到找到或者没有兄弟为止，没有兄弟还没找到，失败。直接return
+      pre = temp;
+      temp = temp->sibling;
+      while (temp != NULL)
+      {
+        if (temp->path == split_string)
+        {
+          break;
+        }
+        else
+        {
+          pre = temp;
+          temp = temp->sibling;
+        }
+      }
+
+      if (temp == NULL)
+      {
+        pre = NULL;
+        return NULL;
+      }
+      else
+      {
+        if (split_string == "")
+        {
+          break; // 查找到了
+        }
+        pre = temp;
+        temp = temp->child;
+      }
+    }
+  }
+  if (temp == NULL)
+  {
+    pre = NULL;
+    return NULL;
+  }
+  else
+  {
+    return temp;
+  }
+}
+void CalvinFSClientApp::rename_dir_tree(BTNode *dir_tree, string from_path, string to_path)
+{
+  // 这个函数用于根据from_path和to_path操作一下dir_tree这个目录树
+  //  1、找：找到from，to路径的位置
+  BTNode *from_pre;
+  BTNode *from = find_path(dir_tree, from_path, from_pre);
+  BTNode *to_pre;
+  //这块不对，不能直接把to_path放进去，因为可能rename到一个新位置，最次也得放ParentDir(to_path)
+  int pos = to_path.rfind('/');
+  string parent_to_path = to_path.substr(0,pos);
+  BTNode *to = find_path(dir_tree, parent_to_path, to_pre);
+  if(from != NULL && to != NULL)
+  {
+      //2、改：对from_path的节点，需要根据to_path的路径先修改名字，再修改指向
+    /*
+      from现在存储源路径的节点；from_pre是指向它的节点
+      to现在存储目的路径的父目录的节点
+
+      我们要做的
+      （1）
+      先判断一下是from_pre的child还是sibling指向from,确定后
+      将from_pre指向from->sibling;
+      （2）
+      将to->child指向from,from->sibling指向to_child,类似于一个头插法
+    */  
+      if(from_pre->child->path == from_path)
+      {
+        from_pre->child = from->sibling;
+      }
+      else
+      {
+        from_pre->sibling = from->sibling;
+      }
+      
+      from->sibling = to->child;
+      to->child = from;
+
+
+  }
+  else
+  {
+    return;
+  }
+
+
 }
 void CalvinFSClientApp::copy_dir_tree(BTNode *dir_tree, string from_path, string to_path)
 {
-
 }
 void CalvinFSClientApp::create_dir_tree(BTNode *dir_tree, string path)
 {
-
 }
 void CalvinFSClientApp::delete_dir_tree(BTNode *dir_tree, string path)
 {
-
 }
-
