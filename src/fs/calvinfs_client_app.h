@@ -1414,7 +1414,15 @@ void LatencyExperimentAppend() {
       string s = path + root->path;
       LOG(ERROR)<<s;
       preorder(root->sibling,path);
-      preorder(root->child,s+"/");
+      if(s == "/")
+      {
+        preorder(root->child,s);
+      }
+      else
+      {
+        preorder(root->child,s+"/");        
+      }
+
     }
   }
   void print_dir_tree(BTNode *dir_tree)
@@ -1425,7 +1433,7 @@ void LatencyExperimentAppend() {
     }
     else
     {
-      preorder(dir_tree, "");
+      preorder(dir_tree, "/");
     }
     //采用先序遍历就好，不过是先遍历右子树那种方式
   }

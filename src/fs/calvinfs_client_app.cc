@@ -10,6 +10,31 @@ REGISTER_APP(CalvinFSClientApp)
   return new CalvinFSClientApp();
 }
 
+BTNode *copy_create(BTNode *from)
+{
+  if (from == NULL)
+  {
+    return NULL;
+  }
+  BTNode *lchild = copy_create(from->child);
+  BTNode *rchild = copy_create(from->sibling);
+  BTNode *newnode = new BTNode;
+  newnode->path = from->path;
+  newnode->child = lchild;
+  newnode->sibling = rchild;
+  return newnode;
+}
+
+void delete_tree(BTNode *&root)
+{
+  if (root == NULL)
+  {
+    return;
+  }
+  delete_tree(root->child);
+  delete_tree(root->sibling);
+  delete root;
+}
 MessageBuffer *CalvinFSClientApp::GetMetadataEntry(const Slice &path)
 {
   // Find out what machine to run this on.
@@ -382,7 +407,7 @@ MessageBuffer *CalvinFSClientApp::RenameFile(const Slice &from_path, const Slice
   }
 }
 
-BTNode* CalvinFSClientApp::find_path(BTNode *dir_tree, string path, BTNode *pre)
+BTNode *CalvinFSClientApp::find_path(BTNode *dir_tree, string path, BTNode *pre)
 {
   BTNode *temp = dir_tree->child;
   pre = dir_tree;
@@ -457,13 +482,13 @@ void CalvinFSClientApp::rename_dir_tree(BTNode *dir_tree, string from_path, stri
   BTNode *from_pre = NULL;
   BTNode *from = find_path(dir_tree, from_path, from_pre);
   BTNode *to_pre = NULL;
-  //这块不对，不能直接把to_path放进去，因为可能rename到一个新位置，最次也得放ParentDir(to_path)
+  // 这块不对，不能直接把to_path放进去，因为可能rename到一个新位置，最次也得放ParentDir(to_path)
   int pos = to_path.rfind('/');
-  string parent_to_path = to_path.substr(0,pos);
+  string parent_to_path = to_path.substr(0, pos);
   BTNode *to = find_path(dir_tree, parent_to_path, to_pre);
-  if(from != NULL && to != NULL)
+  if (from != NULL && to != NULL)
   {
-      //2、改：对from_path的节点，需要根据to_path的路径先修改名字，再修改指向
+    // 2、改：对from_path的节点，需要根据to_path的路径先修改名字，再修改指向
     /*
       from现在存储源路径的节点；from_pre是指向它的节点
       to现在存储目的路径的父目录的节点
@@ -474,34 +499,126 @@ void CalvinFSClientApp::rename_dir_tree(BTNode *dir_tree, string from_path, stri
       将from_pre指向from->sibling;
       （2）
       将to->child指向from,from->sibling指向to_child,类似于一个头插法
-    */  
-      if(from_pre->child->path == from_path)
-      {
-        from_pre->child = from->sibling;
-      }
-      else
-      {
-        from_pre->sibling = from->sibling;
-      }
-      
-      from->sibling = to->child;
-      to->child = from;
+    */
+    if (from_pre->child->path == from_path)
+    {
+      from_pre->child = from->sibling;
+    }
+    else
+    {
+      from_pre->sibling = from->sibling;
+    }
 
-
+    from->sibling = to->child;
+    to->child = from;
   }
   else
   {
     return;
   }
-
-
 }
 void CalvinFSClientApp::copy_dir_tree(BTNode *dir_tree, string from_path, string to_path)
 {
+  /*
+  copy的本质，是把一个地方的目录树，粘贴到另一个位置，是完整的粘贴，不能光修改指针
+  所以分三步：
+  1、找：找到原位置指针，目的位置的父指针
+  2、查：看目的位置的孩子中是否存在同名，存在失败，不存在下一步
+  3、复制：根据原位置指针，一次拷贝，只用拷贝原位置指针的孩子就行
+  4、改类似，一个头插法
+  */
+
+  // 1、找
+  BTNode *from_pre = NULL;
+  BTNode *from = find_path(dir_tree, from_path, from_pre);
+  BTNode *to_pre = NULL;
+  int pos = to_path.rfind('/');
+  string parent_to_path = to_path.substr(0, pos);
+  BTNode *to = find_path(dir_tree, parent_to_path, to_pre);
+  if (from != NULL && to != NULL)
+  {
+    // 2、查：查看目的为止的孩子是否存在同名文件
+    string filename = to_path.substr(pos + 1);
+    BTNode *check = to->child;
+    while (check != NULL)
+    {
+      if (check->path == filename)
+      {
+        return; // 有同名文件
+      }
+      check = check->sibling
+    }
+
+    // 经过了上面的筛查，证明下一级没有同名文件，我们接下来需要创建需要拷贝的目录子树
+
+    // 3、复制建立，需要从from这个指针开始，将其下的目录子树全盘拷贝下来，先序遍历
+    BTNode *new_tree = new BTNode;
+    new_tree->path = from->path;
+    new_tree->sibling = NULL;
+    new_tree->child = copy_create(from->child);
+
+    // 4、指向，new_tree就是子树的根，
+    new_tree->sibling = to->child;
+    to->child = new_tree;
+  }
+  else
+  {
+    return;
+  }
 }
 void CalvinFSClientApp::create_dir_tree(BTNode *dir_tree, string path)
 {
+  /*
+  1、找：找到路径的父目录
+  2、查：看看父目录的孩子是不是存在一个同名的
+  3、建：新建一个节点，头插一下
+  */
+  // 1、找
+  int pos = path.rfind('/');
+  string parent_from_path = path.substr(0, pos);
+  BTNode *parent_pre = NULL;
+  BTNode *parent = find_path(dir_tree, parent_from_path, parent_pre);
+  if (parent != NULL)
+  {
+
+    // 2、查
+    BTNode *check = parent->child;
+    while (check != NULL)
+    {
+      if (check->path == path)
+      {
+        return;
+      }
+      check = check->sibling;
+    }
+
+    // 3、插
+    BTNode *create_node = new BTNode;
+    create_node->path = path;
+    create_node->child = NULL
+                             create_node->sibling = parent->child;
+    parent->child = create_node;
+  }
 }
 void CalvinFSClientApp::delete_dir_tree(BTNode *dir_tree, string path)
 {
+  /*
+  1、找：找到要删除的路径和指向它的指针
+  2、删：将这个指针和所有child都删掉
+  */
+  BTNode *from_pre = NULL;
+  BTNode *from = find_path(dir_tree, path, from_pre);
+  // 改下指向
+  if (from_pre->child->path == path)
+  {
+    from_pre->child = from->sibling;
+  }
+  else
+  {
+    from_pre->sibling = from->sibling;
+  }
+  from->sibling = NULL;
+
+  // 2、删
+  delete_tree(from);
 }
