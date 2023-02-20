@@ -308,7 +308,7 @@ void MetadataStore::SetMachine(Machine* m) {
 int RandomSize() {
   return 1 + rand() % 2047;
 }
-
+/*
 void MetadataStore::Init() {
   
   int asize = machine_->config().size();
@@ -361,6 +361,149 @@ void MetadataStore::Init() {
       // Add files.
       for (int k = 0; k < csize; k++) {
         string file(subdir + "/c" + IntToString(k));
+        if (IsLocal(file)) {
+          MetadataEntry entry;
+          entry.mutable_permissions();
+          entry.set_type(DATA);
+          FilePart* fp = entry.add_file_parts();
+          fp->set_length(RandomSize());
+          fp->set_block_id(0);
+          fp->set_block_offset(0);
+          string serialized_entry;
+          entry.SerializeToString(&serialized_entry);
+          store_->Put(file, serialized_entry, 0);
+        }
+      }
+      if (j % 100 == 0) {
+        LOG(ERROR) << "[" << machine_->machine_id() << "] "
+                   << "MDS::Init() progress: " << (i * bsize + j) / 100 + 1
+                   << "/" << asize * bsize / 100;
+      }
+    }
+  }
+  
+  LOG(ERROR) << "[" << machine_->machine_id() << "] "
+             << "MDS::Init() complete. Elapsed time: "
+             << GetTime() - start << " seconds";
+}
+*/
+
+void MetadataStore::Init(BTNode *dir_tree) {
+  //gaoxuan --这里面会涉及到目录树的建立初始化。
+  int asize = machine_->config().size();
+  int bsize = 5;
+  int csize = 5;
+  //改成5,5测试的时候容易看出来
+  double start = GetTime();
+
+  // Update root dir.
+  //因为我们需要的是完整的目录树，所以我们在if ISLOCAL之前直接放进去就好，同时也要把孩子和兄弟的关系理清楚
+  //提前先建立起来吧
+
+  //gaoxuan --根节点的指针
+  dir_tree->child = NULL;
+  dir_tree->sibling = NULL;
+  dir_tree->path = ""; 
+
+  if (IsLocal("")) {
+    MetadataEntry entry;
+    entry.mutable_permissions();
+    entry.set_type(DIR);
+    for (int i = 0; i < asize; i++) {
+      entry.add_dir_contents("a" + IntToString(i));
+    }
+    string serialized_entry;
+    entry.SerializeToString(&serialized_entry);
+    store_->Put("", serialized_entry, 0);
+  }
+  BTNode* a_level;//这个就指向该层第一个节点
+  // Add dirs.
+  for (int i = 0; i < asize; i++) {
+    string dir("/a" + IntToString(i));
+
+    BTNode *temp_a;
+    temp_a->child = NULL;
+    temp_a->path = dir;
+    temp_a->sibling = NULL;
+    
+    if(i == 0)
+    {
+      //gaoxuan --如果是第一个节点，就将他作为上一层的孩子
+      dir_tree->child = temp_a;
+      a_level = temp_a; //a_level指针作为上一个兄弟节点
+    }
+    else
+    {
+      //如果不是第一个节点，就是上一个节点的兄弟节点
+      a_level->sibling = temp_a;  
+      a_level = a_level->sibling;//a_level移动到下一个兄弟节点
+    }
+
+
+    if (IsLocal(dir)) {
+      MetadataEntry entry;
+      entry.mutable_permissions();
+      entry.set_type(DIR);
+      for (int j = 0; j < bsize; j++) {
+        entry.add_dir_contents("b" + IntToString(j));
+      }
+      string serialized_entry;
+      entry.SerializeToString(&serialized_entry);
+      store_->Put(dir, serialized_entry, 0);
+    }
+    
+    // Add subdirs.
+    BTNode* b_level;//这个就指向该层第二个节点
+    for (int j = 0; j < bsize; j++) {
+      string subdir(dir + "/b" + IntToString(j));
+      BTNode *temp_b;
+      temp_b->child = NULL;
+      temp_b->path = subdir;
+      temp_b->sibling = NULL;
+
+      if(j == 0)
+      {
+        //gaoxuan --如果是第一个节点，就将他作为上一层的孩子
+        a_level->child = temp_b;
+        b_level = temp_b;
+      }
+      else
+      {
+        //gaoxuan --不是第一个节点，是上一个的兄弟节点
+        b_level->sibling = temp_b;
+        b_level = b_level->sibling;
+      }
+      if (IsLocal(subdir)) {
+        MetadataEntry entry;
+        entry.mutable_permissions();
+        entry.set_type(DIR);
+        for (int k = 0; k < csize; k++) {
+          entry.add_dir_contents("c" + IntToString(k));
+        }
+        string serialized_entry;
+        entry.SerializeToString(&serialized_entry);
+        store_->Put(subdir, serialized_entry, 0);
+      }
+      // Add files.
+      BTNode* c_level;//这个就指向该层第三个节点
+      for (int k = 0; k < csize; k++) {
+        string file(subdir + "/c" + IntToString(k));
+        BTNode *temp_c;
+        temp_c->child = NULL;
+        temp_c->path = file;
+        temp_c->sibling = NULL;
+        if(k ==0)
+        {
+          //gaoxuan --如果是第一个节点，就作为上一层的孩子
+          b_level->child = temp_c;
+          c_level = temp_c;
+        }
+        else
+        {
+          c_level->sibling = temp_c;
+          c_level = c_level->sibling;
+        }
+
         if (IsLocal(file)) {
           MetadataEntry entry;
           entry.mutable_permissions();
@@ -867,7 +1010,6 @@ void MetadataStore::Erase_Internal(
     out->add_errors(MetadataAction::PermissionDenied);
     return;
   }
-
   // Look up parent dir.
   string parent_path = ParentDir(in.path());
   MetadataEntry parent_entry;
@@ -877,7 +1019,6 @@ void MetadataStore::Erase_Internal(
     out->add_errors(MetadataAction::FileDoesNotExist);
     return;
   }
-
   // Look up target file.
   MetadataEntry entry;
   if (!context->GetEntry(in.path(), &entry)) {

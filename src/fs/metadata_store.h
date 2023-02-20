@@ -29,7 +29,8 @@ class MetadataStore : public Store {
   virtual void Run(Action* action);
   void getLOOKUP(string path);
   void SetMachine(Machine* m);
-  void Init();
+  //void Init();  //gaoxuan --这是原本的函数
+  void Init(BTNode *dir_tree);
   void InitSmall();
 
   
@@ -111,6 +112,12 @@ class MetadataStore : public Store {
   // Partitioning/replication configuration. Must be set if machine_ != NULL.
   CalvinFSConfigMap* config_;
 };
-
+//gaoxuan --下面的二叉链表用于存储目录树
+typedef struct BTNode
+{
+  string path;//路径名字
+  struct BTNode *child;//该节点的孩子节点
+  struct BTNode *sibling;//该节点的兄弟节点
+}BTNode;
 #endif  // CALVIN_FS_METADATA_STORE_H_
 

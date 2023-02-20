@@ -752,11 +752,13 @@ void LatencyExperimentAppend() {
 
     Spin(1);
     //gaoxuan --function Init() is used to initialize the metadata of dir and file which used for Rename 
-    metadata_->Init();//gaoxuan --Init() is in metadat_store.cc
+    metadata_->Init(dir_tree);//gaoxuan --Init() is in metadat_store.cc,参数用于存储目录树
     Spin(1);
     machine()->GlobalBarrier();
     Spin(1);
-
+    print_dir_tree(dir_tree);
+    //gaoxuan --下面需要测试一下dir_tree里面是否真的有完整的目录树，按照你想象的方式输出一下就好了
+/*
     double start = GetTime();
     string from_path;
     string to_path;
@@ -799,7 +801,7 @@ void LatencyExperimentAppend() {
     //gaoxuan --In this part I want to get all path to check if we rename successfully,in real use,we need to delete it
     //metadata_->getLOOKUP("");
  
-
+*/
 
   }
     void DeleteExperiment() {//gaoxuan --删除文件的实验
@@ -968,7 +970,6 @@ void LatencyExperimentAppend() {
     machine()->SendMessage(header, new MessageBuffer());
   }
   void BackgroundDeleteFile(const Slice& path, FileType type = DATA) {
-
     Header* header = new Header();
     header->set_from(machine()->machine_id());
     header->set_to(machine()->machine_id());
@@ -977,14 +978,8 @@ void LatencyExperimentAppend() {
     header->set_rpc("DELETE_FILE");
     header->add_misc_bool(type == DIR);  // DIR = true, DATA = false
     header->add_misc_string(path.data(), path.size());
-    //gaoxuan --在这里发出消息之前，把from_path.data()和to_path.data()拆分一下
-
-    //第一步：将from_path.data()拆分放进split_string里面，拆完后，不够八个格子的，使用五个空格填充上
-    //拆分的算法，遇到一个/就把之前的字符串放进去
-    //将拆分后的元素添加去的方法：header->add_split_string(拆分的字符串)
     int flag = 0 ;//用来标识此时split_string 里面有多少子串
     char pattern = '/' ;//根据/进行字符串拆分
-
     string temp_from = path.data(); 
     temp_from = temp_from.substr(1,temp_from.size());//这一行是为了去除最前面的/
     temp_from = temp_from + pattern ; //在最后面添加一个/便于处理
@@ -1010,9 +1005,6 @@ void LatencyExperimentAppend() {
       header->add_split_string_from(temp);//将拆出来的子串加到header里面去
       flag++;//拆分的字符串数量++     
     }
-
-    //这一行之前是gaoxuan添加的
-
     if (reporting_ && rand() % 2 == 0) {
       header->set_callback_app(name());
       header->set_callback_rpc("CB");
@@ -1390,6 +1382,29 @@ void LatencyExperimentAppend() {
     machine()->SendMessage(header, new MessageBuffer());
   }
 
+  //gaoxuan --这个函数用来输出一下目录树
+  void preorder(BTNode *root)
+  {
+    if(root != NULL)
+    {
+      LOG(ERROR)<<root->path;
+      preorder(root->sibling);
+      preorder(root->child);
+    }
+  }
+  void print_dir_tree(BTNode *dir_tree)
+  {
+    if(dir_tree == NULL)
+    {
+      LOG(ERROR)<<"Empty tree";
+    }
+    else
+    {
+      preorder(dir_tree);
+    }
+    //采用先序遍历就好，不过是先遍历右子树那种方式
+  }
+
   inline Slice RandomData(uint64 size) {
     uint64 start = rand() % (random_data_.size() - size);
     return Slice(random_data_.data() + start, size);
@@ -1430,6 +1445,10 @@ void LatencyExperimentAppend() {
 
   // MetadataStore for getting RWSets.
   MetadataStore* metadata_;
+
+  //gaoxuan 这里加个指针，多叉树的根指针，初始化为空。在任何实验开始的时候，我们调用metadata_->Init()的时候，作为参数传进去，然后init执行过程中就直接顺便构建
+  //每个操作更改就在这里面handlemessage里面些就好
+  BTNode *dir_tree;
 };
 
 #endif  // CALVIN_FS_CALVINFS_CLIENT_APP_H_

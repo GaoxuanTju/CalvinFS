@@ -149,21 +149,17 @@ MessageBuffer *CalvinFSClientApp::DeleteFile(const Slice &path, FileType type)
   in.SerializeToString(a->mutable_input());
   metadata_->GetRWSets(a);
   log_->Append(a);
-
   MessageBuffer *m = NULL;
   while (!channel->Pop(&m))
   {
     // Wait for action to complete and be sent back.
     usleep(100);
   }
-
   Action result;
   result.ParseFromArray((*m)[0].data(), (*m)[0].size());
   delete m;
   MetadataAction::AppendOutput out;
   out.ParseFromString(result.output());
-
-
   if (out.success())
   {
     
