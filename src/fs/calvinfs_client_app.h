@@ -1411,7 +1411,7 @@ void LatencyExperimentAppend() {
   {
     if(root != NULL)
     {
-      string s = path + root->path
+      string s = path + root->path;
       LOG(ERROR)<<s;
       preorder(root->sibling,path);
       preorder(root->child,s+"/");
