@@ -595,8 +595,8 @@ void CalvinFSClientApp::create_dir_tree(BTNode *dir_tree, string path)
     // 3、插
     BTNode *create_node = new BTNode;
     create_node->path = path;
-    create_node->child = NULL
-                             create_node->sibling = parent->child;
+    create_node->child = NULL;
+    create_node->sibling = parent->child;
     parent->child = create_node;
   }
 }
