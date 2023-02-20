@@ -416,7 +416,7 @@ void MetadataStore::Init(BTNode *dir_tree) {
     entry.SerializeToString(&serialized_entry);
     store_->Put("", serialized_entry, 0);
   }
-  BTNode* a_level;//这个就指向该层第一个节点
+  BTNode* a_level = NULL;//这个就指向该层第一个节点
   // Add dirs.
   for (int i = 0; i < asize; i++) {
     string dir("/a" + IntToString(i));
@@ -453,7 +453,7 @@ void MetadataStore::Init(BTNode *dir_tree) {
     }
     
     // Add subdirs.
-    BTNode* b_level;//这个就指向该层第二个节点
+    BTNode* b_level = NULL;//这个就指向该层第二个节点
     for (int j = 0; j < bsize; j++) {
       string subdir(dir + "/b" + IntToString(j));
       BTNode *temp_b;
@@ -485,7 +485,7 @@ void MetadataStore::Init(BTNode *dir_tree) {
         store_->Put(subdir, serialized_entry, 0);
       }
       // Add files.
-      BTNode* c_level;//这个就指向该层第三个节点
+      BTNode* c_level = NULL;//这个就指向该层第三个节点
       for (int k = 0; k < csize; k++) {
         string file(subdir + "/c" + IntToString(k));
         BTNode *temp_c;
