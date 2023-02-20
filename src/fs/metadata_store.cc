@@ -404,7 +404,7 @@ void MetadataStore::Init(BTNode *dir_tree) {
   dir_tree->child = NULL;
   dir_tree->sibling = NULL;
   dir_tree->path = ""; 
-
+  LOG(ERROR)<<"this place ?";
   if (IsLocal("")) {
     MetadataEntry entry;
     entry.mutable_permissions();

@@ -752,6 +752,7 @@ void LatencyExperimentAppend() {
 
     Spin(1);
     //gaoxuan --function Init() is used to initialize the metadata of dir and file which used for Rename 
+    dir_tree = NULL;
     metadata_->Init(dir_tree);//gaoxuan --Init() is in metadat_store.cc,参数用于存储目录树
     Spin(1);
     machine()->GlobalBarrier();
