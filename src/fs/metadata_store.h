@@ -13,6 +13,14 @@
 #include "components/store/store.h"
 #include "fs/metadata.pb.h"
 
+//gaoxuan --下面的二叉链表用于存储目录树
+typedef struct BTNode
+{
+  string path;//路径名字
+  struct BTNode *child;//该节点的孩子节点
+  struct BTNode *sibling;//该节点的兄弟节点
+}BTNode;
+
 class CalvinFSConfigMap;
 class Machine;
 class VersionedKVStore;
@@ -112,12 +120,6 @@ class MetadataStore : public Store {
   // Partitioning/replication configuration. Must be set if machine_ != NULL.
   CalvinFSConfigMap* config_;
 };
-//gaoxuan --下面的二叉链表用于存储目录树
-typedef struct BTNode
-{
-  string path;//路径名字
-  struct BTNode *child;//该节点的孩子节点
-  struct BTNode *sibling;//该节点的兄弟节点
-}BTNode;
+
 #endif  // CALVIN_FS_METADATA_STORE_H_
 
