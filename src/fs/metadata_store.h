@@ -37,7 +37,7 @@ class MetadataStore : public Store {
   virtual void Run(Action* action);
   void getLOOKUP(string path);
   void SetMachine(Machine* m);
-  //void Init();  //gaoxuan --这是原本的函数
+  void Init();  //gaoxuan --这是原本的函数
   void Init(BTNode *dir_tree);
   void InitSmall();
 
