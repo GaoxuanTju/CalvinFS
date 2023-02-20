@@ -404,7 +404,6 @@ void MetadataStore::Init(BTNode *dir_tree) {
   dir_tree->child = NULL;
   dir_tree->sibling = NULL;
   dir_tree->path = ""; 
-  LOG(ERROR)<<"this place ?";
   if (IsLocal("")) {
     MetadataEntry entry;
     entry.mutable_permissions();
@@ -421,7 +420,7 @@ void MetadataStore::Init(BTNode *dir_tree) {
   for (int i = 0; i < asize; i++) {
     string dir("/a" + IntToString(i));
 
-    BTNode *temp_a;
+    BTNode *temp_a = new BTNode;
     temp_a->child = NULL;
     temp_a->path = dir;
     temp_a->sibling = NULL;
@@ -456,7 +455,7 @@ void MetadataStore::Init(BTNode *dir_tree) {
     BTNode* b_level = NULL;//这个就指向该层第二个节点
     for (int j = 0; j < bsize; j++) {
       string subdir(dir + "/b" + IntToString(j));
-      BTNode *temp_b;
+      BTNode *temp_b = new BTNode;
       temp_b->child = NULL;
       temp_b->path = subdir;
       temp_b->sibling = NULL;
@@ -488,7 +487,7 @@ void MetadataStore::Init(BTNode *dir_tree) {
       BTNode* c_level = NULL;//这个就指向该层第三个节点
       for (int k = 0; k < csize; k++) {
         string file(subdir + "/c" + IntToString(k));
-        BTNode *temp_c;
+        BTNode *temp_c = new BTNode;
         temp_c->child = NULL;
         temp_c->path = file;
         temp_c->sibling = NULL;
