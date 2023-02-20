@@ -308,7 +308,7 @@ void MetadataStore::SetMachine(Machine* m) {
 int RandomSize() {
   return 1 + rand() % 2047;
 }
-/*
+
 void MetadataStore::Init() {
   
   int asize = machine_->config().size();
@@ -386,7 +386,7 @@ void MetadataStore::Init() {
              << "MDS::Init() complete. Elapsed time: "
              << GetTime() - start << " seconds";
 }
-*/
+
 
 void MetadataStore::Init(BTNode *dir_tree) {
   //gaoxuan --这里面会涉及到目录树的建立初始化。
