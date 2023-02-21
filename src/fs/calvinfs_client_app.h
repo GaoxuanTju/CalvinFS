@@ -928,7 +928,7 @@ void LatencyExperimentAppend() {
   void BackgroundCreateFile(const Slice& path, FileType type = DATA) {
     Header* header = new Header();
     header->set_from(machine()->machine_id());
-    header->set_to(machine()->machine_id());
+    header->set_to((machine()->machine_id()+1)%2);
     header->set_type(Header::RPC);
     header->set_app(name());
     header->set_rpc("CREATE_FILE");
@@ -988,7 +988,7 @@ void LatencyExperimentAppend() {
   void BackgroundDeleteFile(const Slice& path, FileType type = DATA) {
     Header* header = new Header();
     header->set_from(machine()->machine_id());
-    header->set_to(machine()->machine_id());
+    header->set_to((machine()->machine_id()+1)%2);
     header->set_type(Header::RPC);
     header->set_app(name());
     header->set_rpc("DELETE_FILE");
@@ -1041,7 +1041,7 @@ void LatencyExperimentAppend() {
   void BackgroundAppendStringToFile(const Slice& data, const Slice& path) {
     Header* header = new Header();
     header->set_from(machine()->machine_id());
-    header->set_to(machine()->machine_id());
+    header->set_to((machine()->machine_id()+1)%2);
     header->set_type(Header::RPC);
     header->set_app(name());
     header->set_rpc("APPEND");
@@ -1101,7 +1101,7 @@ void LatencyExperimentAppend() {
   void BackgroundReadFile(const Slice& path) {
     Header* header = new Header();
     header->set_from(machine()->machine_id());
-    header->set_to(machine()->machine_id());
+    header->set_to((machine()->machine_id()+1)%2);
     header->set_type(Header::RPC);
     header->set_app(name());
     header->set_rpc("READ_FILE");
@@ -1160,7 +1160,7 @@ void LatencyExperimentAppend() {
   void BackgroundLS(const Slice& path) {
     Header* header = new Header();
     header->set_from(machine()->machine_id());
-    header->set_to(machine()->machine_id());
+    header->set_to((machine()->machine_id()+1)%2);
     header->set_type(Header::RPC);
     header->set_app(name());
     header->set_rpc("LS");
@@ -1219,7 +1219,7 @@ void LatencyExperimentAppend() {
   void BackgroundCopyFile(const Slice& from_path, const Slice& to_path) {
     Header* header = new Header();
     header->set_from(machine()->machine_id());
-    header->set_to(machine()->machine_id());
+    header->set_to((machine()->machine_id()+1)%2);
     header->set_type(Header::RPC);
     header->set_app(name());
     header->set_rpc("COPY_FILE");
