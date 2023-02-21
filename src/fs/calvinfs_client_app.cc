@@ -487,8 +487,26 @@ void CalvinFSClientApp::rename_dir_tree(BTNode* &dir_tree, string from_path, str
   string parent_to_path = to_path.substr(0, pos);
   BTNode *to = find_path(dir_tree, parent_to_path, to_pre);
   LOG(ERROR)<<from_path<<" "<<to_path<<" "<<from_pre->path<<" "<<from->path<<" "<<to->path;
+
+  
+
+  int pos_ = from_path.rfind('/');
+  string parent_from_path = from_path.substr(0,pos_);
+
+  int index = to_path.rfind('/');
+  string filename = to_path.substr(index + 1);
+
+  //这里如果是父目录相同的话，只改名字不改指针，名字不同才需要改指针
+
+  //父目录相同
+  if(parent_from_path == parent_to_path)
+  {
+    from->path = filename;
+    return;
+  }
   if (from != NULL && to != NULL)
   {
+
     if(from_pre->child != NULL)
     {
       if (from_pre->child->path == from_path)
@@ -500,11 +518,11 @@ void CalvinFSClientApp::rename_dir_tree(BTNode* &dir_tree, string from_path, str
     {
       from_pre->sibling = from->sibling;
     }
-    int index = to_path.rfind('/');
-    string filename = to_path.substr(index + 1);
+
     from->path = filename;
     from->sibling = to->child;
     to->child = from;
+  
   }
   else
   {
