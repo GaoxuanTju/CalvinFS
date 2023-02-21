@@ -543,7 +543,7 @@ void CalvinFSClientApp::copy_dir_tree(BTNode* &dir_tree, string from_path, strin
   /*
   copy的本质，是把一个地方的目录树，粘贴到另一个位置，是完整的粘贴，不能光修改指针
   所以分三步：
-  1、找：找到原位置指针，目的位置的父指针
+  1、找：找到原位置指针，目的位置的指针,目的位置一定要是目录才行啊
   2、查：看目的位置的孩子中是否存在同名，存在失败，不存在下一步
   3、复制：根据原位置指针，一次拷贝，只用拷贝原位置指针的孩子就行
   4、改类似，一个头插法
@@ -551,15 +551,17 @@ void CalvinFSClientApp::copy_dir_tree(BTNode* &dir_tree, string from_path, strin
 
   // 1、找
   BTNode *from_pre = NULL;
-  BTNode *from = find_path(dir_tree, from_path, from_pre);
   BTNode *to_pre = NULL;
-  int pos = to_path.rfind('/');
-  string parent_to_path = to_path.substr(0, pos);
-  BTNode *to = find_path(dir_tree, parent_to_path, to_pre);
+  BTNode *from = find_path(dir_tree, from_path, from_pre);
+  int pos = from_path.rfind('/');
+ // string parent_to_path = to_path.substr(0, pos);
+ //copy的目的路径就是一个目录，不用找他的父亲了
+  BTNode *to = find_path(dir_tree, to_path, to_pre);
+  LOG(ERROR)<<from_path<<" copy to "<<to_path;
   if (from != NULL && to != NULL)
   {
-    // 2、查：查看目的为止的孩子是否存在同名文件
-    string filename = to_path.substr(pos + 1);
+    // 2、查：查看目的位置的孩子是否存在同名文件
+    string filename = from_path.substr(pos + 1);
     BTNode *check = to->child;
     while (check != NULL)
     {
@@ -570,7 +572,7 @@ void CalvinFSClientApp::copy_dir_tree(BTNode* &dir_tree, string from_path, strin
       check = check->sibling;
     }
 
-    // 经过了上面的筛查，证明下一级没有同名文件，我们接下来需要创建需要拷贝的目录子树
+    // 经过了上面的筛查，证明目的目录下没有同名文件，我们接下来需要创建需要拷贝的目录子树
 
     // 3、复制建立，需要从from这个指针开始，将其下的目录子树全盘拷贝下来，先序遍历
     BTNode *new_tree = new BTNode;

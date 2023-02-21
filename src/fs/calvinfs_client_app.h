@@ -268,6 +268,7 @@ class CalvinFSClientApp : public App {
     }else if(header->rpc() == "SUMMARY_COPY"){//gaoxuan --这里是我后添加的，为了汇总创建请求的内容
       string temp_from = header->misc_string(0);//这个是需要的源路径
       string temp_to = header->misc_string(1);
+      copy_dir_tree(dir_tree, temp_from, temp_to);
 
     }else if(header->rpc() == "SUMMARY_DELETE"){//gaoxuan --这里是我后添加的，为了汇总创建请求的内容
       string temp = header->misc_string(0);//这个是需要的路径
@@ -744,10 +745,10 @@ void LatencyExperimentAppend() {
     Spin(1);
 
     double start = GetTime();
-    for (int i = 0; i < 500; i++) {
-      BackgroundCopyFile("/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(rand() % 1000) + "/c" + IntToString(rand() % 1000),
-                           "/a" + IntToString(rand() % machine()->config().size()) + "/b" + IntToString(rand() % 1000) + "/d" + IntToString(machine()->GetGUID()));
-
+    for (int i = 0; i < 1; i++) {
+      BackgroundCopyFile("/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(rand() % 3) + "/c" + IntToString(rand() % 3),
+                           "/a" + IntToString(rand() % machine()->config().size()) + "/b" + IntToString(rand() % 3) );
+      //上面的目的路径感觉不太对，怎么会到一个/dxxx呢，copy肯定是拷贝到一个目录下呀
       if (i % 100 == 0) {
         LOG(ERROR) << "[" << machine()->machine_id() << "] "
                    << "Test progress : " << i / 100 << "/" << 5;
@@ -811,8 +812,8 @@ void LatencyExperimentAppend() {
     LOG(ERROR) << "Renamed " <<  "10 files. Elapsed time:"
                << (GetTime() - start) << " seconds";
 
-    Spin(10);
-    print_dir_tree(dir_tree);
+   // Spin(10);
+   // print_dir_tree(dir_tree);
 
 
   }
