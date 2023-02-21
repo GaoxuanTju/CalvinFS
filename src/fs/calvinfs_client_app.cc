@@ -407,7 +407,7 @@ MessageBuffer *CalvinFSClientApp::RenameFile(const Slice &from_path, const Slice
   }
 }
 
-BTNode *CalvinFSClientApp::find_path(BTNode *dir_tree, string path, BTNode* &pre)
+BTNode *CalvinFSClientApp::find_path(BTNode* dir_tree, string path, BTNode* &pre)
 {
   BTNode *temp = dir_tree->child;
   pre = dir_tree;
@@ -480,15 +480,10 @@ void CalvinFSClientApp::rename_dir_tree(BTNode* &dir_tree, string from_path, str
   // 这个函数用于根据from_path和to_path操作一下dir_tree这个目录树
   //  1、找：找到from，to路径的位置
   BTNode *from_pre = NULL;
-  BTNode *from = find_path(dir_tree, from_path, from_pre);
   BTNode *to_pre = NULL;
-  // 这块不对，不能直接把to_path放进去，因为可能rename到一个新位置，放ParentDir(to_path)
+
   int pos = to_path.rfind('/');
   string parent_to_path = to_path.substr(0, pos);
-  BTNode *to = find_path(dir_tree, parent_to_path, to_pre);
-  LOG(ERROR)<<from_path<<" "<<to_path<<" "<<from_pre->path<<" "<<from->path<<" "<<to->path;
-
-  
 
   int pos_ = from_path.rfind('/');
   string parent_from_path = from_path.substr(0,pos_);
@@ -496,14 +491,18 @@ void CalvinFSClientApp::rename_dir_tree(BTNode* &dir_tree, string from_path, str
   int index = to_path.rfind('/');
   string filename = to_path.substr(index + 1);
 
-  //这里如果是父目录相同的话，只改名字不改指针，名字不同才需要改指针
-
+ //这里如果是父目录相同的话，只改名字不改指针，名字不同才需要改指针
+  BTNode *from = find_path(dir_tree, from_path, from_pre);
   //父目录相同
   if(parent_from_path == parent_to_path)
   {
     from->path = filename;
     return;
   }
+
+  BTNode *to = find_path(dir_tree, parent_to_path, to_pre);
+
+  //只能是这里有问题呀，新位置能够遍历到新指针，但是原位置还是存在指针遍历到，这是怎么回事
   if (from != NULL && to != NULL)
   {
 
