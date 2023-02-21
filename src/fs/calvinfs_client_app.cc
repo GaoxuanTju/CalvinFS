@@ -487,10 +487,10 @@ void CalvinFSClientApp::rename_dir_tree(BTNode* &dir_tree, string from_path, str
   string parent_to_path = to_path.substr(0, pos);
   BTNode *to = find_path(dir_tree, parent_to_path, to_pre);
   LOG(ERROR)<<from_path<<" "<<to_path<<" "<<from->path<<" "<<to->path;
-/*
+
   if (from != NULL && to != NULL)
   {
-    if (from_pre->child->path == from_path)
+    if (from_pre->child == from)
     {
       from_pre->child = from->sibling;
     }
@@ -506,7 +506,7 @@ void CalvinFSClientApp::rename_dir_tree(BTNode* &dir_tree, string from_path, str
   {
     return;
   }
-  */
+  
 }
 void CalvinFSClientApp::copy_dir_tree(BTNode *dir_tree, string from_path, string to_path)
 {
