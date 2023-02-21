@@ -777,9 +777,9 @@ void LatencyExperimentAppend() {
     double start = GetTime();
     string from_path;
     string to_path;
-    for (int j = 0; j <1 ; j++) {
-      int a1 = rand() % 3;
-      int a2 = rand() % 3;
+    for (int j = 0; j <2 ; j++) {
+      int a1 = rand() % 5;
+      int a2 = rand() % 5;
       while (a2 == a1) {
         a2 = rand() % 5;
       }

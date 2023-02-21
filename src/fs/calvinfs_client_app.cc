@@ -494,7 +494,7 @@ void CalvinFSClientApp::rename_dir_tree(BTNode* &dir_tree, string from_path, str
  //这里如果是父目录相同的话，只改名字不改指针，名字不同才需要改指针
   BTNode *from = find_path(dir_tree, from_path, from_pre);
   //父目录相同
-  LOG(ERROR)<<parent_from_path<<"  and  "<<parent_to_path<<"  "<<from_path<<"  "<<to_path;
+  LOG(ERROR)<<from_path<<" to "<<to_path;
   if(parent_from_path == parent_to_path) 
   {
     from->path = filename;
@@ -517,7 +517,6 @@ void CalvinFSClientApp::rename_dir_tree(BTNode* &dir_tree, string from_path, str
       from_pre->sibling = from->sibling;
     }
 
-    LOG(ERROR)<<" zhe kuai1 mei you bei hzhix ix";
     //下边改变父亲的指向
     from->path = filename;
     from->sibling = to->child;
@@ -527,33 +526,7 @@ void CalvinFSClientApp::rename_dir_tree(BTNode* &dir_tree, string from_path, str
   {
     return;
   }
-/*
-  //只能是这里有问题呀，新位置能够遍历到新指针，但是原位置还是存在指针遍历到，这是怎么回事
-  if (from != NULL && to != NULL)
-  {
 
-    if(from_pre->child != NULL)
-    {
-      if (from_pre->child->path == from->path)
-      {
-        from_pre->child = from->sibling;
-      }
-    }
-    else
-    {
-      from_pre->sibling = from->sibling;
-    }
-
-    from->path = filename;
-    from->sibling = to->child;
-    to->child = from;
-  
-  }
-  else
-  {
-    return;
-  }
-*/
   
 }
 void CalvinFSClientApp::copy_dir_tree(BTNode* &dir_tree, string from_path, string to_path)
