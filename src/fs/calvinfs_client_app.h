@@ -764,6 +764,8 @@ void LatencyExperimentAppend() {
     LOG(ERROR) << "[" << machine()->machine_id() << "] "
                << "Copyed " <<  "500 files. Elapsed time: "
                << (GetTime() - start) << " seconds";
+    Spin(1);
+    print_dir_tree(dir_tree);
   }
 
   void RenameExperiment() {
