@@ -407,7 +407,7 @@ MessageBuffer *CalvinFSClientApp::RenameFile(const Slice &from_path, const Slice
   }
 }
 
-BTNode *CalvinFSClientApp::find_path(BTNode *dir_tree, string path, BTNode *pre)
+BTNode *CalvinFSClientApp::find_path(BTNode *dir_tree, string path, BTNode* &pre)
 {
   BTNode *temp = dir_tree->child;
   pre = dir_tree;
@@ -489,7 +489,7 @@ void CalvinFSClientApp::rename_dir_tree(BTNode* &dir_tree, string from_path, str
   LOG(ERROR)<<from_path<<" "<<to_path<<" "<<from->path<<" "<<to_path;
   if(from_pre == NULL)
   {
-    LOG(ERROR)<<"NULL";
+    LOG(ERROR)<<"NULL";//这一行执行了，说明就是个null
   }
 /*
   if (from != NULL && to != NULL)
