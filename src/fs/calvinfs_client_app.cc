@@ -486,11 +486,7 @@ void CalvinFSClientApp::rename_dir_tree(BTNode* &dir_tree, string from_path, str
   int pos = to_path.rfind('/');
   string parent_to_path = to_path.substr(0, pos);
   BTNode *to = find_path(dir_tree, parent_to_path, to_pre);
-  LOG(ERROR)<<from_path<<" "<<to_path<<" "<<from->path<<" "<<to_path;
-  if(from_pre == NULL)
-  {
-    LOG(ERROR)<<"NULL";//这一行执行了，说明就是个null
-  }
+  LOG(ERROR)<<from_path<<" "<<to_path<<" "<<from->path<<" "<<from_pre->path<<" "<<to->path;
 /*
   if (from != NULL && to != NULL)
   {
