@@ -739,6 +739,7 @@ void LatencyExperimentAppend() {
 
   void CopyExperiment() {
     Spin(1);
+    dir_tree = new BTNode;
     metadata_->Init(dir_tree);
     Spin(1);
     machine()->GlobalBarrier();
