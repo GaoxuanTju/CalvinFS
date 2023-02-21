@@ -810,7 +810,7 @@ void LatencyExperimentAppend() {
     
     LOG(ERROR) << "Renamed " <<  "10 files. Elapsed time:"
                << (GetTime() - start) << " seconds";
-    //print_dir_tree(dir_tree);
+    print_dir_tree(dir_tree);
 
 
   }
