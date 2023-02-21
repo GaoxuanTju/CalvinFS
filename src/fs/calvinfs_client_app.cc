@@ -486,7 +486,9 @@ void CalvinFSClientApp::rename_dir_tree(BTNode* &dir_tree, string from_path, str
   int pos = to_path.rfind('/');
   string parent_to_path = to_path.substr(0, pos);
   BTNode *to = find_path(dir_tree, parent_to_path, to_pre);
-  LOG(ERROR)<<from_path<<" "<<to_path<<" "<<from->path<<" "<<from_pre->path<<" "<<to_path;
+  LOG(ERROR)<<from_path<<" "<<to_path<<" "<<from->path<<" "<<to->path;
+
+ // LOG(ERROR)<<from_pre->path;
 /*
   if (from != NULL && to != NULL)
   {
