@@ -482,8 +482,7 @@ void CalvinFSClientApp::rename_dir_tree(BTNode* &dir_tree, string from_path, str
   BTNode *from_pre = NULL;
   BTNode *from = find_path(dir_tree, from_path, from_pre);
   LOG(ERROR)<<from_path<<"  "<<to_path;
-  //LOG(ERROR)<<from->path;
- // LOG(ERROR)<<from_pre->path;
+/*
   BTNode *to_pre = NULL;
   // 这块不对，不能直接把to_path放进去，因为可能rename到一个新位置，最次也得放ParentDir(to_path)
   int pos = to_path.rfind('/');
@@ -492,18 +491,7 @@ void CalvinFSClientApp::rename_dir_tree(BTNode* &dir_tree, string from_path, str
 
   if (from != NULL && to != NULL)
   {
-    // 2、改：对from_path的节点，需要根据to_path的路径先修改名字，再修改指向
-    /*
-      from现在存储源路径的节点；from_pre是指向它的节点
-      to现在存储目的路径的父目录的节点
 
-      我们要做的
-      （1）
-      先判断一下是from_pre的child还是sibling指向from,确定后
-      将from_pre指向from->sibling;
-      （2）
-      将to->child指向from,from->sibling指向to_child,类似于一个头插法
-    */
     if (from_pre->child->path == from_path)
     {
       from_pre->child = from->sibling;
@@ -520,6 +508,7 @@ void CalvinFSClientApp::rename_dir_tree(BTNode* &dir_tree, string from_path, str
   {
     return;
   }
+  */
 }
 void CalvinFSClientApp::copy_dir_tree(BTNode *dir_tree, string from_path, string to_path)
 {
