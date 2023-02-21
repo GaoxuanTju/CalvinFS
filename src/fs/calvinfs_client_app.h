@@ -263,6 +263,7 @@ class CalvinFSClientApp : public App {
     }else if(header->rpc() == "SUMMARY_RENAME"){//gaoxuan --这里是我后添加的，为了汇总创建请求的内容
       string temp_from = header->misc_string(0);//这个是需要的源路径
       string temp_to = header->misc_string(1);
+      LOG(ERROR)<<"who execute first?";
       rename_dir_tree(dir_tree, temp_from, temp_to);
 
     }else if(header->rpc() == "SUMMARY_COPY"){//gaoxuan --这里是我后添加的，为了汇总创建请求的内容
@@ -907,7 +908,7 @@ void LatencyExperimentAppend() {
   }
 
 
-  void rename_dir_tree(BTNode *dir_tree, string from_path,string to_path);
+  void rename_dir_tree(BTNode* &dir_tree, string from_path,string to_path);
   void copy_dir_tree(BTNode *dir_tree, string from_path, string to_path);
   void create_dir_tree(BTNode *dir_tree, string path);
   void delete_dir_tree(BTNode *dir_tree, string path);

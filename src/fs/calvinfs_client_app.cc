@@ -475,7 +475,7 @@ BTNode *CalvinFSClientApp::find_path(BTNode *dir_tree, string path, BTNode *pre)
     return temp;
   }
 }
-void CalvinFSClientApp::rename_dir_tree(BTNode *dir_tree, string from_path, string to_path)
+void CalvinFSClientApp::rename_dir_tree(BTNode* &dir_tree, string from_path, string to_path)
 {
   // 这个函数用于根据from_path和to_path操作一下dir_tree这个目录树
   //  1、找：找到from，to路径的位置
