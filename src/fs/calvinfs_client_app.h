@@ -259,6 +259,7 @@ class CalvinFSClientApp : public App {
 
     }else if(header->rpc() == "SUMMARY_CREATE"){//gaoxuan --这里是我后添加的，为了汇总创建请求的内容
       string temp = header->misc_string(0);//这个是需要的路径
+      create_dir_tree(dir_tree,temp);
 
     }else if(header->rpc() == "SUMMARY_RENAME"){//gaoxuan --这里是我后添加的，为了汇总创建请求的内容
       string temp_from = header->misc_string(0);//这个是需要的源路径
