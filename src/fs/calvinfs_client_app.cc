@@ -508,7 +508,7 @@ void CalvinFSClientApp::rename_dir_tree(BTNode* &dir_tree, string from_path, str
 
     if(from_pre->child != NULL)
     {
-      if (from_pre->child->path == from_path)
+      if (from_pre->child->path == from->path)
       {
         from_pre->child = from->sibling;
       }
