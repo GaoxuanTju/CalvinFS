@@ -519,7 +519,7 @@ void CalvinFSClientApp::rename_dir_tree(BTNode* &dir_tree, string from_path, str
 
     LOG(ERROR)<<" zhe kuai1 mei you bei hzhix ix";
     //下边改变父亲的指向
-    from_path = filename;
+    from->path = filename;
     from->sibling = to->child;
     to->child = from;
   }
