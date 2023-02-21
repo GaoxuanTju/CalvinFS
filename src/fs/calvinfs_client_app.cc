@@ -599,8 +599,10 @@ void CalvinFSClientApp::create_dir_tree(BTNode* &dir_tree, string path)
   // 1、找
   int pos = path.rfind('/');
   string parent_from_path = path.substr(0, pos);
+  string filename = path.substr(pos+1);
   BTNode *parent_pre = NULL;
   BTNode *parent = find_path(dir_tree, parent_from_path, parent_pre);
+  LOG(ERROR)<<"create "<<path;
   if (parent != NULL)
   {
 
@@ -608,16 +610,16 @@ void CalvinFSClientApp::create_dir_tree(BTNode* &dir_tree, string path)
     BTNode *check = parent->child;
     while (check != NULL)
     {
-      if (check->path == path)
+      if (check->path == filename)
       {
-        return;
+        return;//有同名文件
       }
       check = check->sibling;
     }
 
     // 3、插
     BTNode *create_node = new BTNode;
-    create_node->path = path;
+    create_node->path = filename;
     create_node->child = NULL;
     create_node->sibling = parent->child;
     parent->child = create_node;

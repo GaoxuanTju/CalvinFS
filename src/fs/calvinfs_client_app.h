@@ -284,7 +284,8 @@ class CalvinFSClientApp : public App {
 
   void FillExperiment() {//gaoxuan --这个地方就是创建文件的实验
     Spin(1);
-    metadata_->Init();
+    dir_tree = new BTNode;
+    metadata_->Init(dir_tree);
     Spin(1);
     machine()->GlobalBarrier();
     Spin(1);
@@ -295,9 +296,9 @@ class CalvinFSClientApp : public App {
 
     // Put files into second-level dir.
     double start = GetTime();
-    for (int i = 0; i < files; i++) {
+    for (int i = 0; i < 3; i++) {
       string file = "/d" + IntToString(i);
-      for (int j = 0; j < dirs; j++) {
+      for (int j = 0; j < 3; j++) {
         BackgroundCreateFile(tld + "/b" + IntToString(j) + file);
       }
       LOG(ERROR) << "[" << machine()->machine_id() << "] "
@@ -311,6 +312,8 @@ class CalvinFSClientApp : public App {
     LOG(ERROR) << "[" << machine()->machine_id() << "] "
                << "Created " << dirs * files << " files. Elapsed time: "
                << (GetTime() - start) << " seconds";
+    Spin(1);
+    print_dir_tree(dir_tree);
   }
 
 
