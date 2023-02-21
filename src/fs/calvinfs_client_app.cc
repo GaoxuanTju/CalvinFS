@@ -633,17 +633,28 @@ void CalvinFSClientApp::delete_dir_tree(BTNode* &dir_tree, string path)
   */
   BTNode *from_pre = NULL;
   BTNode *from = find_path(dir_tree, path, from_pre);
-  // 改下指向
-  if (from_pre->child->path == path)
+  int pos = path.rfind('/');
+  string filename = path.substr(pos + 1);
+  if(from != NULL)
   {
-    from_pre->child = from->sibling;
-  }
-  else
-  {
-    from_pre->sibling = from->sibling;
-  }
-  from->sibling = NULL;
+    // 改下指向
+    if(from_pre->child != NULL)
+    {
+      if (from_pre->child->path == filename)
+      {
+        from_pre->child = from->sibling;
+      }    
+    }
+    if(from_pre->sibling != NULL)
+    {
+      if(from_pre->sibling->path == filename)
+      {
+        from_pre->sibling = from->sibling;
+      }
+    }
 
-  // 2、删
-  delete_tree(from);
+    from->sibling = NULL;
+    // 2、删
+    delete_tree(from);
+  }
 }

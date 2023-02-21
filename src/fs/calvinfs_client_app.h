@@ -273,6 +273,7 @@ class CalvinFSClientApp : public App {
 
     }else if(header->rpc() == "SUMMARY_DELETE"){//gaoxuan --这里是我后添加的，为了汇总创建请求的内容
       string temp = header->misc_string(0);//这个是需要的路径
+      delete_dir_tree(dir_tree, temp);
 
     }else {
       LOG(FATAL) << "unknown RPC: " << header->rpc();
@@ -826,15 +827,16 @@ void LatencyExperimentAppend() {
   }
     void DeleteExperiment() {//gaoxuan --删除文件的实验
     Spin(1);
-    metadata_->Init();
+    BTNode* dir_tree = new BTNode;
+    metadata_->Init(dir_tree);
     Spin(1);
     machine()->GlobalBarrier();
     Spin(1);
 
     double start = GetTime();
     string from_path;
-    for (int j = 0; j < 10; j++) {
-      int a1 = rand() % 1000;
+    for (int j = 0; j < 2; j++) {
+      int a1 = rand() % 3;
       
       string from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1) + "/c" + IntToString(j);
       BackgroundDeleteFile(from_path);
@@ -849,6 +851,8 @@ void LatencyExperimentAppend() {
     LOG(ERROR) << "[" << machine()->machine_id() << "] "
                << "Deleted " << 10 << " files. Elapsed time: "
                << (GetTime() - start) << " seconds";
+    Spin(1);
+    print_dir_tree(dir_tree);
   }
 
 
