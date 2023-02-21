@@ -263,7 +263,7 @@ class CalvinFSClientApp : public App {
     }else if(header->rpc() == "SUMMARY_RENAME"){//gaoxuan --这里是我后添加的，为了汇总创建请求的内容
       string temp_from = header->misc_string(0);//这个是需要的源路径
       string temp_to = header->misc_string(1);
-      LOG(ERROR)<<"machine ["<<machine()->machine_id()<<"] received rename request:"<<temp_from<<"  to  "<<temp_to;
+      rename_dir_tree(dir_tree, temp_from, temp_to);
 
     }else if(header->rpc() == "SUMMARY_COPY"){//gaoxuan --这里是我后添加的，为了汇总创建请求的内容
       string temp_from = header->misc_string(0);//这个是需要的源路径
@@ -774,17 +774,14 @@ void LatencyExperimentAppend() {
     Spin(1);
     machine()->GlobalBarrier();
     Spin(1);
-    print_dir_tree(dir_tree);
-    //gaoxuan --下面需要测试一下dir_tree里面是否真的有完整的目录树，按照你想象的方式输出一下就好了
-/*
     double start = GetTime();
     string from_path;
     string to_path;
-    for (int j = 0; j < 10; j++) {
-      int a1 = rand() % 1000;
-      int a2 = rand() % 1000;
+    for (int j = 0; j <1 ; j++) {
+      int a1 = rand() % 5;
+      int a2 = rand() % 5;
       while (a2 == a1) {
-        a2 = rand() % 1000;
+        a2 = rand() % 5;
       }
       
       string from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1) + "/c" + IntToString(j);
@@ -813,13 +810,8 @@ void LatencyExperimentAppend() {
     
     LOG(ERROR) << "Renamed " <<  "10 files. Elapsed time:"
                << (GetTime() - start) << " seconds";
-    
+    print_dir_tree(dir_tree);
 
-  
-    //gaoxuan --In this part I want to get all path to check if we rename successfully,in real use,we need to delete it
-    //metadata_->getLOOKUP("");
- 
-*/
 
   }
     void DeleteExperiment() {//gaoxuan --删除文件的实验
