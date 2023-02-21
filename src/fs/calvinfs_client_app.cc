@@ -494,7 +494,8 @@ void CalvinFSClientApp::rename_dir_tree(BTNode* &dir_tree, string from_path, str
  //这里如果是父目录相同的话，只改名字不改指针，名字不同才需要改指针
   BTNode *from = find_path(dir_tree, from_path, from_pre);
   //父目录相同
-  if(parent_from_path == parent_to_path)
+  LOG(ERROR)<<parent_from_path<<"  and  "<<parent_to_path<<"  "<<from_path<<"  "<<to_path;
+  if(parent_from_path == parent_to_path) 
   {
     from->path = filename;
     return;
