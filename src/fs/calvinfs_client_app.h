@@ -747,7 +747,7 @@ void LatencyExperimentAppend() {
 
     double start = GetTime();
     for (int i = 0; i < 1; i++) {
-      BackgroundCopyFile("/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(rand() % 3) + "/c" + IntToString(rand() % 3),
+      BackgroundCopyFile("/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(rand() % 3) ),
                            "/a" + IntToString(rand() % machine()->config().size()) + "/b" + IntToString(rand() % 3) );
       //上面的目的路径感觉不太对，怎么会到一个/dxxx呢，copy肯定是拷贝到一个目录下呀
       if (i % 100 == 0) {
