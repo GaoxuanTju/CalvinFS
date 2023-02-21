@@ -635,6 +635,7 @@ void CalvinFSClientApp::delete_dir_tree(BTNode* &dir_tree, string path)
   BTNode *from = find_path(dir_tree, path, from_pre);
   int pos = path.rfind('/');
   string filename = path.substr(pos + 1);
+  LOG(ERROR)<<"delete "<<path;
   if(from != NULL)
   {
     // 改下指向
