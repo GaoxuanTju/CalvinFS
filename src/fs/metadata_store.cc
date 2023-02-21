@@ -391,8 +391,8 @@ void MetadataStore::Init() {
 void MetadataStore::Init(BTNode *dir_tree) {
   //gaoxuan --这里面会涉及到目录树的建立初始化。
   int asize = machine_->config().size();
-  int bsize = 5;
-  int csize = 5;
+  int bsize = 3;
+  int csize = 3;
   //改成5,5测试的时候容易看出来
   double start = GetTime();
 
