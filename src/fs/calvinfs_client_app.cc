@@ -481,11 +481,13 @@ void CalvinFSClientApp::rename_dir_tree(BTNode* &dir_tree, string from_path, str
   //  1、找：找到from，to路径的位置
   BTNode *from_pre = NULL;
   BTNode *from = find_path(dir_tree, from_path, from_pre);
+  LOG(ERROR)<<from->path<<"  and  "<<from_pre->path<<" in rename_dir_tree";
   BTNode *to_pre = NULL;
   // 这块不对，不能直接把to_path放进去，因为可能rename到一个新位置，最次也得放ParentDir(to_path)
   int pos = to_path.rfind('/');
   string parent_to_path = to_path.substr(0, pos);
   BTNode *to = find_path(dir_tree, parent_to_path, to_pre);
+  LOG(ERROR)<<to->path<<"  and  "<<to_pre->path<<" in rename_dir_tree";
   if (from != NULL && to != NULL)
   {
     // 2、改：对from_path的节点，需要根据to_path的路径先修改名字，再修改指向
