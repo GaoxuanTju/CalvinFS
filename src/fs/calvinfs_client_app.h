@@ -739,7 +739,7 @@ void LatencyExperimentAppend() {
 
   void CopyExperiment() {
     Spin(1);
-    metadata_->Init();
+    metadata_->Init(dir_tree);
     Spin(1);
     machine()->GlobalBarrier();
     Spin(1);
