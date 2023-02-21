@@ -502,6 +502,30 @@ void CalvinFSClientApp::rename_dir_tree(BTNode* &dir_tree, string from_path, str
 
   BTNode *to = find_path(dir_tree, parent_to_path, to_pre);
 
+  if(from != NULL && to != NULL)
+  {
+    //todo：这现在有bug，文件名字不能和父亲的兄弟相同
+    //如果是左孩子
+    if(from_pre->child->path == from->path)
+    {
+      from_pre->child = from->sibling;
+    }
+    //如果是兄弟
+    if(from_pre->sibling->path ==from->path)
+    {
+      from_pre->sibling = from->sibling;
+    }
+
+    //下边改变父亲的指向
+    from_path = filename;
+    from->sibling = to->child;
+    to->child = from;
+  }
+  else
+  {
+    return;
+  }
+/*
   //只能是这里有问题呀，新位置能够遍历到新指针，但是原位置还是存在指针遍历到，这是怎么回事
   if (from != NULL && to != NULL)
   {
@@ -527,7 +551,7 @@ void CalvinFSClientApp::rename_dir_tree(BTNode* &dir_tree, string from_path, str
   {
     return;
   }
-  
+*/
   
 }
 void CalvinFSClientApp::copy_dir_tree(BTNode* &dir_tree, string from_path, string to_path)
