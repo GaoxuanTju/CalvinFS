@@ -438,7 +438,7 @@ BTNode *CalvinFSClientApp::find_path(BTNode *dir_tree, string path, BTNode *pre)
       temp = temp->sibling;
       while (temp != NULL)
       {
-        if (temp->path == split_string)
+        if (temp->path == first_substr)
         {
           break;
         }
@@ -483,7 +483,7 @@ void CalvinFSClientApp::rename_dir_tree(BTNode* &dir_tree, string from_path, str
   BTNode *from = find_path(dir_tree, from_path, from_pre);
   LOG(ERROR)<<from_path<<"  "<<to_path;
   LOG(ERROR)<<from->path;
-  
+
   BTNode *to_pre = NULL;
   // 这块不对，不能直接把to_path放进去，因为可能rename到一个新位置，最次也得放ParentDir(to_path)
   int pos = to_path.rfind('/');
