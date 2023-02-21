@@ -506,8 +506,18 @@ void CalvinFSClientApp::rename_dir_tree(BTNode* &dir_tree, string from_path, str
   if(from != NULL && to != NULL)
   {
     //todo：这现在有bug，文件名字不能和父亲的兄弟相同
-    //如果是左孩子
 
+    //检查会不会重名
+    BTNode *check = to->child;
+    while (check != NULL)
+    {
+      if (check->path == filename)
+      {
+        return; // 有同名文件
+      }
+      check = check->sibling;
+    }    
+    //如果是左孩子
     if(from_pre->child != NULL)
     {
       if(from_pre->child->path == from->path)
