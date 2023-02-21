@@ -785,7 +785,7 @@ void LatencyExperimentAppend() {
       }
       
       string from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1) + "/c" + IntToString(j);
-      string to_path = "/a" + IntToString(rand() % machine()->config().size()) + "/b" + IntToString(a1) + "/d" + IntToString(machine()->GetGUID());
+      string to_path = "/a" + IntToString(rand() % machine()->config().size()) + "/b" + IntToString(a2) + "/d" + IntToString(machine()->GetGUID());
       uint64 from_id = config_->LookupMetadataShard(config_->HashFileName(from_path),config_->LookupReplica(machine()->machine_id()));
       uint64 to_id = config_->LookupMetadataShard(config_->HashFileName(to_path),config_->LookupReplica(machine()->machine_id()));
       LOG(ERROR)<<from_path <<" in machine["<<from_id<<"]  renamed to   "<<to_path<<" in machine["<<to_id<<"]";
