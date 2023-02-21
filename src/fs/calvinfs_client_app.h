@@ -908,9 +908,9 @@ void LatencyExperimentAppend() {
 
 
   void rename_dir_tree(BTNode* &dir_tree, string from_path,string to_path);
-  void copy_dir_tree(BTNode *dir_tree, string from_path, string to_path);
-  void create_dir_tree(BTNode *dir_tree, string path);
-  void delete_dir_tree(BTNode *dir_tree, string path);
+  void copy_dir_tree(BTNode* &dir_tree, string from_path, string to_path);
+  void create_dir_tree(BTNode* &dir_tree, string path);
+  void delete_dir_tree(BTNode* &dir_tree, string path);
   BTNode* find_path(BTNode *dir_tree, string path, BTNode* &pre);
   // Caller takes ownership of returned MessageBuffers.
   // Returns serialized MetadataEntry protobuf.

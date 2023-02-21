@@ -482,16 +482,13 @@ void CalvinFSClientApp::rename_dir_tree(BTNode* &dir_tree, string from_path, str
   BTNode *from_pre = NULL;
   BTNode *from = find_path(dir_tree, from_path, from_pre);
   BTNode *to_pre = NULL;
-  // 这块不对，不能直接把to_path放进去，因为可能rename到一个新位置，最次也得放ParentDir(to_path)
+  // 这块不对，不能直接把to_path放进去，因为可能rename到一个新位置，放ParentDir(to_path)
   int pos = to_path.rfind('/');
   string parent_to_path = to_path.substr(0, pos);
   BTNode *to = find_path(dir_tree, parent_to_path, to_pre);
 
-
   if (from != NULL && to != NULL)
   {
-
-    
     if(from_pre->child != NULL)
     {
       if (from_pre->child->path == from_path)
@@ -516,7 +513,7 @@ void CalvinFSClientApp::rename_dir_tree(BTNode* &dir_tree, string from_path, str
   
   
 }
-void CalvinFSClientApp::copy_dir_tree(BTNode *dir_tree, string from_path, string to_path)
+void CalvinFSClientApp::copy_dir_tree(BTNode* &dir_tree, string from_path, string to_path)
 {
   /*
   copy的本质，是把一个地方的目录树，粘贴到另一个位置，是完整的粘贴，不能光修改指针
@@ -565,7 +562,7 @@ void CalvinFSClientApp::copy_dir_tree(BTNode *dir_tree, string from_path, string
     return;
   }
 }
-void CalvinFSClientApp::create_dir_tree(BTNode *dir_tree, string path)
+void CalvinFSClientApp::create_dir_tree(BTNode* &dir_tree, string path)
 {
   /*
   1、找：找到路径的父目录
@@ -599,7 +596,7 @@ void CalvinFSClientApp::create_dir_tree(BTNode *dir_tree, string path)
     parent->child = create_node;
   }
 }
-void CalvinFSClientApp::delete_dir_tree(BTNode *dir_tree, string path)
+void CalvinFSClientApp::delete_dir_tree(BTNode* &dir_tree, string path)
 {
   /*
   1、找：找到要删除的路径和指向它的指针
