@@ -415,9 +415,9 @@ BTNode *CalvinFSClientApp::find_path(BTNode *dir_tree, string path, BTNode *pre)
   char pattern = '/';
   string split_string = path;
   split_string = split_string + pattern; // 最后加个/便于处理
+  split_string = split_string.substr(1, split_string.size()); 
   while (temp != NULL && split_string != "")
   {
-    split_string = split_string.substr(1, split_string.size()); // 去除最前的/
     int pos = split_string.find(pattern);
     string first_substr = split_string.substr(0, pos);
     split_string = split_string.substr(pos + 1, split_string.size());
