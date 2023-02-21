@@ -778,8 +778,8 @@ void LatencyExperimentAppend() {
     string from_path;
     string to_path;
     for (int j = 0; j <1 ; j++) {
-      int a1 = rand() % 5;
-      int a2 = rand() % 5;
+      int a1 = rand() % 3;
+      int a2 = rand() % 3;
       while (a2 == a1) {
         a2 = rand() % 5;
       }
