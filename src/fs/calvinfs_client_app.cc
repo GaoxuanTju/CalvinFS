@@ -490,15 +490,22 @@ void CalvinFSClientApp::rename_dir_tree(BTNode* &dir_tree, string from_path, str
 
   if (from != NULL && to != NULL)
   {
-    if (from_pre->child == from)
+
+    //todo :这里暂时有个小bug，如果父目录的兄弟和文件同名会有问题
+    if(from_pre->child != NULL)
     {
-      from_pre->child = from->sibling;
+      if (from_pre->child->path == from_path)
+      {
+        from_pre->child = from->sibling;
+      }
     }
     else
     {
       from_pre->sibling = from->sibling;
     }
-
+    int index = to_path.rfind('/');
+    string filename = to_path.substr(index + 1);
+    from->path = filename;
     from->sibling = to->child;
     to->child = from;
   }
