@@ -922,8 +922,8 @@ public:
                << "10 files. Elapsed time:"
                << (GetTime() - start) << " seconds";
 
-    // Spin(10);
-    // print_dir_tree(dir_tree);
+     Spin(1);
+     print_dir_tree(dir_tree);
   }
   void DeleteExperiment()
   { // gaoxuan --删除文件的实验
