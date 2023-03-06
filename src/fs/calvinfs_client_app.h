@@ -988,7 +988,6 @@ public:
     LOG(ERROR) << "[" << machine()->machine_id() << "] "
                << "LS " << 1 << " files. Elapsed time: "
                << (GetTime() - start) << " seconds";
-    Spin(1);
    // print_dir_tree(dir_tree);
   }
 
