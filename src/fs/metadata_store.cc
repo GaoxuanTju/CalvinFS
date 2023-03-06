@@ -26,7 +26,8 @@ using std::map;
 using std::set;
 using std::string;
 
-REGISTER_APP(MetadataStoreApp) {
+REGISTER_APP(MetadataStoreApp)
+{
   return new StoreApp(new MetadataStore(new HybridVersionedKVStore()));
 }
 
@@ -36,86 +37,107 @@ REGISTER_APP(MetadataStoreApp) {
 //            Extend this to be a DISTRIBUTED one.
 // TODO(agt): Generalize and move to components/store/store.{h,cc}.
 //
-class ExecutionContext {
- public:
+class ExecutionContext
+{
+public:
   // Constructor performs all reads.
-  ExecutionContext(VersionedKVStore* store, Action* action)
-      : store_(store), version_(action->version()), aborted_(false) {
-    for (int i = 0; i < action->readset_size(); i++) {
+  ExecutionContext(VersionedKVStore *store, Action *action)
+      : store_(store), version_(action->version()), aborted_(false)
+  {
+    for (int i = 0; i < action->readset_size(); i++)
+    {
       if (!store_->Get(action->readset(i),
                        version_,
-                       &reads_[action->readset(i)])) {
+                       &reads_[action->readset(i)]))
+      {
         reads_.erase(action->readset(i));
       }
     }
 
-    if (action->readset_size() > 0) {
+    if (action->readset_size() > 0)
+    {
       reader_ = true;
-    } else {
+    }
+    else
+    {
       reader_ = false;
     }
 
-    if (action->writeset_size() > 0) {
+    if (action->writeset_size() > 0)
+    {
       writer_ = true;
-    } else {
+    }
+    else
+    {
       writer_ = false;
     }
-
   }
 
   // Destructor installs all writes.
-  ~ExecutionContext() {
-    if (!aborted_) {
-      for (auto it = writes_.begin(); it != writes_.end(); ++it) {
+  ~ExecutionContext()
+  {
+    if (!aborted_)
+    {
+      for (auto it = writes_.begin(); it != writes_.end(); ++it)
+      {
         store_->Put(it->first, it->second, version_);
       }
-      for (auto it = deletions_.begin(); it != deletions_.end(); ++it) {
+      for (auto it = deletions_.begin(); it != deletions_.end(); ++it)
+      {
         store_->Delete(*it, version_);
       }
     }
   }
 
-  bool EntryExists(const string& path) {
+  bool EntryExists(const string &path)
+  {
     return reads_.count(path) != 0;
   }
 
-  bool GetEntry(const string& path, MetadataEntry* entry) {
+  bool GetEntry(const string &path, MetadataEntry *entry)
+  {
     entry->Clear();
-    if (reads_.count(path) != 0) {
+    if (reads_.count(path) != 0)
+    {
       entry->ParseFromString(reads_[path]);
       return true;
     }
     return false;
   }
 
-  void PutEntry(const string& path, const MetadataEntry& entry) {
+  void PutEntry(const string &path, const MetadataEntry &entry)
+  {
     deletions_.erase(path);
     entry.SerializeToString(&writes_[path]);
-    if (reads_.count(path) != 0) {
+    if (reads_.count(path) != 0)
+    {
       entry.SerializeToString(&reads_[path]);
     }
   }
 
-  void DeleteEntry(const string& path) {
+  void DeleteEntry(const string &path)
+  {
     reads_.erase(path);
     writes_.erase(path);
     deletions_.insert(path);
   }
 
-  bool IsWriter() {
+  bool IsWriter()
+  {
     if (writer_)
       return true;
     else
       return false;
   }
 
-  void Abort() {
+  void Abort()
+  {
     aborted_ = true;
   }
 
- protected:
+protected:
   ExecutionContext() {}
-  VersionedKVStore* store_;
+  VersionedKVStore *store_;
   uint64 version_;
   bool aborted_;
   map<string, string> reads_;
@@ -133,15 +155,17 @@ class ExecutionContext {
 //
 // TODO(agt): Generalize and move to components/store/store.{h,cc}.
 //
-class DistributedExecutionContext : public ExecutionContext {
- public:
+class DistributedExecutionContext : public ExecutionContext
+{
+public:
   // Constructor performs all reads.
   DistributedExecutionContext(
-      Machine* machine,
-      CalvinFSConfigMap* config,
-      VersionedKVStore* store,
-      Action* action)
-        : machine_(machine), config_(config) {
+      Machine *machine,
+      CalvinFSConfigMap *config,
+      VersionedKVStore *store,
+      Action *action)
+      : machine_(machine), config_(config)
+  {
     // Initialize parent class variables.
     store_ = store;
     version_ = action->version();
@@ -153,18 +177,41 @@ class DistributedExecutionContext : public ExecutionContext {
     // Figure out what machines are readers (and perform local reads).
     reader_ = false;
     set<uint64> remote_readers;
-    for (int i = 0; i < action->readset_size(); i++) {//gaoxuan --now handle the read/write set passed from GetRWs
-      uint64 mds = config_->HashFileName(action->readset(i));
-      uint64 machine = config_->LookupMetadataShard(mds, replica_);//gaoxuan --get right machine of the path
-      if (machine == machine_->machine_id()) {//gaoxuan --if the path in read/write set is local,put it's metadataentry into map reads_,key is path,value is entry
+    for (int i = 0; i < action->readset_size(); i++)
+    { // gaoxuan --now handle the read/write set passed from GetRWs
+
+      string path = action->readset(i); // 获取这个路径
+      // 判断涉不涉及分层，目前是看有没有b，如果有b就分层
+      char pattern = 'b';
+      string hash_name;
+      if (path.find(pattern) != std::string::npos)
+      {
+        // 对路径进行处理，搞成初始化那时候的规则
+        int pos = path.find(pattern);
+        string temp = path.substr(pos + 1);
+        int pos_1 = path.find('/');
+        string flag_level = temp.substr(0, pos_1);
+        hash_name = "/" + flag_level + temp.substr(pos_1 + 1);
+      }
+      else
+      { // 不涉及分层，这半部分就是上面那样直接获取即可
+        hash_name = path;
+      }
+      uint64 mds = config_->HashFileName(hash_name);
+      uint64 machine = config_->LookupMetadataShard(mds, replica_); // gaoxuan --get right machine of the path
+      if (machine == machine_->machine_id())
+      { // gaoxuan --if the path in read/write set is local,put it's metadataentry into map reads_,key is path,value is entry
         // Local read.
-        if (!store_->Get(action->readset(i),
+        if (!store_->Get(hash_name,
                          version_,
-                         &reads_[action->readset(i)])) {
-          reads_.erase(action->readset(i));
+                         &reads_[hash_name]))
+        {
+          reads_.erase(hash_name);
         }
         reader_ = true;
-      } else {//gaoxuan --this machine is that we want to read. Put it into set remote_readers
+      }
+      else
+      { // gaoxuan --this machine is that we want to read. Put it into set remote_readers
         remote_readers.insert(machine);
       }
     }
@@ -172,49 +219,79 @@ class DistributedExecutionContext : public ExecutionContext {
     // Figure out what machines are writers.
     writer_ = false;
     set<uint64> remote_writers;
-    for (int i = 0; i < action->writeset_size(); i++) {
-      uint64 mds = config_->HashFileName(action->writeset(i));
+    for (int i = 0; i < action->writeset_size(); i++)
+    {
+
+      string path = action->writeset(i);
+      // 判断涉不涉及分层，目前是看有没有b，如果有b就分层
+      char pattern = 'b';
+      string hash_name;
+      if (path.find(pattern) != std::string::npos)
+      {
+        // 对路径进行处理，搞成初始化那时候的规则
+        int pos = path.find(pattern);
+        string temp = path.substr(pos + 1);
+        int pos_1 = path.find('/');
+        string flag_level = temp.substr(0, pos_1);
+        hash_name = "/" + flag_level + temp.substr(pos_1 + 1);
+      }
+      else
+      { // 不涉及分层，这半部分就是上面那样直接获取即可
+        hash_name = path;
+      }
+
+      uint64 mds = config_->HashFileName(hash_name);
       uint64 machine = config_->LookupMetadataShard(mds, replica_);
-      if (machine == machine_->machine_id()) {
+      if (machine == machine_->machine_id())
+      {
         writer_ = true;
-      } else {
+      }
+      else
+      {
         remote_writers.insert(machine);
       }
     }
 
     // If any reads were performed locally, broadcast them to writers.
-    if (reader_) {
+    if (reader_)
+    {
       MapProto local_reads;
-      for (auto it = reads_.begin(); it != reads_.end(); ++it) {
-        MapProto::Entry* e = local_reads.add_entries();
+      for (auto it = reads_.begin(); it != reads_.end(); ++it)
+      {
+        MapProto::Entry *e = local_reads.add_entries();
         e->set_key(it->first);
         e->set_value(it->second);
       }
-      //gaoxuan --why do we want to read but we need to broadcast to writers?
-      for (auto it = remote_writers.begin(); it != remote_writers.end(); ++it) {
-        Header* header = new Header();
+      // gaoxuan --why do we want to read but we need to broadcast to writers?
+      for (auto it = remote_writers.begin(); it != remote_writers.end(); ++it)
+      {
+        Header *header = new Header();
         header->set_from(machine_->machine_id());
         header->set_to(*it);
-        header->set_type(Header::DATA);//gaoxuan --deliver packets directly,and the specific logic refers to lock
-        header->set_data_channel("action-" + UInt64ToString(version_));//gaoxuan --Can this version make a difference ? 
+        header->set_type(Header::DATA);                                 // gaoxuan --deliver packets directly,and the specific logic refers to lock
+        header->set_data_channel("action-" + UInt64ToString(version_)); // gaoxuan --Can this version make a difference ?
         machine_->SendMessage(header, new MessageBuffer(local_reads));
       }
     }
 
     // If any writes will be performed locally, wait for all remote reads.
-    if (writer_) {
+    if (writer_)
+    {
       // Get channel.
-      AtomicQueue<MessageBuffer*>* channel =
+      AtomicQueue<MessageBuffer *> *channel =
           machine_->DataChannel("action-" + UInt64ToString(version_));
-      for (uint32 i = 0; i < remote_readers.size(); i++) {//gaoxuan --in this part we get remote entry
-        MessageBuffer* m = NULL;
+      for (uint32 i = 0; i < remote_readers.size(); i++)
+      { // gaoxuan --in this part we get remote entry
+        MessageBuffer *m = NULL;
         // Get results.
-        while (!channel->Pop(&m)) {
+        while (!channel->Pop(&m))
+        {
           usleep(10);
         }
         MapProto remote_read;
         remote_read.ParseFromArray((*m)[0].data(), (*m)[0].size());
-        for (int j = 0; j < remote_read.entries_size(); j++) {
+        for (int j = 0; j < remote_read.entries_size(); j++)
+        {
           CHECK(reads_.count(remote_read.entries(j).key()) == 0);
           reads_[remote_read.entries(j).key()] = remote_read.entries(j).value();
         }
@@ -225,77 +302,90 @@ class DistributedExecutionContext : public ExecutionContext {
   }
 
   // Destructor installs all LOCAL writes.
-  ~DistributedExecutionContext() {
-    if (!aborted_) {
-      for (auto it = writes_.begin(); it != writes_.end(); ++it) {
+  ~DistributedExecutionContext()
+  {
+    if (!aborted_)
+    {
+      for (auto it = writes_.begin(); it != writes_.end(); ++it)
+      {
         uint64 mds = config_->HashFileName(it->first);
         uint64 machine = config_->LookupMetadataShard(mds, replica_);
-        if (machine == machine_->machine_id()) {
+        if (machine == machine_->machine_id())
+        {
           store_->Put(it->first, it->second, version_);
         }
       }
-      for (auto it = deletions_.begin(); it != deletions_.end(); ++it) {
+      for (auto it = deletions_.begin(); it != deletions_.end(); ++it)
+      {
         uint64 mds = config_->HashFileName(*it);
         uint64 machine = config_->LookupMetadataShard(mds, replica_);
-        if (machine == machine_->machine_id()) {
+        if (machine == machine_->machine_id())
+        {
           store_->Delete(*it, version_);
         }
       }
     }
   }
 
- private:
+private:
   // Local machine.
-  Machine* machine_;
+  Machine *machine_;
 
   // Deployment configuration.
-  CalvinFSConfigMap* config_;
+  CalvinFSConfigMap *config_;
 
   // Local replica id.
   uint64 replica_;
-
 };
 
 ///////////////////////          MetadataStore          ///////////////////////
-//use rfind to get the index of last '/',so the parentdir is for index 0 to index of last '/'
-string ParentDir(const string& path) {
+// use rfind to get the index of last '/',so the parentdir is for index 0 to index of last '/'
+string ParentDir(const string &path)
+{
   // Root dir is a special case.
-  if (path.empty()) {
+  if (path.empty())
+  {
     LOG(FATAL) << "root dir has no parent";
   }
   uint32 offset = path.rfind('/');
-  CHECK_NE(string::npos, offset);     // at least 1 slash required
-  CHECK_NE(path.size() - 1, offset);  // filename cannot be empty
+  CHECK_NE(string::npos, offset);    // at least 1 slash required
+  CHECK_NE(path.size() - 1, offset); // filename cannot be empty
   return string(path, 0, offset);
 }
-//get the name of file, without the absolute path
-string FileName(const string& path) {
+// get the name of file, without the absolute path
+string FileName(const string &path)
+{
   // Root dir is a special case.
-  if (path.empty()) {
+  if (path.empty())
+  {
     return path;
   }
   uint32 offset = path.rfind('/');
-  CHECK_NE(string::npos, offset);     // at least 1 slash required
-  CHECK_NE(path.size() - 1, offset);  // filename cannot be empty
+  CHECK_NE(string::npos, offset);    // at least 1 slash required
+  CHECK_NE(path.size() - 1, offset); // filename cannot be empty
   return string(path, offset + 1);
 }
 
-MetadataStore::MetadataStore(VersionedKVStore* store)
-    : store_(store), machine_(NULL), config_(NULL) {
+MetadataStore::MetadataStore(VersionedKVStore *store)
+    : store_(store), machine_(NULL), config_(NULL)
+{
 }
 
-MetadataStore::~MetadataStore() {
+MetadataStore::~MetadataStore()
+{
   delete store_;
 }
 
-void MetadataStore::SetMachine(Machine* m) {
-  
+void MetadataStore::SetMachine(Machine *m)
+{
+
   machine_ = m;
   config_ = new CalvinFSConfigMap(machine_);
 
   // Initialize by inserting an entry for the root directory "/" (actual
   // representation is "" since trailing slashes are always removed).
-  if (IsLocal("")) {
+  if (IsLocal(""))
+  {
     MetadataEntry entry;
     entry.mutable_permissions();
     entry.set_type(DIR);
@@ -305,24 +395,28 @@ void MetadataStore::SetMachine(Machine* m) {
   }
 }
 
-int RandomSize() {
+int RandomSize()
+{
   return 1 + rand() % 2047;
 }
 
-void MetadataStore::Init() {
-  
+void MetadataStore::Init()
+{
+
   int asize = machine_->config().size();
   int bsize = 1000;
   int csize = 500;
-  
+
   double start = GetTime();
 
   // Update root dir.
-  if (IsLocal("")) {
+  if (IsLocal(""))
+  {
     MetadataEntry entry;
     entry.mutable_permissions();
     entry.set_type(DIR);
-    for (int i = 0; i < 1000; i++) {
+    for (int i = 0; i < 1000; i++)
+    {
       entry.add_dir_contents("a" + IntToString(i));
     }
     string serialized_entry;
@@ -331,13 +425,16 @@ void MetadataStore::Init() {
   }
 
   // Add dirs.
-  for (int i = 0; i < asize; i++) {
+  for (int i = 0; i < asize; i++)
+  {
     string dir("/a" + IntToString(i));
-    if (IsLocal(dir)) {
+    if (IsLocal(dir))
+    {
       MetadataEntry entry;
       entry.mutable_permissions();
       entry.set_type(DIR);
-      for (int j = 0; j < bsize; j++) {
+      for (int j = 0; j < bsize; j++)
+      {
         entry.add_dir_contents("b" + IntToString(j));
       }
       string serialized_entry;
@@ -345,13 +442,16 @@ void MetadataStore::Init() {
       store_->Put(dir, serialized_entry, 0);
     }
     // Add subdirs.
-    for (int j = 0; j < bsize; j++) {
+    for (int j = 0; j < bsize; j++)
+    {
       string subdir(dir + "/b" + IntToString(j));
-      if (IsLocal(subdir)) {
+      if (IsLocal(subdir))
+      {
         MetadataEntry entry;
         entry.mutable_permissions();
         entry.set_type(DIR);
-        for (int k = 0; k < csize; k++) {
+        for (int k = 0; k < csize; k++)
+        {
           entry.add_dir_contents("c" + IntToString(k));
         }
         string serialized_entry;
@@ -359,13 +459,15 @@ void MetadataStore::Init() {
         store_->Put(subdir, serialized_entry, 0);
       }
       // Add files.
-      for (int k = 0; k < csize; k++) {
+      for (int k = 0; k < csize; k++)
+      {
         string file(subdir + "/c" + IntToString(k));
-        if (IsLocal(file)) {
+        if (IsLocal(file))
+        {
           MetadataEntry entry;
           entry.mutable_permissions();
           entry.set_type(DATA);
-          FilePart* fp = entry.add_file_parts();
+          FilePart *fp = entry.add_file_parts();
           fp->set_length(RandomSize());
           fp->set_block_id(0);
           fp->set_block_offset(0);
@@ -374,86 +476,92 @@ void MetadataStore::Init() {
           store_->Put(file, serialized_entry, 0);
         }
       }
-      if (j % 100 == 0) {
+      if (j % 100 == 0)
+      {
         LOG(ERROR) << "[" << machine_->machine_id() << "] "
                    << "MDS::Init() progress: " << (i * bsize + j) / 100 + 1
                    << "/" << asize * bsize / 100;
       }
     }
   }
-  
+
   LOG(ERROR) << "[" << machine_->machine_id() << "] "
              << "MDS::Init() complete. Elapsed time: "
              << GetTime() - start << " seconds";
 }
 
-
-void MetadataStore::Init(BTNode *dir_tree) {
-  //gaoxuan --这里面会涉及到目录树的建立初始化。
+void MetadataStore::Init(BTNode *dir_tree)
+{
+  // gaoxuan --这里面会涉及到目录树的建立初始化。
   int asize = machine_->config().size();
   int bsize = 5;
   int csize = 5;
-  //改成5,5测试的时候容易看出来
+  // 改成5,5测试的时候容易看出来
   double start = GetTime();
 
   // Update root dir.
-  //因为我们需要的是完整的目录树，所以我们在if ISLOCAL之前直接放进去就好，同时也要把孩子和兄弟的关系理清楚
-  //提前先建立起来吧
+  // 因为我们需要的是完整的目录树，所以我们在if ISLOCAL之前直接放进去就好，同时也要把孩子和兄弟的关系理清楚
+  // 提前先建立起来吧
 
-  //gaoxuan --根节点的指针
+  // gaoxuan --根节点的指针
   dir_tree->child = NULL;
   dir_tree->sibling = NULL;
-  dir_tree->path = ""; 
-  if (IsLocal("")) {
+  dir_tree->path = "";
+  if (IsLocal(""))
+  {
     MetadataEntry entry;
     entry.mutable_permissions();
     entry.set_type(DIR);
-    for (int i = 0; i < asize; i++) {
+    for (int i = 0; i < asize; i++)
+    {
       entry.add_dir_contents("a" + IntToString(i));
     }
     string serialized_entry;
     entry.SerializeToString(&serialized_entry);
     store_->Put("", serialized_entry, 0);
   }
-  BTNode* a_level = NULL;//这个就指向该层第一个节点
+  BTNode *a_level = NULL; // 这个就指向该层第一个节点
   // Add dirs.
-  for (int i = 0; i < asize; i++) {
+  for (int i = 0; i < asize; i++)
+  {
     string dir("/a" + IntToString(i));
     string dir_("a" + IntToString(i));
     BTNode *temp_a = new BTNode;
     temp_a->child = NULL;
     temp_a->path = dir_;
     temp_a->sibling = NULL;
-    
-    if(i == 0)
+
+    if (i == 0)
     {
-      //gaoxuan --如果是第一个节点，就将他作为上一层的孩子
+      // gaoxuan --如果是第一个节点，就将他作为上一层的孩子
       dir_tree->child = temp_a;
-      a_level = temp_a; //a_level指针作为上一个兄弟节点
+      a_level = temp_a; // a_level指针作为上一个兄弟节点
     }
     else
     {
-      //如果不是第一个节点，就是上一个节点的兄弟节点
-      a_level->sibling = temp_a;  
-      a_level = a_level->sibling;//a_level移动到下一个兄弟节点
+      // 如果不是第一个节点，就是上一个节点的兄弟节点
+      a_level->sibling = temp_a;
+      a_level = a_level->sibling; // a_level移动到下一个兄弟节点
     }
 
-
-    if (IsLocal(dir)) {
+    if (IsLocal(dir))
+    {
       MetadataEntry entry;
       entry.mutable_permissions();
       entry.set_type(DIR);
-      for (int j = 0; j < bsize; j++) {
+      for (int j = 0; j < bsize; j++)
+      {
         entry.add_dir_contents("b" + IntToString(j));
       }
       string serialized_entry;
       entry.SerializeToString(&serialized_entry);
       store_->Put(dir, serialized_entry, 0);
     }
-    
+
     // Add subdirs.
-    BTNode* b_level = NULL;//这个就指向该层第二个节点
-    for (int j = 0; j < bsize; j++) {
+    BTNode *b_level = NULL; // 这个就指向该层第二个节点
+    for (int j = 0; j < bsize; j++)
+    {
       string subdir(dir + "/b" + IntToString(j));
       string subdir_("b" + IntToString(j));
       BTNode *temp_b = new BTNode;
@@ -461,23 +569,25 @@ void MetadataStore::Init(BTNode *dir_tree) {
       temp_b->path = subdir_;
       temp_b->sibling = NULL;
 
-      if(j == 0)
+      if (j == 0)
       {
-        //gaoxuan --如果是第一个节点，就将他作为上一层的孩子
+        // gaoxuan --如果是第一个节点，就将他作为上一层的孩子
         a_level->child = temp_b;
         b_level = temp_b;
       }
       else
       {
-        //gaoxuan --不是第一个节点，是上一个的兄弟节点
+        // gaoxuan --不是第一个节点，是上一个的兄弟节点
         b_level->sibling = temp_b;
         b_level = b_level->sibling;
       }
-      if (IsLocal(subdir)) {
+      if (IsLocal(subdir))
+      {
         MetadataEntry entry;
         entry.mutable_permissions();
         entry.set_type(DIR);
-        for (int k = 0; k < csize; k++) {
+        for (int k = 0; k < csize; k++)
+        {
           entry.add_dir_contents("c" + IntToString(k));
         }
         string serialized_entry;
@@ -485,17 +595,18 @@ void MetadataStore::Init(BTNode *dir_tree) {
         store_->Put(subdir, serialized_entry, 0);
       }
       // Add files.
-      BTNode* c_level = NULL;//这个就指向该层第三个节点
-      for (int k = 0; k < csize; k++) {
+      BTNode *c_level = NULL; // 这个就指向该层第三个节点
+      for (int k = 0; k < csize; k++)
+      {
         string file(subdir + "/c" + IntToString(k));
         string file_("c" + IntToString(k));
         BTNode *temp_c = new BTNode;
         temp_c->child = NULL;
         temp_c->path = file_;
         temp_c->sibling = NULL;
-        if(k ==0)
+        if (k == 0)
         {
-          //gaoxuan --如果是第一个节点，就作为上一层的孩子
+          // gaoxuan --如果是第一个节点，就作为上一层的孩子
           b_level->child = temp_c;
           c_level = temp_c;
         }
@@ -505,11 +616,12 @@ void MetadataStore::Init(BTNode *dir_tree) {
           c_level = c_level->sibling;
         }
 
-        if (IsLocal(file)) {
+        if (IsLocal(file))
+        {
           MetadataEntry entry;
           entry.mutable_permissions();
           entry.set_type(DATA);
-          FilePart* fp = entry.add_file_parts();
+          FilePart *fp = entry.add_file_parts();
           fp->set_length(RandomSize());
           fp->set_block_id(0);
           fp->set_block_offset(0);
@@ -518,31 +630,207 @@ void MetadataStore::Init(BTNode *dir_tree) {
           store_->Put(file, serialized_entry, 0);
         }
       }
-      if (j % 100 == 0) {
+      if (j % 100 == 0)
+      {
         LOG(ERROR) << "[" << machine_->machine_id() << "] "
                    << "MDS::Init() progress: " << (i * bsize + j) / 100 + 1
                    << "/" << asize * bsize / 100;
       }
     }
   }
-  
+
   LOG(ERROR) << "[" << machine_->machine_id() << "] "
              << "MDS::Init() complete. Elapsed time: "
              << GetTime() - start << " seconds";
 }
 
-void MetadataStore::InitSmall() {
+// 这个初始化函数是增加了分层的
+void MetadataStore::Init(BTNode *dir_tree, string level)
+{
+  // gaoxuan --这里面会涉及到目录树的建立初始化。
+  int asize = machine_->config().size();
+  int bsize = 5;
+  int csize = 5;
+  // 改成5,5测试的时候容易看出来
+  double start = GetTime();
+
+  // Update root dir.
+  // 因为我们需要的是完整的目录树，所以我们在if ISLOCAL之前直接放进去就好，同时也要把孩子和兄弟的关系理清楚
+  // 提前先建立起来吧
+
+  // gaoxuan --根节点的指针
+  dir_tree->child = NULL;
+  dir_tree->sibling = NULL;
+  dir_tree->path = "";
+  if (IsLocal(""))
+  {
+    MetadataEntry entry;
+    entry.mutable_permissions();
+    entry.set_type(DIR);
+    for (int i = 0; i < asize; i++)
+    {
+      entry.add_dir_contents("a" + IntToString(i));
+    }
+    string serialized_entry;
+    entry.SerializeToString(&serialized_entry);
+    store_->Put("", serialized_entry, 0);
+  }
+  BTNode *a_level = NULL; // 这个就指向该层第一个节点
+  // Add dirs.
+  for (int i = 0; i < asize; i++)
+  {
+    string dir("/a" + IntToString(i));
+    string dir_("a" + IntToString(i));
+    BTNode *temp_a = new BTNode;
+    temp_a->child = NULL;
+    temp_a->path = dir_;
+    temp_a->sibling = NULL;
+
+    if (i == 0)
+    {
+      // gaoxuan --如果是第一个节点，就将他作为上一层的孩子
+      dir_tree->child = temp_a;
+      a_level = temp_a; // a_level指针作为上一个兄弟节点
+    }
+    else
+    {
+      // 如果不是第一个节点，就是上一个节点的兄弟节点
+      a_level->sibling = temp_a;
+      a_level = a_level->sibling; // a_level移动到下一个兄弟节点
+    }
+
+    if (IsLocal(dir))
+    {
+      MetadataEntry entry;
+      entry.mutable_permissions();
+      entry.set_type(DIR);
+      for (int j = 0; j < bsize; j++)
+      {
+        entry.add_dir_contents("b" + IntToString(j));
+      }
+      string serialized_entry;
+      entry.SerializeToString(&serialized_entry);
+      store_->Put(dir, serialized_entry, 0);
+    }
+
+    // Add subdirs.
+    BTNode *b_level = NULL; // 这个就指向该层第二个节点
+
+    string flag_level = IntToString(i);
+    // 现在flag_level目前就是要对拼接到字符串前的标识了
+    for (int j = 0; j < bsize; j++)
+    {
+      string subdir(dir + "/b" + IntToString(j));
+      string subdir_("b" + IntToString(j));
+      string subdir__("/" + flag_level + subdir_);
+      // gaoxuan --目前写死在b这一层开始分层
+      // 1、对相对路径hash
+      // 2、键值对继续存储元数据
+
+      // 现在无法绕开的问题就是相对路径很大概率是相同的，那么无论是hash
+      // 还是键值对存储数据都不能实现
+      /*
+      这一点是分层点，我们在分层点确定是
+
+
+      */
+
+      BTNode *temp_b = new BTNode;
+      temp_b->child = NULL;
+      temp_b->path = subdir_;
+      temp_b->sibling = NULL;
+
+      if (j == 0)
+      {
+        // gaoxuan --如果是第一个节点，就将他作为上一层的孩子
+        a_level->child = temp_b;
+        b_level = temp_b;
+      }
+      else
+      {
+        // gaoxuan --不是第一个节点，是上一个的兄弟节点
+        b_level->sibling = temp_b;
+        b_level = b_level->sibling;
+      }
+      if (IsLocal(subdir__))
+      {
+        MetadataEntry entry;
+        entry.mutable_permissions();
+        entry.set_type(DIR);
+        for (int k = 0; k < csize; k++)
+        {
+          entry.add_dir_contents("c" + IntToString(k));
+        }
+        string serialized_entry;
+        entry.SerializeToString(&serialized_entry);
+        store_->Put(subdir__, serialized_entry, 0);
+      }
+      // Add files.
+      BTNode *c_level = NULL; // 这个就指向该层第三个节点
+      for (int k = 0; k < csize; k++)
+      {
+        string file(subdir__ + "/c" + IntToString(k));
+        string file_("c" + IntToString(k));
+
+        BTNode *temp_c = new BTNode;
+        temp_c->child = NULL;
+        temp_c->path = file_;
+        temp_c->sibling = NULL;
+        if (k == 0)
+        {
+          // gaoxuan --如果是第一个节点，就作为上一层的孩子
+          b_level->child = temp_c;
+          c_level = temp_c;
+        }
+        else
+        {
+          c_level->sibling = temp_c;
+          c_level = c_level->sibling;
+        }
+
+        if (IsLocal(file))
+        {
+          MetadataEntry entry;
+          entry.mutable_permissions();
+          entry.set_type(DATA);
+          FilePart *fp = entry.add_file_parts();
+          fp->set_length(RandomSize());
+          fp->set_block_id(0);
+          fp->set_block_offset(0);
+          string serialized_entry;
+          entry.SerializeToString(&serialized_entry);
+          store_->Put(file, serialized_entry, 0);
+        }
+      }
+      if (j % 100 == 0)
+      {
+        LOG(ERROR) << "[" << machine_->machine_id() << "] "
+                   << "MDS::Init() progress: " << (i * bsize + j) / 100 + 1
+                   << "/" << asize * bsize / 100;
+      }
+    }
+  }
+
+  LOG(ERROR) << "[" << machine_->machine_id() << "] "
+             << "MDS::Init() complete. Elapsed time: "
+             << GetTime() - start << " seconds";
+}
+
+void MetadataStore::InitSmall()
+{
   int asize = machine_->config().size();
   int bsize = 1000;
 
   double start = GetTime();
 
   // Update root dir.
-  if (IsLocal("")) {
+  if (IsLocal(""))
+  {
     MetadataEntry entry;
     entry.mutable_permissions();
     entry.set_type(DIR);
-    for (int i = 0; i < 1000; i++) {
+    for (int i = 0; i < 1000; i++)
+    {
       entry.add_dir_contents("a" + IntToString(i));
     }
     string serialized_entry;
@@ -551,13 +839,16 @@ void MetadataStore::InitSmall() {
   }
 
   // Add dirs.
-  for (int i = 0; i < asize; i++) {
+  for (int i = 0; i < asize; i++)
+  {
     string dir("/a" + IntToString(i));
-    if (IsLocal(dir)) {
+    if (IsLocal(dir))
+    {
       MetadataEntry entry;
       entry.mutable_permissions();
       entry.set_type(DIR);
-      for (int j = 0; j < bsize; j++) {
+      for (int j = 0; j < bsize; j++)
+      {
         entry.add_dir_contents("b" + IntToString(j));
       }
       string serialized_entry;
@@ -565,9 +856,11 @@ void MetadataStore::InitSmall() {
       store_->Put(dir, serialized_entry, 0);
     }
     // Add subdirs.
-    for (int j = 0; j < bsize; j++) {
+    for (int j = 0; j < bsize; j++)
+    {
       string subdir(dir + "/b" + IntToString(j));
-      if (IsLocal(subdir)) {
+      if (IsLocal(subdir))
+      {
         MetadataEntry entry;
         entry.mutable_permissions();
         entry.set_type(DIR);
@@ -578,7 +871,8 @@ void MetadataStore::InitSmall() {
       }
       // Add files.
       string file(subdir + "/c");
-      if (IsLocal(file)) {
+      if (IsLocal(file))
+      {
         MetadataEntry entry;
         entry.mutable_permissions();
         entry.set_type(DATA);
@@ -593,150 +887,151 @@ void MetadataStore::InitSmall() {
              << GetTime() - start << " seconds";
 }
 
-bool MetadataStore::IsLocal(const string& path) {
+bool MetadataStore::IsLocal(const string &path)
+{
   return machine_->machine_id() ==
          config_->LookupMetadataShard(
-            config_->HashFileName(path),
-            config_->LookupReplica(machine_->machine_id()));
+             config_->HashFileName(path),
+             config_->LookupReplica(machine_->machine_id()));
 }
-
 
 void MetadataStore::getLOOKUP(string path)
 {
-    std::stack <string> stack1;//gaoxuan --the stack is used for tranversing  the file tree
-    stack1.push(path);//gaoxuan --we want to tranverse all children of this path to add read/write set
-  
-    while (!stack1.empty()) 
-    {
-      string top = stack1.top(); // gaoxuan --get the top
-      stack1.pop();              // gaoxuan --pop the top
-      if(top.find("d") != std::string::npos)//gaoxuan --this 10 is used to limit output.Because it will be too many output without limitation 
-      {
-            LOG(ERROR)<<"renamed file is: "<<top;
-      }
-      uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(top)), config_->LookupReplica(machine_->machine_id()));
-      Header *header = new Header();
-      header->set_from(machine_->machine_id());
-      header->set_to(mds_machine);
-      header->set_type(Header::RPC);
-      header->set_app("client");
-      header->set_rpc("LOOKUP");
-      header->add_misc_string(top.c_str(), strlen(top.c_str()));
-    //gaoxuan --在这里发出消息之前，把from_path.data()和to_path.data()拆分一下
+  std::stack<string> stack1; // gaoxuan --the stack is used for tranversing  the file tree
+  stack1.push(path);         // gaoxuan --we want to tranverse all children of this path to add read/write set
 
-    //第一步：将from_path.data()拆分放进split_string里面，拆完后，不够八个格子的，使用空格填充上
-    //拆分的算法，遇到一个/就把之前的字符串放进去
-    //将拆分后的元素添加去的方法：header->add_split_string(拆分的字符串)
-    int flag = 0 ;//用来标识此时split_string 里面有多少子串
-    char pattern = '/' ;//根据/进行字符串拆分
-
-    string temp_from = top.c_str(); 
-    temp_from = temp_from.substr(1,temp_from.size());//这一行是为了去除最前面的/
-    temp_from = temp_from + pattern ; //在最后面添加一个/便于处理
-    int pos = temp_from.find(pattern);//找到第一个/的位置
-    while(pos != std::string::npos)//循环不断找/，找到一个拆分一次
+  while (!stack1.empty())
+  {
+    string top = stack1.top();              // gaoxuan --get the top
+    stack1.pop();                           // gaoxuan --pop the top
+    if (top.find("d") != std::string::npos) // gaoxuan --this 10 is used to limit output.Because it will be too many output without limitation
     {
-      string temp1 = temp_from.substr(0,pos);//temp里面就是拆分出来的第一个子串
+      LOG(ERROR) << "renamed file is: " << top;
+    }
+    uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(top)), config_->LookupReplica(machine_->machine_id()));
+    Header *header = new Header();
+    header->set_from(machine_->machine_id());
+    header->set_to(mds_machine);
+    header->set_type(Header::RPC);
+    header->set_app("client");
+    header->set_rpc("LOOKUP");
+    header->add_misc_string(top.c_str(), strlen(top.c_str()));
+    // gaoxuan --在这里发出消息之前，把from_path.data()和to_path.data()拆分一下
+
+    // 第一步：将from_path.data()拆分放进split_string里面，拆完后，不够八个格子的，使用空格填充上
+    // 拆分的算法，遇到一个/就把之前的字符串放进去
+    // 将拆分后的元素添加去的方法：header->add_split_string(拆分的字符串)
+    int flag = 0;       // 用来标识此时split_string 里面有多少子串
+    char pattern = '/'; // 根据/进行字符串拆分
+
+    string temp_from = top.c_str();
+    temp_from = temp_from.substr(1, temp_from.size()); // 这一行是为了去除最前面的/
+    temp_from = temp_from + pattern;                   // 在最后面添加一个/便于处理
+    int pos = temp_from.find(pattern);                 // 找到第一个/的位置
+    while (pos != std::string::npos)                   // 循环不断找/，找到一个拆分一次
+    {
+      string temp1 = temp_from.substr(0, pos); // temp里面就是拆分出来的第一个子串
       string temp = temp1;
-      for(int i = temp.size() ; i < 5 ; i++)
+      for (int i = temp.size(); i < 5; i++)
       {
         temp = temp + " ";
       }
-      header->add_split_string_from(temp);//将拆出来的子串加到header里面去
-      flag++;//拆分的字符串数量++
-      temp_from = temp_from.substr(pos+1,temp_from.size());
+      header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+      flag++;                              // 拆分的字符串数量++
+      temp_from = temp_from.substr(pos + 1, temp_from.size());
       pos = temp_from.find(pattern);
     }
     header->set_from_length(flag);
-    while(flag != 8)
+    while (flag != 8)
     {
-      string temp = "     ";//用五个空格填充一下
-      header->add_split_string_from(temp);//将拆出来的子串加到header里面去
-      flag++;//拆分的字符串数量++     
+      string temp = "     ";               // 用五个空格填充一下
+      header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+      flag++;                              // 拆分的字符串数量++
     }
 
-    //这一行之前是gaoxuan添加的
-      
-      MessageBuffer *m = NULL;
-      header->set_data_ptr(reinterpret_cast<uint64>(&m));
-      machine_->SendMessage(header, new MessageBuffer());
-      while (m == NULL)
+    // 这一行之前是gaoxuan添加的
+
+    MessageBuffer *m = NULL;
+    header->set_data_ptr(reinterpret_cast<uint64>(&m));
+    machine_->SendMessage(header, new MessageBuffer());
+    while (m == NULL)
+    {
+      usleep(10);
+      Noop<MessageBuffer *>(m);
+    }
+
+    MessageBuffer *serialized = m;
+    Action b;
+    b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
+    delete serialized;
+    MetadataAction::LookupOutput out;
+    out.ParseFromString(b.output());
+    if (out.success() && out.entry().type() == DIR)
+    {
+
+      for (int i = 0; i < out.entry().dir_contents_size(); i++)
       {
-        usleep(10);
-        Noop<MessageBuffer *>(m);
+
+        string full_path = top + "/" + out.entry().dir_contents(i);
+        stack1.push(full_path);
       }
-
-      
-      MessageBuffer *serialized = m;
-      Action b;
-      b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
-      delete serialized;
-      MetadataAction::LookupOutput out;
-      out.ParseFromString(b.output());
-      if (out.success() && out.entry().type() == DIR)
-      {
-        
-        
-        for (int i = 0; i < out.entry().dir_contents_size(); i++)
-        {
-          
-          string full_path =top + "/" + out.entry().dir_contents(i);
-          stack1.push(full_path);
-          
-          
-        }
-      }     
     }
-    LOG(ERROR)<<"finished LOOKUP!";
+  }
+  LOG(ERROR) << "finished LOOKUP!";
 }
-void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is called by RameFile() for RenameExperiment
+void MetadataStore::GetRWSets(Action *action)
+{ // gaoxuan --this function is called by RameFile() for RenameExperiment
   action->clear_readset();
   action->clear_writeset();
 
   MetadataAction::Type type =
       static_cast<MetadataAction::Type>(action->action_type());
 
-  if (type == MetadataAction::CREATE_FILE) {
+  if (type == MetadataAction::CREATE_FILE)
+  {
     MetadataAction::CreateFileInput in;
     in.ParseFromString(action->input());
     action->add_readset(in.path());
     action->add_writeset(in.path());
     action->add_readset(ParentDir(in.path()));
     action->add_writeset(ParentDir(in.path()));
-
-  } else if (type == MetadataAction::ERASE) {
+  }
+  else if (type == MetadataAction::ERASE)
+  {
     MetadataAction::EraseInput in;
     in.ParseFromString(action->input());
     action->add_readset(in.path());
     action->add_writeset(in.path());
     action->add_readset(ParentDir(in.path()));
     action->add_writeset(ParentDir(in.path()));
-
-  } else if (type == MetadataAction::COPY) {
+  }
+  else if (type == MetadataAction::COPY)
+  {
     MetadataAction::CopyInput in;
     in.ParseFromString(action->input());
     action->add_readset(in.from_path());
     action->add_writeset(in.to_path());
     action->add_readset(ParentDir(in.to_path()));
     action->add_writeset(ParentDir(in.to_path()));
-
-  }else if (type == MetadataAction::RENAME) {// the version of gaoxuan
-    //gaoxuan --this part is rewrited by gaoxuan
-    //gaoxuan --add read/write set in the way of DFS
+  }
+  else if (type == MetadataAction::RENAME)
+  { // the version of gaoxuan
+    // gaoxuan --this part is rewrited by gaoxuan
+    // gaoxuan --add read/write set in the way of DFS
     MetadataAction::RenameInput in;
     in.ParseFromString(action->input());
-    std::stack <string> stack1;//gaoxuan --the stack is used for tranversing  the file tree
-    stack1.push(in.from_path());//gaoxuan --we want to tranverse all children of this path to add read/write set
-   string To_path = in.to_path();
-    while (!stack1.empty()) 
+    std::stack<string> stack1;   // gaoxuan --the stack is used for tranversing  the file tree
+    stack1.push(in.from_path()); // gaoxuan --we want to tranverse all children of this path to add read/write set
+    string To_path = in.to_path();
+    while (!stack1.empty())
     {
       string top = stack1.top(); // get the top
       stack1.pop();              // pop the top
       action->add_readset(top);
       action->add_writeset(top);
-      
-      string s = top.substr(in.from_path().size());//gaoxuan --s is used to get the path without from_path 
-      To_path = in.to_path()+s;//gaoxuan --To_path is the path that needed to add writeset
+
+      string s = top.substr(in.from_path().size()); // gaoxuan --s is used to get the path without from_path
+      To_path = in.to_path() + s;                   // gaoxuan --To_path is the path that needed to add writeset
       action->add_writeset(To_path);
 
       uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(top)), config_->LookupReplica(machine_->machine_id()));
@@ -747,40 +1042,40 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
       header->set_app(getAPPname());
       header->set_rpc("LOOKUP");
       header->add_misc_string(top.c_str(), strlen(top.c_str()));
-    //gaoxuan --在这里发出消息之前，把from_path.data()和to_path.data()拆分一下
+      // gaoxuan --在这里发出消息之前，把from_path.data()和to_path.data()拆分一下
 
-    //第一步：将from_path.data()拆分放进split_string里面，拆完后，不够八个格子的，使用空格填充上
-    //拆分的算法，遇到一个/就把之前的字符串放进去
-    //将拆分后的元素添加去的方法：header->add_split_string(拆分的字符串)
-    int flag = 0 ;//用来标识此时split_string 里面有多少子串
-    char pattern = '/' ;//根据/进行字符串拆分
+      // 第一步：将from_path.data()拆分放进split_string里面，拆完后，不够八个格子的，使用空格填充上
+      // 拆分的算法，遇到一个/就把之前的字符串放进去
+      // 将拆分后的元素添加去的方法：header->add_split_string(拆分的字符串)
+      int flag = 0;       // 用来标识此时split_string 里面有多少子串
+      char pattern = '/'; // 根据/进行字符串拆分
 
-    string temp_from = top.c_str(); 
-    temp_from = temp_from.substr(1,temp_from.size());//这一行是为了去除最前面的/
-    temp_from = temp_from + pattern ; //在最后面添加一个/便于处理
-    int pos = temp_from.find(pattern);//找到第一个/的位置
-    while(pos != std::string::npos)//循环不断找/，找到一个拆分一次
-    {
-      string temp1 = temp_from.substr(0,pos);//temp里面就是拆分出来的第一个子串
-      string temp = temp1;
-      for(int i = temp.size() ; i < 5 ; i++)
+      string temp_from = top.c_str();
+      temp_from = temp_from.substr(1, temp_from.size()); // 这一行是为了去除最前面的/
+      temp_from = temp_from + pattern;                   // 在最后面添加一个/便于处理
+      int pos = temp_from.find(pattern);                 // 找到第一个/的位置
+      while (pos != std::string::npos)                   // 循环不断找/，找到一个拆分一次
       {
-        temp = temp + " ";
+        string temp1 = temp_from.substr(0, pos); // temp里面就是拆分出来的第一个子串
+        string temp = temp1;
+        for (int i = temp.size(); i < 5; i++)
+        {
+          temp = temp + " ";
+        }
+        header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+        flag++;                              // 拆分的字符串数量++
+        temp_from = temp_from.substr(pos + 1, temp_from.size());
+        pos = temp_from.find(pattern);
       }
-      header->add_split_string_from(temp);//将拆出来的子串加到header里面去
-      flag++;//拆分的字符串数量++
-      temp_from = temp_from.substr(pos+1,temp_from.size());
-      pos = temp_from.find(pattern);
-    }
-    header->set_from_length(flag);
-    while(flag != 8)
-    {
-      string temp = "     ";//用空格填充一下
-      header->add_split_string_from(temp);//将拆出来的子串加到header里面去
-      flag++;//拆分的字符串数量++     
-    }
+      header->set_from_length(flag);
+      while (flag != 8)
+      {
+        string temp = "     ";               // 用空格填充一下
+        header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+        flag++;                              // 拆分的字符串数量++
+      }
 
-    //这一行之前是gaoxuan添加的
+      // 这一行之前是gaoxuan添加的
 
       MessageBuffer *m = NULL;
       header->set_data_ptr(reinterpret_cast<uint64>(&m));
@@ -791,7 +1086,6 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
         Noop<MessageBuffer *>(m);
       }
 
-
       MessageBuffer *serialized = m;
       Action b;
       b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
@@ -800,80 +1094,88 @@ void MetadataStore::GetRWSets(Action* action) {//gaoxuan --this function is call
       out.ParseFromString(b.output());
       if (out.success() && out.entry().type() == DIR)
       {
-        
+
         for (int i = 0; i < out.entry().dir_contents_size(); i++)
         {
-          string full_path =top + "/" + out.entry().dir_contents(i);
+          string full_path = top + "/" + out.entry().dir_contents(i);
           stack1.push(full_path);
-        
         }
-      }     
+      }
     }
-    //gaoxuan --in case that add read/write set repeatedly when form_path and to_path have same parent dir
-    if(ParentDir(in.from_path())==ParentDir(in.to_path()))
+    // gaoxuan --in case that add read/write set repeatedly when form_path and to_path have same parent dir
+    if (ParentDir(in.from_path()) == ParentDir(in.to_path()))
     {
-          action->add_readset(ParentDir(in.from_path()));
-          action->add_writeset(ParentDir(in.from_path()));
+      action->add_readset(ParentDir(in.from_path()));
+      action->add_writeset(ParentDir(in.from_path()));
     }
     else
     {
-          action->add_readset(ParentDir(in.from_path()));
-          action->add_writeset(ParentDir(in.from_path()));
-      
-          action->add_readset(ParentDir(in.to_path()));
-          action->add_writeset(ParentDir(in.to_path()));
-    }
+      action->add_readset(ParentDir(in.from_path()));
+      action->add_writeset(ParentDir(in.from_path()));
 
-   
+      action->add_readset(ParentDir(in.to_path()));
+      action->add_writeset(ParentDir(in.to_path()));
+    }
   }
-  else if (type == MetadataAction::LOOKUP) {
+  else if (type == MetadataAction::LOOKUP)
+  {
     MetadataAction::LookupInput in;
     in.ParseFromString(action->input());
     action->add_readset(in.path());
     action->add_writeset(in.path());
-
-  } else if (type == MetadataAction::RESIZE) {
+  }
+  else if (type == MetadataAction::RESIZE)
+  {
     MetadataAction::ResizeInput in;
     in.ParseFromString(action->input());
     action->add_readset(in.path());
     action->add_writeset(in.path());
-
-  } else if (type == MetadataAction::WRITE) {
+  }
+  else if (type == MetadataAction::WRITE)
+  {
     MetadataAction::WriteInput in;
     in.ParseFromString(action->input());
     action->add_readset(in.path());
     action->add_writeset(in.path());
-
-  } else if (type == MetadataAction::APPEND) {
+  }
+  else if (type == MetadataAction::APPEND)
+  {
     MetadataAction::AppendInput in;
     in.ParseFromString(action->input());
     action->add_readset(in.path());
     action->add_writeset(in.path());
-
-  } else if (type == MetadataAction::CHANGE_PERMISSIONS) {
+  }
+  else if (type == MetadataAction::CHANGE_PERMISSIONS)
+  {
     MetadataAction::ChangePermissionsInput in;
     in.ParseFromString(action->input());
     action->add_readset(in.path());
     action->add_writeset(in.path());
-
-  } else {
+  }
+  else
+  {
     LOG(FATAL) << "invalid action type";
   }
 }
 
-void MetadataStore::Run(Action* action) {
-  //gaoxuan --this part will be executed by scheduler after action has beed append to log
-  // Prepare by performing all reads.
-  ExecutionContext* context;
-  if (machine_ == NULL) {
+void MetadataStore::Run(Action *action)
+{
+  // gaoxuan --this part will be executed by scheduler after action has beed append to log
+  //  Prepare by performing all reads.
+  ExecutionContext *context;
+  if (machine_ == NULL)
+  {
     context = new ExecutionContext(store_, action);
-  } else {//gaoxuan --we can confirm we get all entry we want,because in DistributedExecutionContext has this logic
+  }
+  else
+  { // gaoxuan --we can confirm we get all entry we want,because in DistributedExecutionContext has this logic
     context =
         new DistributedExecutionContext(machine_, config_, store_, action);
   }
-  
-  if (!context->IsWriter()) {
-    
+
+  if (!context->IsWriter())
+  {
+
     delete context;
     return;
   }
@@ -882,73 +1184,83 @@ void MetadataStore::Run(Action* action) {
   MetadataAction::Type type =
       static_cast<MetadataAction::Type>(action->action_type());
 
-  if (type == MetadataAction::CREATE_FILE) {
+  if (type == MetadataAction::CREATE_FILE)
+  {
     MetadataAction::CreateFileInput in;
     MetadataAction::CreateFileOutput out;
     in.ParseFromString(action->input());
     CreateFile_Internal(context, in, &out);
     out.SerializeToString(action->mutable_output());
-
-  } else if (type == MetadataAction::ERASE) {
+  }
+  else if (type == MetadataAction::ERASE)
+  {
     MetadataAction::EraseInput in;
     MetadataAction::EraseOutput out;
     in.ParseFromString(action->input());
     Erase_Internal(context, in, &out);
     out.SerializeToString(action->mutable_output());
-
-  } else if (type == MetadataAction::COPY) {
+  }
+  else if (type == MetadataAction::COPY)
+  {
     MetadataAction::CopyInput in;
     MetadataAction::CopyOutput out;
     in.ParseFromString(action->input());
     Copy_Internal(context, in, &out);
     out.SerializeToString(action->mutable_output());
-
-  } else if (type == MetadataAction::RENAME) {
-    //LOG(ERROR)<<"Run is executing!";
+  }
+  else if (type == MetadataAction::RENAME)
+  {
+    // LOG(ERROR)<<"Run is executing!";
     MetadataAction::RenameInput in;
     MetadataAction::RenameOutput out;
     in.ParseFromString(action->input());
-    //LOG(ERROR)<<"In Run :: "<<in.from_path()<<" and "<<in.to_path();
+    // LOG(ERROR)<<"In Run :: "<<in.from_path()<<" and "<<in.to_path();
     Rename_Internal(context, in, &out);
     out.SerializeToString(action->mutable_output());
-
-  } else if (type == MetadataAction::LOOKUP) {
+  }
+  else if (type == MetadataAction::LOOKUP)
+  {
     MetadataAction::LookupInput in;
     MetadataAction::LookupOutput out;
-   // LOG(ERROR)<<"The logic of LOOKUP in Run ";
+    // LOG(ERROR)<<"The logic of LOOKUP in Run ";
     in.ParseFromString(action->input());
     Lookup_Internal(context, in, &out);
     out.SerializeToString(action->mutable_output());
-
-  } else if (type == MetadataAction::RESIZE) {
+  }
+  else if (type == MetadataAction::RESIZE)
+  {
     MetadataAction::ResizeInput in;
     MetadataAction::ResizeOutput out;
     in.ParseFromString(action->input());
     Resize_Internal(context, in, &out);
     out.SerializeToString(action->mutable_output());
-
-  } else if (type == MetadataAction::WRITE) {
+  }
+  else if (type == MetadataAction::WRITE)
+  {
     MetadataAction::WriteInput in;
     MetadataAction::WriteOutput out;
     in.ParseFromString(action->input());
     Write_Internal(context, in, &out);
     out.SerializeToString(action->mutable_output());
-
-  } else if (type == MetadataAction::APPEND) {
+  }
+  else if (type == MetadataAction::APPEND)
+  {
     MetadataAction::AppendInput in;
     MetadataAction::AppendOutput out;
     in.ParseFromString(action->input());
     Append_Internal(context, in, &out);
     out.SerializeToString(action->mutable_output());
-
-  } else if (type == MetadataAction::CHANGE_PERMISSIONS) {
+  }
+  else if (type == MetadataAction::CHANGE_PERMISSIONS)
+  {
     MetadataAction::ChangePermissionsInput in;
     MetadataAction::ChangePermissionsOutput out;
     in.ParseFromString(action->input());
     ChangePermissions_Internal(context, in, &out);
     out.SerializeToString(action->mutable_output());
-
-  } else {
+  }
+  else
+  {
     LOG(FATAL) << "invalid action type";
   }
 
@@ -956,11 +1268,13 @@ void MetadataStore::Run(Action* action) {
 }
 
 void MetadataStore::CreateFile_Internal(
-    ExecutionContext* context,
-    const MetadataAction::CreateFileInput& in,
-    MetadataAction::CreateFileOutput* out) {
+    ExecutionContext *context,
+    const MetadataAction::CreateFileInput &in,
+    MetadataAction::CreateFileOutput *out)
+{
   // Don't fuck with the root dir.
-  if (in.path() == "") {
+  if (in.path() == "")
+  {
     out->set_success(false);
     out->add_errors(MetadataAction::PermissionDenied);
     return;
@@ -969,7 +1283,8 @@ void MetadataStore::CreateFile_Internal(
   // Look up parent dir.
   string parent_path = ParentDir(in.path());
   MetadataEntry parent_entry;
-  if (!context->GetEntry(parent_path, &parent_entry)) {
+  if (!context->GetEntry(parent_path, &parent_entry))
+  {
     // Parent doesn't exist!
     out->set_success(false);
     out->add_errors(MetadataAction::FileDoesNotExist);
@@ -981,8 +1296,10 @@ void MetadataStore::CreateFile_Internal(
   // If file already exists, fail.
   // TODO(agt): Look up file directly instead of looking through parent dir?
   string filename = FileName(in.path());
-  for (int i = 0; i < parent_entry.dir_contents_size(); i++) {
-    if (parent_entry.dir_contents(i) == filename) {
+  for (int i = 0; i < parent_entry.dir_contents_size(); i++)
+  {
+    if (parent_entry.dir_contents(i) == filename)
+    {
       out->set_success(false);
       out->add_errors(MetadataAction::FileAlreadyExists);
       return;
@@ -1002,11 +1319,13 @@ void MetadataStore::CreateFile_Internal(
 }
 
 void MetadataStore::Erase_Internal(
-    ExecutionContext* context,
-    const MetadataAction::EraseInput& in,
-    MetadataAction::EraseOutput* out) {
+    ExecutionContext *context,
+    const MetadataAction::EraseInput &in,
+    MetadataAction::EraseOutput *out)
+{
   // Don't fuck with the root dir.
-  if (in.path() == "") {
+  if (in.path() == "")
+  {
     out->set_success(false);
     out->add_errors(MetadataAction::PermissionDenied);
     return;
@@ -1014,7 +1333,8 @@ void MetadataStore::Erase_Internal(
   // Look up parent dir.
   string parent_path = ParentDir(in.path());
   MetadataEntry parent_entry;
-  if (!context->GetEntry(parent_path, &parent_entry)) {
+  if (!context->GetEntry(parent_path, &parent_entry))
+  {
     // Parent doesn't exist!
     out->set_success(false);
     out->add_errors(MetadataAction::FileDoesNotExist);
@@ -1022,13 +1342,15 @@ void MetadataStore::Erase_Internal(
   }
   // Look up target file.
   MetadataEntry entry;
-  if (!context->GetEntry(in.path(), &entry)) {
+  if (!context->GetEntry(in.path(), &entry))
+  {
     // File doesn't exist!
     out->set_success(false);
     out->add_errors(MetadataAction::FileDoesNotExist);
     return;
   }
-  if (entry.type() == DIR && entry.dir_contents_size() != 0) {
+  if (entry.type() == DIR && entry.dir_contents_size() != 0)
+  {
     // Trying to delete a non-empty directory!
     out->set_success(false);
     out->add_errors(MetadataAction::DirectoryNotEmpty);
@@ -1042,8 +1364,10 @@ void MetadataStore::Erase_Internal(
 
   // Find file and remove it from parent directory.
   string filename = FileName(in.path());
-  for (int i = 0; i < parent_entry.dir_contents_size(); i++) {
-    if (parent_entry.dir_contents(i) == filename) {
+  for (int i = 0; i < parent_entry.dir_contents_size(); i++)
+  {
+    if (parent_entry.dir_contents(i) == filename)
+    {
       // Remove reference to target file entry from dir contents.
       parent_entry.mutable_dir_contents()
           ->SwapElements(i, parent_entry.dir_contents_size() - 1);
@@ -1057,13 +1381,15 @@ void MetadataStore::Erase_Internal(
 }
 
 void MetadataStore::Copy_Internal(
-    ExecutionContext* context,
-    const MetadataAction::CopyInput& in,
-    MetadataAction::CopyOutput* out) {
+    ExecutionContext *context,
+    const MetadataAction::CopyInput &in,
+    MetadataAction::CopyOutput *out)
+{
 
   // Currently only support Copy: (non-recursive: only succeeds for DATA files and EMPTY directory)
   MetadataEntry from_entry;
-  if (!context->GetEntry(in.from_path(), &from_entry)) {
+  if (!context->GetEntry(in.from_path(), &from_entry))
+  {
     // File doesn't exist!
     out->set_success(false);
     out->add_errors(MetadataAction::FileDoesNotExist);
@@ -1072,7 +1398,8 @@ void MetadataStore::Copy_Internal(
 
   string parent_to_path = ParentDir(in.to_path());
   MetadataEntry parent_to_entry;
-  if (!context->GetEntry(parent_to_path, &parent_to_entry)) {
+  if (!context->GetEntry(parent_to_path, &parent_to_entry))
+  {
     // File doesn't exist!
     out->set_success(false);
     out->add_errors(MetadataAction::FileDoesNotExist);
@@ -1081,8 +1408,10 @@ void MetadataStore::Copy_Internal(
 
   // If file already exists, fail.
   string filename = FileName(in.to_path());
-  for (int i = 0; i < parent_to_entry.dir_contents_size(); i++) {
-    if (parent_to_entry.dir_contents(i) == filename) {
+  for (int i = 0; i < parent_to_entry.dir_contents_size(); i++)
+  {
+    if (parent_to_entry.dir_contents(i) == filename)
+    {
       out->set_success(false);
       out->add_errors(MetadataAction::FileAlreadyExists);
       return;
@@ -1092,7 +1421,7 @@ void MetadataStore::Copy_Internal(
   // Update parent
   parent_to_entry.add_dir_contents(filename);
   context->PutEntry(parent_to_path, parent_to_entry);
-  
+
   // Add entry
   MetadataEntry to_entry;
   to_entry.CopyFrom(from_entry);
@@ -1100,17 +1429,19 @@ void MetadataStore::Copy_Internal(
 }
 
 void MetadataStore::Rename_Internal(
-    ExecutionContext* context,
-    const MetadataAction::RenameInput& in,
-    MetadataAction::RenameOutput* out) {//gaoxuan --this function wiil be executed when running RenameExperiment
+    ExecutionContext *context,
+    const MetadataAction::RenameInput &in,
+    MetadataAction::RenameOutput *out)
+{ // gaoxuan --this function wiil be executed when running RenameExperiment
   // Currently only support Copy: (non-recursive: only succeeds for DATA files and EMPTY directory)
 
-//gaoxuan --now consider how to modify the logic of rename with correct context
-  //LOG(ERROR)<<"Rename_internal is Executing!";
-  MetadataEntry from_entry;//gaoxuan --get from_path's entry to check if it's existed,put it into from_entry
-  if (!context->GetEntry(in.from_path(), &from_entry)) {
+  // gaoxuan --now consider how to modify the logic of rename with correct context
+  // LOG(ERROR)<<"Rename_internal is Executing!";
+  MetadataEntry from_entry; // gaoxuan --get from_path's entry to check if it's existed,put it into from_entry
+  if (!context->GetEntry(in.from_path(), &from_entry))
+  {
     // File doesn't exist!
-    LOG(ERROR)<<"File doesn't exist!";
+    LOG(ERROR) << "File doesn't exist!";
     out->set_success(false);
     out->add_errors(MetadataAction::FileDoesNotExist);
     return;
@@ -1118,9 +1449,10 @@ void MetadataStore::Rename_Internal(
 
   string parent_from_path = ParentDir(in.from_path());
   MetadataEntry parent_from_entry;
-  if (!context->GetEntry(parent_from_path, &parent_from_entry)) {
+  if (!context->GetEntry(parent_from_path, &parent_from_entry))
+  {
     // File doesn't exist!
-    LOG(ERROR)<<"From_Parent File doesn't exist!";
+    LOG(ERROR) << "From_Parent File doesn't exist!";
     out->set_success(false);
     out->add_errors(MetadataAction::FileDoesNotExist);
     return;
@@ -1128,146 +1460,267 @@ void MetadataStore::Rename_Internal(
 
   string parent_to_path = ParentDir(in.to_path());
   MetadataEntry parent_to_entry;
-  if (!context->GetEntry(parent_to_path, &parent_to_entry)) {
+  if (!context->GetEntry(parent_to_path, &parent_to_entry))
+  {
     // File doesn't exist!
-    LOG(ERROR)<<"To_Parent File doesn't exist!";
+    LOG(ERROR) << "To_Parent File doesn't exist!";
     out->set_success(false);
     out->add_errors(MetadataAction::FileDoesNotExist);
     return;
   }
- 
+
   // If file already exists, fail.
-  //gaoxuan --check if exist a file with same name in the Parent dir of to_path 
+  // gaoxuan --check if exist a file with same name in the Parent dir of to_path
   string to_filename = FileName(in.to_path());
-  for (int i = 0; i < parent_to_entry.dir_contents_size(); i++) {
-    if (parent_to_entry.dir_contents(i) == to_filename) {
-      LOG(ERROR)<<"file already exists, fail.";
+  for (int i = 0; i < parent_to_entry.dir_contents_size(); i++)
+  {
+    if (parent_to_entry.dir_contents(i) == to_filename)
+    {
+      LOG(ERROR) << "file already exists, fail.";
       out->set_success(false);
       out->add_errors(MetadataAction::FileAlreadyExists);
       return;
     }
   }
-//gaoxuan --the part above is used to check if we can rename
-//gaoxuan --in the following part we should change it to a loop
-  // Update to_parent (add new dir content)
+  // gaoxuan --the part above is used to check if we can rename
+  // gaoxuan --in the following part we should change it to a loop
+  //  Update to_parent (add new dir content)
   parent_to_entry.add_dir_contents(to_filename);
   context->PutEntry(parent_to_path, parent_to_entry);
-  
-  if((from_entry.type()==DIR)&&(from_entry.dir_contents_size()!=0))//gaoxuan --only if the object we want to rename is DIR we need to loop,if its a file we don't need loop
+
+  if ((from_entry.type() == DIR) && (from_entry.dir_contents_size() != 0)) // gaoxuan --only if the object we want to rename is DIR we need to loop,if its a file we don't need loop
   {
-  //gaoxuan --use BFS to add new metadata entry 
-      std::queue<string> queue1; 
-      string root = in.to_path();
-      queue1.push(root); 
-      string from_path =in.from_path();//gaoxuan --the path used to copyEntry
-      while (!queue1.empty()) { 
-          string front = queue1.front();//gaoxuan --get the front in queue
-          queue1.pop();         
-          //Add Entry
-          MetadataEntry to_entry1;//gaoxuan --the entry which will be added
-          MetadataEntry from_entry1;//gaoxuan --the entry which will be used to copy to to_entry
-          context->GetEntry(from_path, &from_entry1);
-          to_entry1.CopyFrom(from_entry1);
-          context->PutEntry(front, to_entry1);
-          //gaoxuan --this part is used to delete the old entry
-          // Update from_parent(Find file and remove it from parent directory.)
-          string from_filename = FileName(from_path);
-          //get the entry of parent of from_path
-          string parent_from_path1 = ParentDir(from_path);
-          MetadataEntry parent_from_entry1;
-          context->GetEntry(parent_from_path1, &parent_from_entry1);
+    // gaoxuan --use BFS to add new metadata entry
+    std::queue<string> queue1;
+    string root = in.to_path();
+    queue1.push(root);
+    string from_path = in.from_path(); // gaoxuan --the path used to copyEntry
+    while (!queue1.empty())
+    {
+      string front = queue1.front(); // gaoxuan --get the front in queue
+      queue1.pop();
+      // Add Entry
+      MetadataEntry to_entry1;   // gaoxuan --the entry which will be added
+      MetadataEntry from_entry1; // gaoxuan --the entry which will be used to copy to to_entry
+      context->GetEntry(from_path, &from_entry1);
+      to_entry1.CopyFrom(from_entry1);
+      context->PutEntry(front, to_entry1);
+      // gaoxuan --this part is used to delete the old entry
+      //  Update from_parent(Find file and remove it from parent directory.)
+      string from_filename = FileName(from_path);
+      // get the entry of parent of from_path
+      string parent_from_path1 = ParentDir(from_path);
+      MetadataEntry parent_from_entry1;
+      context->GetEntry(parent_from_path1, &parent_from_entry1);
 
-          for (int i = 0; i < parent_from_entry1.dir_contents_size(); i++) {
-            if (parent_from_entry1.dir_contents(i) == from_filename) {
-              // Remove reference to target file entry from dir contents.
-              parent_from_entry1.mutable_dir_contents()
-                  ->SwapElements(i, parent_from_entry1.dir_contents_size() - 1);
-              parent_from_entry1.mutable_dir_contents()->RemoveLast();
+      for (int i = 0; i < parent_from_entry1.dir_contents_size(); i++)
+      {
+        if (parent_from_entry1.dir_contents(i) == from_filename)
+        {
+          // Remove reference to target file entry from dir contents.
+          parent_from_entry1.mutable_dir_contents()
+              ->SwapElements(i, parent_from_entry1.dir_contents_size() - 1);
+          parent_from_entry1.mutable_dir_contents()->RemoveLast();
 
-              // Write updated parent entry.
-              context->PutEntry(parent_from_path1, parent_from_entry1);
-              break;
-            }
-          }
-          // Erase the from_entry
-          context->DeleteEntry(from_path);
-          //gaoxuan --this part is used to delete the old entry
+          // Write updated parent entry.
+          context->PutEntry(parent_from_path1, parent_from_entry1);
+          break;
+        }
+      }
+      // Erase the from_entry
+      context->DeleteEntry(from_path);
+      // gaoxuan --this part is used to delete the old entry
 
-          if (to_entry1.type() == DIR) {
-            
-            for (int i = 0; i < to_entry1.dir_contents_size(); i++) {
-              
-              string full_path = front+"/"+to_entry1.dir_contents(i);
-              queue1.push(full_path);
-            }  
-          }
-          
-          if(!queue1.empty())
-          {
-            from_path = in.from_path() + queue1.front().substr(in.to_path().size());
-          } 
+      if (to_entry1.type() == DIR)
+      {
+
+        for (int i = 0; i < to_entry1.dir_contents_size(); i++)
+        {
+
+          string full_path = front + "/" + to_entry1.dir_contents(i);
+          queue1.push(full_path);
+        }
       }
 
-  } else
-  {//gaoxuan --empty dir or file RENAME opretaion
-          MetadataEntry to_entry1;//gaoxuan --the entry which will be added
-          MetadataEntry from_entry1;//gaoxuan --the entry which will be used to copy to to_entry
-          context->GetEntry(in.from_path(), &from_entry1);
-          to_entry1.CopyFrom(from_entry1);
-          context->PutEntry(in.to_path(), to_entry1);
-          //gaoxuan --this part is used to delete the old entry
-          // Update from_parent(Find file and remove it from parent directory.)
-          string from_filename = FileName(in.from_path());
-          //get the entry of parent of from_path
-          string parent_from_path1 = ParentDir(in.from_path());
-          MetadataEntry parent_from_entry1;
-          context->GetEntry(parent_from_path1, &parent_from_entry1);
-
-          for (int i = 0; i < parent_from_entry1.dir_contents_size(); i++) {
-            if (parent_from_entry1.dir_contents(i) == from_filename) {
-              // Remove reference to target file entry from dir contents.
-              parent_from_entry1.mutable_dir_contents()
-                  ->SwapElements(i, parent_from_entry1.dir_contents_size() - 1);
-              parent_from_entry1.mutable_dir_contents()->RemoveLast();
-
-              // Write updated parent entry.
-              context->PutEntry(parent_from_path1, parent_from_entry1);
-              break;
-            }
-          }
-          // Erase the from_entry
-          context->DeleteEntry(in.from_path());
+      if (!queue1.empty())
+      {
+        from_path = in.from_path() + queue1.front().substr(in.to_path().size());
+      }
+    }
   }
+  else
+  {                            // gaoxuan --empty dir or file RENAME opretaion
+    MetadataEntry to_entry1;   // gaoxuan --the entry which will be added
+    MetadataEntry from_entry1; // gaoxuan --the entry which will be used to copy to to_entry
+    context->GetEntry(in.from_path(), &from_entry1);
+    to_entry1.CopyFrom(from_entry1);
+    context->PutEntry(in.to_path(), to_entry1);
+    // gaoxuan --this part is used to delete the old entry
+    //  Update from_parent(Find file and remove it from parent directory.)
+    string from_filename = FileName(in.from_path());
+    // get the entry of parent of from_path
+    string parent_from_path1 = ParentDir(in.from_path());
+    MetadataEntry parent_from_entry1;
+    context->GetEntry(parent_from_path1, &parent_from_entry1);
 
+    for (int i = 0; i < parent_from_entry1.dir_contents_size(); i++)
+    {
+      if (parent_from_entry1.dir_contents(i) == from_filename)
+      {
+        // Remove reference to target file entry from dir contents.
+        parent_from_entry1.mutable_dir_contents()
+            ->SwapElements(i, parent_from_entry1.dir_contents_size() - 1);
+        parent_from_entry1.mutable_dir_contents()->RemoveLast();
+
+        // Write updated parent entry.
+        context->PutEntry(parent_from_path1, parent_from_entry1);
+        break;
+      }
+    }
+    // Erase the from_entry
+    context->DeleteEntry(in.from_path());
+  }
 }
 
 void MetadataStore::Lookup_Internal(
-    ExecutionContext* context,
-    const MetadataAction::LookupInput& in,
-    MetadataAction::LookupOutput* out) {
+    ExecutionContext *context,
+    const MetadataAction::LookupInput &in,
+    MetadataAction::LookupOutput *out)
+{
   // Look up existing entry.
   MetadataEntry entry;
-  if (!context->GetEntry(in.path(), &entry)) {
-    // File doesn't exist!
-    
-    out->set_success(false);
-    out->add_errors(MetadataAction::FileDoesNotExist);
-    return;
-  }
- 
-  // TODO(agt): Check permissions.
 
-  // Return entry.
-  out->mutable_entry()->CopyFrom(entry);
+  string path = in.path();
+  string hash_name;
+
+  std::stack<string> stack1; // gaoxuan --the stack is used for tranversing  the file tree
+  stack1.push("");           // gaoxuan --we want to tranverse all children of this path to add read/write set
+
+  if (path.find("b") != std::string::npos)
+  {
+    // 要分层
+    int pos_b = path.find('b');
+    string temp = path.substr(pos_b);
+    int pos_pattern = temp.find('/');
+    string flag_level = temp.substr(pos_b + 1, pos_pattern);
+    string before = path.substr(0, pos_pattern);
+    hash_name = "/" + flag_level + temp.substr(pos_pattern+1);
+    // gaoxuan --use BFS to add new metadata entry
+    std::queue<string> queue1;
+    string root = "";
+    queue1.push(root);
+    while (!queue1.empty())
+    {
+      string front = queue1.front(); // gaoxuan --get the front in queue
+      queue1.pop();
+      uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
+      Header *header = new Header();
+      header->set_from(machine_->machine_id());
+      header->set_to(mds_machine);
+      header->set_type(Header::RPC);
+      header->set_app("client");
+      header->set_rpc("LOOKUP");
+      header->add_misc_string(front.c_str(), strlen(front.c_str()));
+      // 这一行之前是gaoxuan添加的
+
+      MessageBuffer *m = NULL;
+      header->set_data_ptr(reinterpret_cast<uint64>(&m));
+      machine_->SendMessage(header, new MessageBuffer());
+      while (m == NULL)
+      {
+        usleep(10);
+        Noop<MessageBuffer *>(m);
+      }
+
+      MessageBuffer *serialized = m;
+      Action b;
+      b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
+      delete serialized;
+      MetadataAction::LookupOutput out;
+      out.ParseFromString(b.output());
+
+      if(front==before)
+      {
+        //找到了分层点
+        break;
+      }
+      for (int i = 0; i < out.entry().dir_contents_size(); i++)
+      {
+        string full_path = front + "/" + out.entry().dir_contents(i);
+        queue1.push(full_path);
+      }
+
+    }
+    //上面一直找到分层点，下面对hash路径进行键值对获取
+    context->GetEntry(hash_name, &entry);
+    // TODO(agt): Check permissions.
+
+    // Return entry.
+    out->mutable_entry()->CopyFrom(entry);
+  }
+  else
+  {
+    //不分层，只是树
+    while (!queue1.empty())
+    {
+      string front = queue1.front(); // gaoxuan --get the front in queue
+      queue1.pop();
+      uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
+      Header *header = new Header();
+      header->set_from(machine_->machine_id());
+      header->set_to(mds_machine);
+      header->set_type(Header::RPC);
+      header->set_app("client");
+      header->set_rpc("LOOKUP");
+      header->add_misc_string(front.c_str(), strlen(front.c_str()));
+      // 这一行之前是gaoxuan添加的
+
+      MessageBuffer *m = NULL;
+      header->set_data_ptr(reinterpret_cast<uint64>(&m));
+      machine_->SendMessage(header, new MessageBuffer());
+      while (m == NULL)
+      {
+        usleep(10);
+        Noop<MessageBuffer *>(m);
+      }
+
+      MessageBuffer *serialized = m;
+      Action b;
+      b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
+      delete serialized;
+      MetadataAction::LookupOutput out;
+      out.ParseFromString(b.output());
+
+      if(front==path)
+      {
+        //找到了路径的元数据
+        entry = out.entry();
+        break;
+      }
+      for (int i = 0; i < out.entry().dir_contents_size(); i++)
+      {
+        string full_path = front + "/" + out.entry().dir_contents(i);
+        queue1.push(full_path);
+      }
+
+    }
+
+    // TODO(agt): Check permissions.
+
+    // Return entry.
+    out->mutable_entry()->CopyFrom(entry);
+  }
 }
 
 void MetadataStore::Resize_Internal(
-    ExecutionContext* context,
-    const MetadataAction::ResizeInput& in,
-    MetadataAction::ResizeOutput* out) {
+    ExecutionContext *context,
+    const MetadataAction::ResizeInput &in,
+    MetadataAction::ResizeOutput *out)
+{
   // Look up existing entry.
   MetadataEntry entry;
-  if (!context->GetEntry(in.path(), &entry)) {
+  if (!context->GetEntry(in.path(), &entry))
+  {
     // File doesn't exist!
     out->set_success(false);
     out->add_errors(MetadataAction::FileDoesNotExist);
@@ -1275,7 +1728,8 @@ void MetadataStore::Resize_Internal(
   }
 
   // Only resize DATA files.
-  if (entry.type() != DATA) {
+  if (entry.type() != DATA)
+  {
     out->set_success(false);
     out->add_errors(MetadataAction::WrongFileType);
     return;
@@ -1284,16 +1738,19 @@ void MetadataStore::Resize_Internal(
   // TODO(agt): Check permissions.
 
   // If we're resizing to size 0, just clear all file part.
-  if (in.size() == 0) {
+  if (in.size() == 0)
+  {
     entry.clear_file_parts();
     return;
   }
 
   // Truncate/remove entries that go past the target size.
   uint64 total = 0;
-  for (int i = 0; i < entry.file_parts_size(); i++) {
+  for (int i = 0; i < entry.file_parts_size(); i++)
+  {
     total += entry.file_parts(i).length();
-    if (total >= in.size()) {
+    if (total >= in.size())
+    {
       // Discard all following file parts.
       entry.mutable_file_parts()->DeleteSubrange(
           i + 1,
@@ -1307,7 +1764,8 @@ void MetadataStore::Resize_Internal(
   }
 
   // If resize operation INCREASES file size, append a new default file part.
-  if (total < in.size()) {
+  if (total < in.size())
+  {
     entry.add_file_parts()->set_length(in.size() - total);
   }
 
@@ -1316,19 +1774,22 @@ void MetadataStore::Resize_Internal(
 }
 
 void MetadataStore::Write_Internal(
-    ExecutionContext* context,
-    const MetadataAction::WriteInput& in,
-    MetadataAction::WriteOutput* out) {
+    ExecutionContext *context,
+    const MetadataAction::WriteInput &in,
+    MetadataAction::WriteOutput *out)
+{
   LOG(FATAL) << "not implemented";
 }
 
 void MetadataStore::Append_Internal(
-    ExecutionContext* context,
-    const MetadataAction::AppendInput& in,
-    MetadataAction::AppendOutput* out) {
+    ExecutionContext *context,
+    const MetadataAction::AppendInput &in,
+    MetadataAction::AppendOutput *out)
+{
   // Look up existing entry.
   MetadataEntry entry;
-  if (!context->GetEntry(in.path(), &entry)) {
+  if (!context->GetEntry(in.path(), &entry))
+  {
     // File doesn't exist!
     out->set_success(false);
     out->add_errors(MetadataAction::FileDoesNotExist);
@@ -1336,7 +1797,8 @@ void MetadataStore::Append_Internal(
   }
 
   // Only append to DATA files.
-  if (entry.type() != DATA) {
+  if (entry.type() != DATA)
+  {
     out->set_success(false);
     out->add_errors(MetadataAction::WrongFileType);
     return;
@@ -1345,7 +1807,8 @@ void MetadataStore::Append_Internal(
   // TODO(agt): Check permissions.
 
   // Append data to end of file.
-  for (int i = 0; i < in.data_size(); i++) {
+  for (int i = 0; i < in.data_size(); i++)
+  {
     entry.add_file_parts()->CopyFrom(in.data(i));
   }
 
@@ -1354,9 +1817,9 @@ void MetadataStore::Append_Internal(
 }
 
 void MetadataStore::ChangePermissions_Internal(
-    ExecutionContext* context,
-    const MetadataAction::ChangePermissionsInput& in,
-    MetadataAction::ChangePermissionsOutput* out) {
+    ExecutionContext *context,
+    const MetadataAction::ChangePermissionsInput &in,
+    MetadataAction::ChangePermissionsOutput *out)
+{
   LOG(FATAL) << "not implemented";
 }
-
