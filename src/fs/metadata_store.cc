@@ -1593,8 +1593,6 @@ void MetadataStore::Lookup_Internal(
   string path = in.path();
   string hash_name;
 
-  std::stack<string> stack1; // gaoxuan --the stack is used for tranversing  the file tree
-  stack1.push("");           // gaoxuan --we want to tranverse all children of this path to add read/write set
 
   if (path.find("b") != std::string::npos)
   {
@@ -1661,6 +1659,10 @@ void MetadataStore::Lookup_Internal(
   else
   {
     //不分层，只是树
+        // gaoxuan --use BFS to add new metadata entry
+    std::queue<string> queue1;
+    string root = "";
+    queue1.push(root);
     while (!queue1.empty())
     {
       string front = queue1.front(); // gaoxuan --get the front in queue

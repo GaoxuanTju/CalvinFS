@@ -971,7 +971,7 @@ public:
     Spin(1);
 
     double start = GetTime();
-    string from_path;
+  
 
         string from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(1) + "/c" + IntToString(1);
         BackgroundLS(from_path);
