@@ -307,9 +307,13 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
   out.ParseFromString(a.output());
   if (out.success() && out.entry().type() == DIR)
   {
+    LOG(ERROR)<<"metadataEntry of " << path.data() <<" is :";
     string *result = new string();
     for (int i = 0; i < out.entry().dir_contents_size(); i++)
     {
+      //gaoxuan --
+      LOG(ERROR)<<out.entry().dir_contents(i);
+      //gaoxuan --
       result->append(out.entry().dir_contents(i));
       result->append("\n");
     }
