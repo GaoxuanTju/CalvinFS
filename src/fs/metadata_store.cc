@@ -188,10 +188,12 @@ public:
       {
         // 对路径进行处理，搞成初始化那时候的规则
         int pos = path.find(pattern);
-        string temp = path.substr(pos + 1);
-        int pos_1 = path.find('/');
-        string flag_level = temp.substr(0, pos_1);
-        hash_name = "/" + flag_level + temp.substr(pos_1 + 1);
+        string name = path.substr(pos);
+        int pos_1 = path.find('a');
+        string temp = path.substr(pos_1);
+        int pos_2 = temp.find('/');
+        string flag_level = temp.substr(0, pos_2);
+        hash_name = "/" + flag_level + name;
       }
       else
       { // 不涉及分层，这半部分就是上面那样直接获取即可
@@ -228,12 +230,14 @@ public:
       string hash_name;
       if (path.find(pattern) != std::string::npos)
       {
-        // 对路径进行处理，搞成初始化那时候的规则
+         // 对路径进行处理，搞成初始化那时候的规则
         int pos = path.find(pattern);
-        string temp = path.substr(pos + 1);
-        int pos_1 = path.find('/');
-        string flag_level = temp.substr(0, pos_1);
-        hash_name = "/" + flag_level + temp.substr(pos_1 + 1);
+        string name = path.substr(pos);
+        int pos_1 = path.find('a');
+        string temp = path.substr(pos_1);
+        int pos_2 = temp.find('/');
+        string flag_level = temp.substr(0, pos_2);
+        hash_name = "/" + flag_level + name;
       }
       else
       { // 不涉及分层，这半部分就是上面那样直接获取即可
@@ -1596,14 +1600,27 @@ void MetadataStore::Lookup_Internal(
 
   if (path.find("b") != std::string::npos)
   {
+    /*
+        // 对路径进行处理，搞成初始化那时候的规则
+        int pos = path.find(pattern);
+        string name = path.substr(pos);
+        int pos_1 = path.find('a');
+        string temp = path.substr(pos_1);
+        int pos_2 = temp.find('/');
+        string flag_level = temp.substr(0, pos_2);
+        hash_name = "/" + flag_level + name;    
+    */
+
     // 要分层
-    int pos_b = path.find('b');
-    string temp = path.substr(pos_b);
-    int pos_pattern = temp.find('/');
-    string flag_level = temp.substr(pos_b + 1, pos_pattern);
-    string before = path.substr(0, pos_pattern);
-    hash_name = "/" + flag_level + temp.substr(pos_pattern+1);
+        int pos = path.find('b');
+        string name = path.substr(pos);
+        int pos_1 = path.find('a');
+        string temp = path.substr(pos_1);
+        int pos_2 = temp.find('/');
+        string flag_level = temp.substr(0, pos_2);
+        hash_name = "/" + flag_level + name; 
     // gaoxuan --use BFS to add new metadata entry
+    string before = path.substr(0, pos-1);
     std::queue<string> queue1;
     string root = "";
     queue1.push(root);

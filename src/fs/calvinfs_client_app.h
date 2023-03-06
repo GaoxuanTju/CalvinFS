@@ -925,8 +925,8 @@ public:
                << "10 files. Elapsed time:"
                << (GetTime() - start) << " seconds";
 
-     Spin(1);
-     print_dir_tree(dir_tree);
+    Spin(1);
+    print_dir_tree(dir_tree);
   }
   void DeleteExperiment()
   { // gaoxuan --删除文件的实验
@@ -961,23 +961,21 @@ public:
     Spin(1);
     print_dir_tree(dir_tree);
   }
-    void LsExperiment()
+  void LsExperiment()
   { // gaoxuan --删除文件的实验
     Spin(1);
     dir_tree = new BTNode;
-    metadata_->Init(dir_tree,"");
+    metadata_->Init(dir_tree, "");
     Spin(1);
     machine()->GlobalBarrier();
     Spin(1);
 
     double start = GetTime();
-  
 
-        string from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(1) + "/c" + IntToString(1);
-        BackgroundLS(from_path);
-        LOG(ERROR) << "[" << machine()->machine_id() << "] "
-                   << "LS file " << from_path;
-
+    string from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(1) + "/c" + IntToString(1);
+    BackgroundLS(from_path);
+    LOG(ERROR) << "[" << machine()->machine_id() << "] "
+               << "LS file " << from_path;
 
     // Wait for all operations to finish.
     while (capacity_.load() < kMaxCapacity)
@@ -988,7 +986,6 @@ public:
     LOG(ERROR) << "[" << machine()->machine_id() << "] "
                << "LS " << 1 << " files. Elapsed time: "
                << (GetTime() - start) << " seconds";
-   // print_dir_tree(dir_tree);
   }
 
   void LatencyExperimentRenameFile()
