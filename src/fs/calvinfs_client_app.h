@@ -972,7 +972,7 @@ public:
 
     double start = GetTime();
 
-    string from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(1);
+    string from_path = "/a" + IntToString(machine()->machine_id());
     BackgroundLS(from_path);
     LOG(ERROR) << "[" << machine()->machine_id() << "] "
                << "LS file " << from_path;
