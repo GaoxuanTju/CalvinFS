@@ -1627,6 +1627,7 @@ void MetadataStore::Lookup_Internal(
     int pos_2 = temp.find('/');
     string flag_level = temp.substr(1, pos_2);
     hash_name = "/" + flag_level + name;
+    LOG(ERROR)<<"hash_name is "<<hash_name;
     // gaoxuan --use BFS to add new metadata entry
     string before = path.substr(0, pos - 1);
     std::queue<string> queue1;
@@ -1679,6 +1680,10 @@ void MetadataStore::Lookup_Internal(
       context->GetEntry(hash_name, &entry);
       LOG(ERROR)<<hash_name<<" 's entry!";
       }
+      else
+      {
+        LOG(ERROR)<<hash_name<<" dont's exists!";
+      }
     // TODO(agt): Check permissions.
 
     // Return entry.
@@ -1686,6 +1691,7 @@ void MetadataStore::Lookup_Internal(
   }
   else
   {
+    LOG(ERROR)<<"don't split level";
     // 不分层，只是树
     //  gaoxuan --use BFS to add new metadata entry
     std::queue<string> queue1;
