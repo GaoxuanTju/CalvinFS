@@ -839,6 +839,178 @@ void MetadataStore::Init(BTNode *dir_tree, string level)
              << GetTime() - start << " seconds";
 }
 
+// 这个初始化函数是增加了分层的
+void MetadataStore::Init_for_depth(BTNode *dir_tree)
+{
+  // gaoxuan --这里面会涉及到目录树的建立初始化。
+  int asize = machine_->config().size();
+  int bsize = 5;
+  int csize = 5;
+  // 改成5,5测试的时候容易看出来
+  double start = GetTime();
+
+  // Update root dir.
+  // 因为我们需要的是完整的目录树，所以我们在if ISLOCAL之前直接放进去就好，同时也要把孩子和兄弟的关系理清楚
+  // 提前先建立起来吧
+
+  // gaoxuan --根节点的指针
+  dir_tree->child = NULL;
+  dir_tree->sibling = NULL;
+  dir_tree->path = "";
+  if (IsLocal(""))
+  {
+    MetadataEntry entry;
+    entry.mutable_permissions();
+    entry.set_type(DIR);
+    for (int i = 0; i < asize; i++)
+    {
+      entry.add_dir_contents("a" + IntToString(i));
+    }
+    string serialized_entry;
+    entry.SerializeToString(&serialized_entry);
+    store_->Put("", serialized_entry, 0);
+  }
+  BTNode *a_level = NULL; // 这个就指向该层第一个节点
+  // Add dirs.
+  for (int i = 0; i < asize; i++)
+  {
+    string dir("/a" + IntToString(i));
+    string dir_("a" + IntToString(i));
+    BTNode *temp_a = new BTNode;
+    temp_a->child = NULL;
+    temp_a->path = dir_;
+    temp_a->sibling = NULL;
+
+    if (i == 0)
+    {
+      // gaoxuan --如果是第一个节点，就将他作为上一层的孩子
+      dir_tree->child = temp_a;
+      a_level = temp_a; // a_level指针作为上一个兄弟节点
+    }
+    else
+    {
+      // 如果不是第一个节点，就是上一个节点的兄弟节点
+      a_level->sibling = temp_a;
+      a_level = a_level->sibling; // a_level移动到下一个兄弟节点
+    }
+
+    if (IsLocal(dir))
+    {
+      MetadataEntry entry;
+      entry.mutable_permissions();
+      entry.set_type(DIR);
+      for (int j = 0; j < bsize; j++)
+      {
+        entry.add_dir_contents("b" + IntToString(j));
+      }
+      string serialized_entry;
+      entry.SerializeToString(&serialized_entry);
+      store_->Put(dir, serialized_entry, 0);
+    }
+
+    // Add subdirs.
+    BTNode *b_level = NULL; // 这个就指向该层第二个节点
+
+    string flag_level = IntToString(i);
+    // 现在flag_level目前就是要对拼接到字符串前的标识了
+    for (int j = 0; j < bsize; j++)
+    {
+      string subdir(dir + "/b" + IntToString(j));
+      string subdir_("b" + IntToString(j));
+      string subdir__("/" + flag_level + subdir_);
+      // gaoxuan --目前写死在b这一层开始分层
+      // 1、对相对路径hash
+      // 2、键值对继续存储元数据
+
+      // 现在无法绕开的问题就是相对路径很大概率是相同的，那么无论是hash
+      // 还是键值对存储数据都不能实现
+      /*
+      这一点是分层点，我们在分层点确定是
+
+
+      */
+
+      BTNode *temp_b = new BTNode;
+      temp_b->child = NULL;
+      temp_b->path = subdir_;
+      temp_b->sibling = NULL;
+
+      if (j == 0)
+      {
+        // gaoxuan --如果是第一个节点，就将他作为上一层的孩子
+        a_level->child = temp_b;
+        b_level = temp_b;
+      }
+      else
+      {
+        // gaoxuan --不是第一个节点，是上一个的兄弟节点
+        b_level->sibling = temp_b;
+        b_level = b_level->sibling;
+      }
+      if (IsLocal(subdir__))
+      {
+        MetadataEntry entry;
+        entry.mutable_permissions();
+        entry.set_type(DIR);
+        for (int k = 0; k < csize; k++)
+        {
+          entry.add_dir_contents("c" + IntToString(k));
+        }
+        string serialized_entry;
+        entry.SerializeToString(&serialized_entry);
+        store_->Put(subdir__, serialized_entry, 0);
+      }
+      // Add files.
+      BTNode *c_level = NULL; // 这个就指向该层第三个节点
+      for (int k = 0; k < csize; k++)
+      {
+        string file(subdir__ + "/c" + IntToString(k));
+        string file_("c" + IntToString(k));
+
+        BTNode *temp_c = new BTNode;
+        temp_c->child = NULL;
+        temp_c->path = file_;
+        temp_c->sibling = NULL;
+        if (k == 0)
+        {
+          // gaoxuan --如果是第一个节点，就作为上一层的孩子
+          b_level->child = temp_c;
+          c_level = temp_c;
+        }
+        else
+        {
+          c_level->sibling = temp_c;
+          c_level = c_level->sibling;
+        }
+
+        if (IsLocal(file))
+        {
+          MetadataEntry entry;
+          entry.mutable_permissions();
+          entry.set_type(DATA);
+          FilePart *fp = entry.add_file_parts();
+          fp->set_length(RandomSize());
+          fp->set_block_id(0);
+          fp->set_block_offset(0);
+          string serialized_entry;
+          entry.SerializeToString(&serialized_entry);
+          store_->Put(file, serialized_entry, 0);
+        }
+      }
+      if (j % 100 == 0)
+      {
+        LOG(ERROR) << "[" << machine_->machine_id() << "] "
+                   << "MDS::Init() progress: " << (i * bsize + j) / 100 + 1
+                   << "/" << asize * bsize / 100;
+      }
+    }
+  }
+
+  LOG(ERROR) << "[" << machine_->machine_id() << "] "
+             << "MDS::Init() complete. Elapsed time: "
+             << GetTime() - start << " seconds";
+}
+
 void MetadataStore::InitSmall()
 {
   int asize = machine_->config().size();

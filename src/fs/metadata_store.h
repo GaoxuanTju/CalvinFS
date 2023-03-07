@@ -40,6 +40,7 @@ class MetadataStore : public Store {
   void Init();  //gaoxuan --这是原本的函数
   void Init(BTNode *dir_tree);
   void Init(BTNode *dir_tree,string level );
+  void Init_for_depth(BTNode *dir_tree);
   void InitSmall();
 
   
