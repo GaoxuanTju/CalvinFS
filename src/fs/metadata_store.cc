@@ -1674,11 +1674,11 @@ void MetadataStore::Lookup_Internal(
       }
     }
     // 上面一直找到分层点，下面对hash路径进行键值对获取
-    
-    if(!context->GetEntry(hash_name, &entry))
-    {
-      LOG(ERROR)<<in.path()<<"  don't exists";
-    }
+      if(context->EntryExists(hash_name))
+      {//存在这个路径的元数据项，证明就是他
+      context->GetEntry(hash_name, &entry);
+      LOG(ERROR)<<hash_name<<" 's entry!";
+      }
     // TODO(agt): Check permissions.
 
     // Return entry.
