@@ -50,7 +50,7 @@ MessageBuffer *CalvinFSClientApp::GetMetadataEntry(const Slice &path)
     MetadataAction::LookupInput in;
     in.set_path(path.data(), path.size());
 
-   // a.set_version(1000000000); // gaoxuan --this line is very important for LOOKUP
+    a.set_version(1000000000); // gaoxuan --this line is very important for LOOKUP
     in.SerializeToString(a.mutable_input());
     metadata_->GetRWSets(&a);
     metadata_->Run(&a);
@@ -305,24 +305,7 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
 
   MetadataAction::LookupOutput out;
   out.ParseFromString(a.output());
-  if(out.success())
-  {
-    LOG(ERROR)<<"metadataEntry of " << path.data() <<" is :";
-    string *result = new string();
-    for (int i = 0; i < out.entry().dir_contents_size(); i++)
-    {
-      //gaoxuan --
-      LOG(ERROR)<<out.entry().dir_contents(i);
-      //gaoxuan --
-      result->append(out.entry().dir_contents(i));
-      result->append("\n");
-    }
-    return new MessageBuffer(result);
-  }
-  else
-  {
-    LOG(ERROR)<<"failed LS";
-  }
+
 
   if(out.entry().type() == DIR)
   {
