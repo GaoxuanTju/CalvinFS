@@ -47,7 +47,7 @@ public:
     for (int i = 0; i < action->readset_size(); i++)
     {
       string path = action->readset(i);
-       // 判断涉不涉及分层，目前是看有没有b，如果有b就分层
+      // 判断涉不涉及分层，目前是看有没有b，如果有b就分层
       char pattern = 'b';
       string hash_name;
       if (path.find(pattern) != std::string::npos)
@@ -64,7 +64,7 @@ public:
       else
       { // 不涉及分层，这半部分就是上面那样直接获取即可
         hash_name = path;
-      }     
+      }
       if (!store_->Get(hash_name,
                        version_,
                        &reads_[action->readset(i)]))
@@ -843,16 +843,31 @@ void MetadataStore::Init(BTNode *dir_tree, string level)
 void MetadataStore::Init_for_depth(BTNode *dir_tree)
 {
   // gaoxuan --这里面会涉及到目录树的建立初始化。
-  int asize = machine_->config().size();
-  int bsize = 5;
-  int csize = 5;
+  int a_0 = machine_->config().size();
+  int a_1 = 2;
+  int a_2 = 2;
+  int a_3 = 2;
+  int a_4 = 2;
+  int a_5 = 2;
+  int a_6 = 2;
+  int a_7 = 2;
+  int a_8 = 2;
+  int a_9 = 2;
+  int a_10 = 2;
+  int a_11 = 2;
+  int a_12 = 2;
+  int a_13 = 2;
+  int a_14 = 2;
+  int a_15 = 2;
+  int a_16 = 2;
+  int a_17 = 2;
+  int a_18 = 2;
+  int a_19 = 2;
+  int a_20 = 2;
+  int bsize = 2;
+  int csize = 2;
   // 改成5,5测试的时候容易看出来
   double start = GetTime();
-
-  // Update root dir.
-  // 因为我们需要的是完整的目录树，所以我们在if ISLOCAL之前直接放进去就好，同时也要把孩子和兄弟的关系理清楚
-  // 提前先建立起来吧
-
   // gaoxuan --根节点的指针
   dir_tree->child = NULL;
   dir_tree->sibling = NULL;
@@ -862,153 +877,829 @@ void MetadataStore::Init_for_depth(BTNode *dir_tree)
     MetadataEntry entry;
     entry.mutable_permissions();
     entry.set_type(DIR);
-    for (int i = 0; i < asize; i++)
+    for (int i_0 = 0; i_0 < a_0; i_0++)
     {
-      entry.add_dir_contents("a" + IntToString(i));
+      entry.add_dir_contents("a_0" + IntToString(i_0));
     }
     string serialized_entry;
     entry.SerializeToString(&serialized_entry);
     store_->Put("", serialized_entry, 0);
   }
-  BTNode *a_level = NULL; // 这个就指向该层第一个节点
-  // Add dirs.
-  for (int i = 0; i < asize; i++)
+  BTNode *a_0_level = NULL; // 这个就指向该层第一个节点
+  for (int i_0 = 0; i_0 < a_0; i_0++)
   {
-    string dir("/a" + IntToString(i));
-    string dir_("a" + IntToString(i));
+    string a_0_dir("/a_0" + IntToString(i_0));
+    string a_0_dir_("a_0" + IntToString(i_0));
     BTNode *temp_a = new BTNode;
     temp_a->child = NULL;
-    temp_a->path = dir_;
+    temp_a->path = a_0_dir_;
     temp_a->sibling = NULL;
-
-    if (i == 0)
+    if (i_0 == 0)
     {
       // gaoxuan --如果是第一个节点，就将他作为上一层的孩子
       dir_tree->child = temp_a;
-      a_level = temp_a; // a_level指针作为上一个兄弟节点
+      a_0_level = temp_a; // a_level指针作为上一个兄弟节点
     }
     else
     {
       // 如果不是第一个节点，就是上一个节点的兄弟节点
-      a_level->sibling = temp_a;
-      a_level = a_level->sibling; // a_level移动到下一个兄弟节点
+      a_0_level->sibling = temp_a;
+      a_0_level = a_0_level->sibling; // a_level移动到下一个兄弟节点
     }
-
-    if (IsLocal(dir))
+    if (IsLocal(a_0_dir))
     {
       MetadataEntry entry;
       entry.mutable_permissions();
       entry.set_type(DIR);
-      for (int j = 0; j < bsize; j++)
+      for (int i_1 = 0; i_1 < a_1; i_1++)
       {
-        entry.add_dir_contents("b" + IntToString(j));
+        entry.add_dir_contents("a_1" + IntToString(i_1));
       }
       string serialized_entry;
       entry.SerializeToString(&serialized_entry);
-      store_->Put(dir, serialized_entry, 0);
+      store_->Put(a_0_dir, serialized_entry, 0);
     }
-
-    // Add subdirs.
-    BTNode *b_level = NULL; // 这个就指向该层第二个节点
-
-    string flag_level = IntToString(i);
-    // 现在flag_level目前就是要对拼接到字符串前的标识了
-    for (int j = 0; j < bsize; j++)
+    BTNode *a_1_level = NULL; // 这个就指向该层第一个节点
+    for (int i_1 = 0; i_1 < a_1; i_1++)
     {
-      string subdir(dir + "/b" + IntToString(j));
-      string subdir_("b" + IntToString(j));
-      string subdir__("/" + flag_level + subdir_);
-      // gaoxuan --目前写死在b这一层开始分层
-      // 1、对相对路径hash
-      // 2、键值对继续存储元数据
-
-      // 现在无法绕开的问题就是相对路径很大概率是相同的，那么无论是hash
-      // 还是键值对存储数据都不能实现
-      /*
-      这一点是分层点，我们在分层点确定是
-
-
-      */
-
-      BTNode *temp_b = new BTNode;
-      temp_b->child = NULL;
-      temp_b->path = subdir_;
-      temp_b->sibling = NULL;
-
-      if (j == 0)
+      string a_1_dir("/a_1" + IntToString(i_1));
+      string a_1_dir_("a_1" + IntToString(i_1));
+      BTNode *temp_a = new BTNode;
+      temp_a->child = NULL;
+      temp_a->path = a_1_dir_;
+      temp_a->sibling = NULL;
+      if (i_1 == 0)
       {
         // gaoxuan --如果是第一个节点，就将他作为上一层的孩子
-        a_level->child = temp_b;
-        b_level = temp_b;
+        a_0_level->child = temp_a;
+        a_1_level = temp_a; // a_level指针作为上一个兄弟节点
       }
       else
       {
-        // gaoxuan --不是第一个节点，是上一个的兄弟节点
-        b_level->sibling = temp_b;
-        b_level = b_level->sibling;
+        // 如果不是第一个节点，就是上一个节点的兄弟节点
+        a_1_level->sibling = temp_a;
+        a_1_level = a_1_level->sibling; // a_level移动到下一个兄弟节点
       }
-      if (IsLocal(subdir__))
+      if (IsLocal(a_1_dir))
       {
         MetadataEntry entry;
         entry.mutable_permissions();
         entry.set_type(DIR);
-        for (int k = 0; k < csize; k++)
+        for (int i_2 = 0; i_2 < a_2; i_2++)
         {
-          entry.add_dir_contents("c" + IntToString(k));
+          entry.add_dir_contents("a_2" + IntToString(i_2));
         }
         string serialized_entry;
         entry.SerializeToString(&serialized_entry);
-        store_->Put(subdir__, serialized_entry, 0);
+        store_->Put(a_1_dir, serialized_entry, 0);
       }
-      // Add files.
-      BTNode *c_level = NULL; // 这个就指向该层第三个节点
-      for (int k = 0; k < csize; k++)
+      BTNode *a_2_level = NULL; // 这个就指向该层第一个节点
+      for (int i_2 = 0; i_2 < a_2; i_2++)
       {
-        string file(subdir__ + "/c" + IntToString(k));
-        string file_("c" + IntToString(k));
-
-        BTNode *temp_c = new BTNode;
-        temp_c->child = NULL;
-        temp_c->path = file_;
-        temp_c->sibling = NULL;
-        if (k == 0)
+        string a_2_dir("/a_2" + IntToString(i_2));
+        string a_2_dir_("a_2" + IntToString(i_2));
+        BTNode *temp_a = new BTNode;
+        temp_a->child = NULL;
+        temp_a->path = a_2_dir_;
+        temp_a->sibling = NULL;
+        if (i_2 == 0)
         {
-          // gaoxuan --如果是第一个节点，就作为上一层的孩子
-          b_level->child = temp_c;
-          c_level = temp_c;
+          // gaoxuan --如果是第一个节点，就将他作为上一层的孩子
+          a_1_level->child = temp_a;
+          a_2_level = temp_a; // a_level指针作为上一个兄弟节点
         }
         else
         {
-          c_level->sibling = temp_c;
-          c_level = c_level->sibling;
+          // 如果不是第一个节点，就是上一个节点的兄弟节点
+          a_2_level->sibling = temp_a;
+          a_2_level = a_2_level->sibling; // a_level移动到下一个兄弟节点
         }
-
-        if (IsLocal(file))
+        if (IsLocal(a_2_dir))
         {
           MetadataEntry entry;
           entry.mutable_permissions();
-          entry.set_type(DATA);
-          FilePart *fp = entry.add_file_parts();
-          fp->set_length(RandomSize());
-          fp->set_block_id(0);
-          fp->set_block_offset(0);
+          entry.set_type(DIR);
+          for (int i_3 = 0; i_3 < a_3; i_3++)
+          {
+            entry.add_dir_contents("a_3" + IntToString(i_3));
+          }
           string serialized_entry;
           entry.SerializeToString(&serialized_entry);
-          store_->Put(file, serialized_entry, 0);
+          store_->Put(a_2_dir, serialized_entry, 0);
         }
-      }
-      if (j % 100 == 0)
-      {
-        LOG(ERROR) << "[" << machine_->machine_id() << "] "
-                   << "MDS::Init() progress: " << (i * bsize + j) / 100 + 1
-                   << "/" << asize * bsize / 100;
+        BTNode *a_3_level = NULL; // 这个就指向该层第一个节点
+        for (int i_3 = 0; i_3 < a_3; i_3++)
+        {
+          string a_3_dir("/a_3" + IntToString(i_3));
+          string a_3_dir_("a_3" + IntToString(i_3));
+          BTNode *temp_a = new BTNode;
+          temp_a->child = NULL;
+          temp_a->path = a_3_dir_;
+          temp_a->sibling = NULL;
+          if (i_3 == 0)
+          {
+            // gaoxuan --如果是第一个节点，就将他作为上一层的孩子
+            a_2_level->child = temp_a;
+            a_3_level = temp_a; // a_level指针作为上一个兄弟节点
+          }
+          else
+          {
+            // 如果不是第一个节点，就是上一个节点的兄弟节点
+            a_3_level->sibling = temp_a;
+            a_3_level = a_3_level->sibling; // a_level移动到下一个兄弟节点
+          }
+          if (IsLocal(a_3_dir))
+          {
+            MetadataEntry entry;
+            entry.mutable_permissions();
+            entry.set_type(DIR);
+            for (int i_4 = 0; i_4 < a_4; i_4++)
+            {
+              entry.add_dir_contents("a_4" + IntToString(i_4));
+            }
+            string serialized_entry;
+            entry.SerializeToString(&serialized_entry);
+            store_->Put(a_3_dir, serialized_entry, 0);
+          }
+          BTNode *a_4_level = NULL; // 这个就指向该层第一个节点
+          for (int i_4 = 0; i_4 < a_4; i_4++)
+          {
+            string a_4_dir("/a_4" + IntToString(i_4));
+            string a_4_dir_("a_4" + IntToString(i_4));
+            BTNode *temp_a = new BTNode;
+            temp_a->child = NULL;
+            temp_a->path = a_4_dir_;
+            temp_a->sibling = NULL;
+            if (i_4 == 0)
+            {
+              // gaoxuan --如果是第一个节点，就将他作为上一层的孩子
+              a_3_level->child = temp_a;
+              a_4_level = temp_a; // a_level指针作为上一个兄弟节点
+            }
+            else
+            {
+              // 如果不是第一个节点，就是上一个节点的兄弟节点
+              a_4_level->sibling = temp_a;
+              a_4_level = a_4_level->sibling; // a_level移动到下一个兄弟节点
+            }
+            if (IsLocal(a_4_dir))
+            {
+              MetadataEntry entry;
+              entry.mutable_permissions();
+              entry.set_type(DIR);
+              for (int i_5 = 0; i_5 < a_5; i_5++)
+              {
+                entry.add_dir_contents("a_5" + IntToString(i_5));
+              }
+              string serialized_entry;
+              entry.SerializeToString(&serialized_entry);
+              store_->Put(a_4_dir, serialized_entry, 0);
+            }
+            BTNode *a_5_level = NULL; // 这个就指向该层第一个节点
+            for (int i_5 = 0; i_5 < a_5; i_5++)
+            {
+              string a_5_dir("/a_5" + IntToString(i_5));
+              string a_5_dir_("a_5" + IntToString(i_5));
+              BTNode *temp_a = new BTNode;
+              temp_a->child = NULL;
+              temp_a->path = a_5_dir_;
+              temp_a->sibling = NULL;
+              if (i_5 == 0)
+              {
+                // gaoxuan --如果是第一个节点，就将他作为上一层的孩子
+                a_4_level->child = temp_a;
+                a_5_level = temp_a; // a_level指针作为上一个兄弟节点
+              }
+              else
+              {
+                // 如果不是第一个节点，就是上一个节点的兄弟节点
+                a_5_level->sibling = temp_a;
+                a_5_level = a_5_level->sibling; // a_level移动到下一个兄弟节点
+              }
+              if (IsLocal(a_5_dir))
+              {
+                MetadataEntry entry;
+                entry.mutable_permissions();
+                entry.set_type(DIR);
+                for (int i_6 = 0; i_6 < a_6; i_6++)
+                {
+                  entry.add_dir_contents("a_6" + IntToString(i_6));
+                }
+                string serialized_entry;
+                entry.SerializeToString(&serialized_entry);
+                store_->Put(a_5_dir, serialized_entry, 0);
+              }
+              BTNode *a_6_level = NULL; // 这个就指向该层第一个节点
+              for (int i_6 = 0; i_6 < a_6; i_6++)
+              {
+                string a_6_dir("/a_6" + IntToString(i_6));
+                string a_6_dir_("a_6" + IntToString(i_6));
+                BTNode *temp_a = new BTNode;
+                temp_a->child = NULL;
+                temp_a->path = a_6_dir_;
+                temp_a->sibling = NULL;
+                if (i_6 == 0)
+                {
+                  // gaoxuan --如果是第一个节点，就将他作为上一层的孩子
+                  a_5_level->child = temp_a;
+                  a_6_level = temp_a; // a_level指针作为上一个兄弟节点
+                }
+                else
+                {
+                  // 如果不是第一个节点，就是上一个节点的兄弟节点
+                  a_6_level->sibling = temp_a;
+                  a_6_level = a_6_level->sibling; // a_level移动到下一个兄弟节点
+                }
+                if (IsLocal(a_6_dir))
+                {
+                  MetadataEntry entry;
+                  entry.mutable_permissions();
+                  entry.set_type(DIR);
+                  for (int i_7 = 0; i_7 < a_7; i_7++)
+                  {
+                    entry.add_dir_contents("a_7" + IntToString(i_7));
+                  }
+                  string serialized_entry;
+                  entry.SerializeToString(&serialized_entry);
+                  store_->Put(a_6_dir, serialized_entry, 0);
+                }
+                BTNode *a_7_level = NULL; // 这个就指向该层第一个节点
+                for (int i_7 = 0; i_7 < a_7; i_7++)
+                {
+                  string a_7_dir("/a_7" + IntToString(i_7));
+                  string a_7_dir_("a_7" + IntToString(i_7));
+                  BTNode *temp_a = new BTNode;
+                  temp_a->child = NULL;
+                  temp_a->path = a_7_dir_;
+                  temp_a->sibling = NULL;
+                  if (i_7 == 0)
+                  {
+                    // gaoxuan --如果是第一个节点，就将他作为上一层的孩子
+                    a_6_level->child = temp_a;
+                    a_7_level = temp_a; // a_level指针作为上一个兄弟节点
+                  }
+                  else
+                  {
+                    // 如果不是第一个节点，就是上一个节点的兄弟节点
+                    a_7_level->sibling = temp_a;
+                    a_7_level = a_7_level->sibling; // a_level移动到下一个兄弟节点
+                  }
+                  if (IsLocal(a_7_dir))
+                  {
+                    MetadataEntry entry;
+                    entry.mutable_permissions();
+                    entry.set_type(DIR);
+                    for (int i_8 = 0; i_8 < a_8; i_8++)
+                    {
+                      entry.add_dir_contents("a_8" + IntToString(i_8));
+                    }
+                    string serialized_entry;
+                    entry.SerializeToString(&serialized_entry);
+                    store_->Put(a_7_dir, serialized_entry, 0);
+                  }
+                  BTNode *a_8_level = NULL; // 这个就指向该层第一个节点
+                  for (int i_8 = 0; i_8 < a_8; i_8++)
+                  {
+                    string a_8_dir("/a_8" + IntToString(i_8));
+                    string a_8_dir_("a_8" + IntToString(i_8));
+                    BTNode *temp_a = new BTNode;
+                    temp_a->child = NULL;
+                    temp_a->path = a_8_dir_;
+                    temp_a->sibling = NULL;
+                    if (i_8 == 0)
+                    {
+                      // gaoxuan --如果是第一个节点，就将他作为上一层的孩子
+                      a_7_level->child = temp_a;
+                      a_8_level = temp_a; // a_level指针作为上一个兄弟节点
+                    }
+                    else
+                    {
+                      // 如果不是第一个节点，就是上一个节点的兄弟节点
+                      a_8_level->sibling = temp_a;
+                      a_8_level = a_8_level->sibling; // a_level移动到下一个兄弟节点
+                    }
+                    if (IsLocal(a_8_dir))
+                    {
+                      MetadataEntry entry;
+                      entry.mutable_permissions();
+                      entry.set_type(DIR);
+                      for (int i_9 = 0; i_9 < a_9; i_9++)
+                      {
+                        entry.add_dir_contents("a_9" + IntToString(i_9));
+                      }
+                      string serialized_entry;
+                      entry.SerializeToString(&serialized_entry);
+                      store_->Put(a_8_dir, serialized_entry, 0);
+                    }
+                    BTNode *a_9_level = NULL; // 这个就指向该层第一个节点
+                    for (int i_9 = 0; i_9 < a_9; i_9++)
+                    {
+                      string a_9_dir("/a_9" + IntToString(i_9));
+                      string a_9_dir_("a_9" + IntToString(i_9));
+                      BTNode *temp_a = new BTNode;
+                      temp_a->child = NULL;
+                      temp_a->path = a_9_dir_;
+                      temp_a->sibling = NULL;
+                      if (i_9 == 0)
+                      {
+                        // gaoxuan --如果是第一个节点，就将他作为上一层的孩子
+                        a_8_level->child = temp_a;
+                        a_9_level = temp_a; // a_level指针作为上一个兄弟节点
+                      }
+                      else
+                      {
+                        // 如果不是第一个节点，就是上一个节点的兄弟节点
+                        a_9_level->sibling = temp_a;
+                        a_9_level = a_9_level->sibling; // a_level移动到下一个兄弟节点
+                      }
+                      if (IsLocal(a_9_dir))
+                      {
+                        MetadataEntry entry;
+                        entry.mutable_permissions();
+                        entry.set_type(DIR);
+                        for (int i_10 = 0; i_10 < a_10; i_10++)
+                        {
+                          entry.add_dir_contents("a_10" + IntToString(i_10));
+                        }
+                        string serialized_entry;
+                        entry.SerializeToString(&serialized_entry);
+                        store_->Put(a_9_dir, serialized_entry, 0);
+                      }
+                      BTNode *a_10_level = NULL; // 这个就指向该层第一个节点
+                      for (int i_10 = 0; i_10 < a_10; i_10++)
+                      {
+                        string a_10_dir("/a_10" + IntToString(i_10));
+                        string a_10_dir_("a_10" + IntToString(i_10));
+                        BTNode *temp_a = new BTNode;
+                        temp_a->child = NULL;
+                        temp_a->path = a_10_dir_;
+                        temp_a->sibling = NULL;
+                        if (i_10 == 0)
+                        {
+                          // gaoxuan --如果是第一个节点，就将他作为上一层的孩子
+                          a_9_level->child = temp_a;
+                          a_10_level = temp_a; // a_level指针作为上一个兄弟节点
+                        }
+                        else
+                        {
+                          // 如果不是第一个节点，就是上一个节点的兄弟节点
+                          a_10_level->sibling = temp_a;
+                          a_10_level = a_10_level->sibling; // a_level移动到下一个兄弟节点
+                        }
+                        if (IsLocal(a_10_dir))
+                        {
+                          MetadataEntry entry;
+                          entry.mutable_permissions();
+                          entry.set_type(DIR);
+                          for (int i_11 = 0; i_11 < a_11; i_11++)
+                          {
+                            entry.add_dir_contents("a_11" + IntToString(i_11));
+                          }
+                          string serialized_entry;
+                          entry.SerializeToString(&serialized_entry);
+                          store_->Put(a_10_dir, serialized_entry, 0);
+                        }
+                        BTNode *a_11_level = NULL; // 这个就指向该层第一个节点
+                        for (int i_11 = 0; i_11 < a_11; i_11++)
+                        {
+                          string a_11_dir("/a_11" + IntToString(i_11));
+                          string a_11_dir_("a_11" + IntToString(i_11));
+                          BTNode *temp_a = new BTNode;
+                          temp_a->child = NULL;
+                          temp_a->path = a_11_dir_;
+                          temp_a->sibling = NULL;
+                          if (i_11 == 0)
+                          {
+                            // gaoxuan --如果是第一个节点，就将他作为上一层的孩子
+                            a_10_level->child = temp_a;
+                            a_11_level = temp_a; // a_level指针作为上一个兄弟节点
+                          }
+                          else
+                          {
+                            // 如果不是第一个节点，就是上一个节点的兄弟节点
+                            a_11_level->sibling = temp_a;
+                            a_11_level = a_11_level->sibling; // a_level移动到下一个兄弟节点
+                          }
+                          if (IsLocal(a_11_dir))
+                          {
+                            MetadataEntry entry;
+                            entry.mutable_permissions();
+                            entry.set_type(DIR);
+                            for (int i_12 = 0; i_12 < a_12; i_12++)
+                            {
+                              entry.add_dir_contents("a_12" + IntToString(i_12));
+                            }
+                            string serialized_entry;
+                            entry.SerializeToString(&serialized_entry);
+                            store_->Put(a_11_dir, serialized_entry, 0);
+                          }
+                          BTNode *a_12_level = NULL; // 这个就指向该层第一个节点
+                          for (int i_12 = 0; i_12 < a_12; i_12++)
+                          {
+                            string a_12_dir("/a_12" + IntToString(i_12));
+                            string a_12_dir_("a_12" + IntToString(i_12));
+                            BTNode *temp_a = new BTNode;
+                            temp_a->child = NULL;
+                            temp_a->path = a_12_dir_;
+                            temp_a->sibling = NULL;
+                            if (i_12 == 0)
+                            {
+                              // gaoxuan --如果是第一个节点，就将他作为上一层的孩子
+                              a_11_level->child = temp_a;
+                              a_12_level = temp_a; // a_level指针作为上一个兄弟节点
+                            }
+                            else
+                            {
+                              // 如果不是第一个节点，就是上一个节点的兄弟节点
+                              a_12_level->sibling = temp_a;
+                              a_12_level = a_12_level->sibling; // a_level移动到下一个兄弟节点
+                            }
+                            if (IsLocal(a_12_dir))
+                            {
+                              MetadataEntry entry;
+                              entry.mutable_permissions();
+                              entry.set_type(DIR);
+                              for (int i_13 = 0; i_13 < a_13; i_13++)
+                              {
+                                entry.add_dir_contents("a_13" + IntToString(i_13));
+                              }
+                              string serialized_entry;
+                              entry.SerializeToString(&serialized_entry);
+                              store_->Put(a_12_dir, serialized_entry, 0);
+                            }
+                            BTNode *a_13_level = NULL; // 这个就指向该层第一个节点
+                            for (int i_13 = 0; i_13 < a_13; i_13++)
+                            {
+                              string a_13_dir("/a_13" + IntToString(i_13));
+                              string a_13_dir_("a_13" + IntToString(i_13));
+                              BTNode *temp_a = new BTNode;
+                              temp_a->child = NULL;
+                              temp_a->path = a_13_dir_;
+                              temp_a->sibling = NULL;
+                              if (i_13 == 0)
+                              {
+                                // gaoxuan --如果是第一个节点，就将他作为上一层的孩子
+                                a_12_level->child = temp_a;
+                                a_13_level = temp_a; // a_level指针作为上一个兄弟节点
+                              }
+                              else
+                              {
+                                // 如果不是第一个节点，就是上一个节点的兄弟节点
+                                a_13_level->sibling = temp_a;
+                                a_13_level = a_13_level->sibling; // a_level移动到下一个兄弟节点
+                              }
+                              if (IsLocal(a_13_dir))
+                              {
+                                MetadataEntry entry;
+                                entry.mutable_permissions();
+                                entry.set_type(DIR);
+                                for (int i_14 = 0; i_14 < a_14; i_14++)
+                                {
+                                  entry.add_dir_contents("a_14" + IntToString(i_14));
+                                }
+                                string serialized_entry;
+                                entry.SerializeToString(&serialized_entry);
+                                store_->Put(a_13_dir, serialized_entry, 0);
+                              }
+                              BTNode *a_14_level = NULL; // 这个就指向该层第一个节点
+                              for (int i_14 = 0; i_14 < a_14; i_14++)
+                              {
+                                string a_14_dir("/a_14" + IntToString(i_14));
+                                string a_14_dir_("a_14" + IntToString(i_14));
+                                BTNode *temp_a = new BTNode;
+                                temp_a->child = NULL;
+                                temp_a->path = a_14_dir_;
+                                temp_a->sibling = NULL;
+                                if (i_14 == 0)
+                                {
+                                  // gaoxuan --如果是第一个节点，就将他作为上一层的孩子
+                                  a_13_level->child = temp_a;
+                                  a_14_level = temp_a; // a_level指针作为上一个兄弟节点
+                                }
+                                else
+                                {
+                                  // 如果不是第一个节点，就是上一个节点的兄弟节点
+                                  a_14_level->sibling = temp_a;
+                                  a_14_level = a_14_level->sibling; // a_level移动到下一个兄弟节点
+                                }
+                                if (IsLocal(a_14_dir))
+                                {
+                                  MetadataEntry entry;
+                                  entry.mutable_permissions();
+                                  entry.set_type(DIR);
+                                  for (int i_15 = 0; i_15 < a_15; i_15++)
+                                  {
+                                    entry.add_dir_contents("a_15" + IntToString(i_15));
+                                  }
+                                  string serialized_entry;
+                                  entry.SerializeToString(&serialized_entry);
+                                  store_->Put(a_14_dir, serialized_entry, 0);
+                                }
+                                BTNode *a_15_level = NULL; // 这个就指向该层第一个节点
+                                for (int i_15 = 0; i_15 < a_15; i_15++)
+                                {
+                                  string a_15_dir("/a_15" + IntToString(i_15));
+                                  string a_15_dir_("a_15" + IntToString(i_15));
+                                  BTNode *temp_a = new BTNode;
+                                  temp_a->child = NULL;
+                                  temp_a->path = a_15_dir_;
+                                  temp_a->sibling = NULL;
+                                  if (i_15 == 0)
+                                  {
+                                    // gaoxuan --如果是第一个节点，就将他作为上一层的孩子
+                                    a_14_level->child = temp_a;
+                                    a_15_level = temp_a; // a_level指针作为上一个兄弟节点
+                                  }
+                                  else
+                                  {
+                                    // 如果不是第一个节点，就是上一个节点的兄弟节点
+                                    a_15_level->sibling = temp_a;
+                                    a_15_level = a_15_level->sibling; // a_level移动到下一个兄弟节点
+                                  }
+                                  if (IsLocal(a_15_dir))
+                                  {
+                                    MetadataEntry entry;
+                                    entry.mutable_permissions();
+                                    entry.set_type(DIR);
+                                    for (int i_16 = 0; i_16 < a_16; i_16++)
+                                    {
+                                      entry.add_dir_contents("a_16" + IntToString(i_16));
+                                    }
+                                    string serialized_entry;
+                                    entry.SerializeToString(&serialized_entry);
+                                    store_->Put(a_15_dir, serialized_entry, 0);
+                                  }
+                                  BTNode *a_16_level = NULL; // 这个就指向该层第一个节点
+                                  for (int i_16 = 0; i_16 < a_16; i_16++)
+                                  {
+                                    string a_16_dir("/a_16" + IntToString(i_16));
+                                    string a_16_dir_("a_16" + IntToString(i_16));
+                                    BTNode *temp_a = new BTNode;
+                                    temp_a->child = NULL;
+                                    temp_a->path = a_16_dir_;
+                                    temp_a->sibling = NULL;
+                                    if (i_16 == 0)
+                                    {
+                                      // gaoxuan --如果是第一个节点，就将他作为上一层的孩子
+                                      a_15_level->child = temp_a;
+                                      a_16_level = temp_a; // a_level指针作为上一个兄弟节点
+                                    }
+                                    else
+                                    {
+                                      // 如果不是第一个节点，就是上一个节点的兄弟节点
+                                      a_16_level->sibling = temp_a;
+                                      a_16_level = a_16_level->sibling; // a_level移动到下一个兄弟节点
+                                    }
+                                    if (IsLocal(a_16_dir))
+                                    {
+                                      MetadataEntry entry;
+                                      entry.mutable_permissions();
+                                      entry.set_type(DIR);
+                                      for (int i_17 = 0; i_17 < a_17; i_17++)
+                                      {
+                                        entry.add_dir_contents("a_17" + IntToString(i_17));
+                                      }
+                                      string serialized_entry;
+                                      entry.SerializeToString(&serialized_entry);
+                                      store_->Put(a_16_dir, serialized_entry, 0);
+                                    }
+                                    BTNode *a_17_level = NULL; // 这个就指向该层第一个节点
+                                    for (int i_17 = 0; i_17 < a_17; i_17++)
+                                    {
+                                      string a_17_dir("/a_17" + IntToString(i_17));
+                                      string a_17_dir_("a_17" + IntToString(i_17));
+                                      BTNode *temp_a = new BTNode;
+                                      temp_a->child = NULL;
+                                      temp_a->path = a_17_dir_;
+                                      temp_a->sibling = NULL;
+                                      if (i_17 == 0)
+                                      {
+                                        // gaoxuan --如果是第一个节点，就将他作为上一层的孩子
+                                        a_16_level->child = temp_a;
+                                        a_17_level = temp_a; // a_level指针作为上一个兄弟节点
+                                      }
+                                      else
+                                      {
+                                        // 如果不是第一个节点，就是上一个节点的兄弟节点
+                                        a_17_level->sibling = temp_a;
+                                        a_17_level = a_17_level->sibling; // a_level移动到下一个兄弟节点
+                                      }
+                                      if (IsLocal(a_17_dir))
+                                      {
+                                        MetadataEntry entry;
+                                        entry.mutable_permissions();
+                                        entry.set_type(DIR);
+                                        for (int i_18 = 0; i_18 < a_18; i_18++)
+                                        {
+                                          entry.add_dir_contents("a_18" + IntToString(i_18));
+                                        }
+                                        string serialized_entry;
+                                        entry.SerializeToString(&serialized_entry);
+                                        store_->Put(a_17_dir, serialized_entry, 0);
+                                      }
+                                      BTNode *a_18_level = NULL; // 这个就指向该层第一个节点
+                                      for (int i_18 = 0; i_18 < a_18; i_18++)
+                                      {
+                                        string a_18_dir("/a_18" + IntToString(i_18));
+                                        string a_18_dir_("a_18" + IntToString(i_18));
+                                        BTNode *temp_a = new BTNode;
+                                        temp_a->child = NULL;
+                                        temp_a->path = a_18_dir_;
+                                        temp_a->sibling = NULL;
+                                        if (i_18 == 0)
+                                        {
+                                          // gaoxuan --如果是第一个节点，就将他作为上一层的孩子
+                                          a_17_level->child = temp_a;
+                                          a_18_level = temp_a; // a_level指针作为上一个兄弟节点
+                                        }
+                                        else
+                                        {
+                                          // 如果不是第一个节点，就是上一个节点的兄弟节点
+                                          a_18_level->sibling = temp_a;
+                                          a_18_level = a_18_level->sibling; // a_level移动到下一个兄弟节点
+                                        }
+                                        if (IsLocal(a_18_dir))
+                                        {
+                                          MetadataEntry entry;
+                                          entry.mutable_permissions();
+                                          entry.set_type(DIR);
+                                          for (int i_19 = 0; i_19 < a_19; i_19++)
+                                          {
+                                            entry.add_dir_contents("a_19" + IntToString(i_19));
+                                          }
+                                          string serialized_entry;
+                                          entry.SerializeToString(&serialized_entry);
+                                          store_->Put(a_18_dir, serialized_entry, 0);
+                                        }
+                                        BTNode *a_19_level = NULL; // 这个就指向该层第一个节点
+                                        for (int i_19 = 0; i_19 < a_19; i_19++)
+                                        {
+                                          string a_19_dir("/a_19" + IntToString(i_19));
+                                          string a_19_dir_("a_19" + IntToString(i_19));
+                                          BTNode *temp_a = new BTNode;
+                                          temp_a->child = NULL;
+                                          temp_a->path = a_19_dir_;
+                                          temp_a->sibling = NULL;
+                                          if (i_19 == 0)
+                                          {
+                                            // gaoxuan --如果是第一个节点，就将他作为上一层的孩子
+                                            a_18_level->child = temp_a;
+                                            a_19_level = temp_a; // a_level指针作为上一个兄弟节点
+                                          }
+                                          else
+                                          {
+                                            // 如果不是第一个节点，就是上一个节点的兄弟节点
+                                            a_19_level->sibling = temp_a;
+                                            a_19_level = a_19_level->sibling; // a_level移动到下一个兄弟节点
+                                          }
+                                          if (IsLocal(a_19_dir))
+                                          {
+                                            MetadataEntry entry;
+                                            entry.mutable_permissions();
+                                            entry.set_type(DIR);
+                                            for (int i_20 = 0; i_20 < a_20; i_20++)
+                                            {
+                                              entry.add_dir_contents("a_20" + IntToString(i_20));
+                                            }
+                                            string serialized_entry;
+                                            entry.SerializeToString(&serialized_entry);
+                                            store_->Put(a_19_dir, serialized_entry, 0);
+                                          }
+                                          BTNode *a_20_level = NULL; // 这个就指向该层第一个节点
+                                          for (int i_20 = 0; i_20 < a_20; i_20++)
+                                          {
+                                            string a_20_dir("/a_20" + IntToString(i_20));
+                                            string a_20_dir_("a_20" + IntToString(i_20));
+                                            BTNode *temp_a = new BTNode;
+                                            temp_a->child = NULL;
+                                            temp_a->path = a_20_dir_;
+                                            temp_a->sibling = NULL;
+                                            if (i_20 == 0)
+                                            {
+                                              // gaoxuan --如果是第一个节点，就将他作为上一层的孩子
+                                              a_19_level->child = temp_a;
+                                              a_20_level = temp_a; // a_level指针作为上一个兄弟节点
+                                            }
+                                            else
+                                            {
+                                              // 如果不是第一个节点，就是上一个节点的兄弟节点
+                                              a_20_level->sibling = temp_a;
+                                              a_20_level = a_20_level->sibling; // a_level移动到下一个兄弟节点
+                                            }
+                                            if (IsLocal(a_20_dir))
+                                            {
+                                              MetadataEntry entry;
+                                              entry.mutable_permissions();
+                                              entry.set_type(DIR);
+                                              for (int j = 0; j < bsize; j++)
+                                              {
+                                                entry.add_dir_contents("b" + IntToString(j));
+                                              }
+                                              string serialized_entry;
+                                              entry.SerializeToString(&serialized_entry);
+                                              store_->Put(a_20_dir, serialized_entry, 0);
+                                            }
+
+                                            // Add subdirs.
+                                            BTNode *b_level = NULL; // 这个就指向该层第二个节点
+
+                                            string flag_level = IntToString(i_20);
+                                            // 现在flag_level目前就是要对拼接到字符串前的标识了
+                                            for (int j = 0; j < bsize; j++)
+                                            {
+                                              string subdir(a_20_dir + "/b" + IntToString(j));
+                                              string subdir_("b" + IntToString(j));
+                                              string subdir__("/" + flag_level + subdir_);
+
+                                              BTNode *temp_b = new BTNode;
+                                              temp_b->child = NULL;
+                                              temp_b->path = subdir_;
+                                              temp_b->sibling = NULL;
+
+                                              if (j == 0)
+                                              {
+                                                // gaoxuan --如果是第一个节点，就将他作为上一层的孩子
+                                                a_20_level->child = temp_b;
+                                                b_level = temp_b;
+                                              }
+                                              else
+                                              {
+                                                // gaoxuan --不是第一个节点，是上一个的兄弟节点
+                                                b_level->sibling = temp_b;
+                                                b_level = b_level->sibling;
+                                              }
+                                              if (IsLocal(subdir__))
+                                              {
+                                                MetadataEntry entry;
+                                                entry.mutable_permissions();
+                                                entry.set_type(DIR);
+                                                for (int k = 0; k < csize; k++)
+                                                {
+                                                  entry.add_dir_contents("c" + IntToString(k));
+                                                }
+                                                string serialized_entry;
+                                                entry.SerializeToString(&serialized_entry);
+                                                store_->Put(subdir__, serialized_entry, 0);
+                                              }
+                                              // Add files.
+                                              BTNode *c_level = NULL; // 这个就指向该层第三个节点
+                                              for (int k = 0; k < csize; k++)
+                                              {
+                                                string file(subdir__ + "/c" + IntToString(k));
+                                                string file_("c" + IntToString(k));
+
+                                                BTNode *temp_c = new BTNode;
+                                                temp_c->child = NULL;
+                                                temp_c->path = file_;
+                                                temp_c->sibling = NULL;
+                                                if (k == 0)
+                                                {
+                                                  // gaoxuan --如果是第一个节点，就作为上一层的孩子
+                                                  b_level->child = temp_c;
+                                                  c_level = temp_c;
+                                                }
+                                                else
+                                                {
+                                                  c_level->sibling = temp_c;
+                                                  c_level = c_level->sibling;
+                                                }
+
+                                                if (IsLocal(file))
+                                                {
+                                                  MetadataEntry entry;
+                                                  entry.mutable_permissions();
+                                                  entry.set_type(DATA);
+                                                  FilePart *fp = entry.add_file_parts();
+                                                  fp->set_length(RandomSize());
+                                                  fp->set_block_id(0);
+                                                  fp->set_block_offset(0);
+                                                  string serialized_entry;
+                                                  entry.SerializeToString(&serialized_entry);
+                                                  store_->Put(file, serialized_entry, 0);
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     }
   }
-
-  LOG(ERROR) << "[" << machine_->machine_id() << "] "
-             << "MDS::Init() complete. Elapsed time: "
-             << GetTime() - start << " seconds";
 }
 
 void MetadataStore::InitSmall()
@@ -1787,10 +2478,10 @@ void MetadataStore::Lookup_Internal(
 
   string path = in.path();
   string hash_name;
-  LOG(ERROR)<<path.data()<<" in"<<" lookup";
+  // LOG(ERROR)<<path.data()<<" in"<<" lookup";
   if (path.find("b") != std::string::npos)
   {
-  
+
     // 要分层
     int pos = path.find('b');
     string name = path.substr(pos);
@@ -1799,7 +2490,7 @@ void MetadataStore::Lookup_Internal(
     int pos_2 = temp.find('/');
     string flag_level = temp.substr(1, pos_2);
     hash_name = "/" + flag_level + name;
-    LOG(ERROR)<<"hash_name is "<<hash_name;
+    //  LOG(ERROR)<<"hash_name is "<<hash_name;
     // gaoxuan --use BFS to add new metadata entry
     string before = path.substr(0, pos - 1);
     std::queue<string> queue1;
@@ -1847,15 +2538,15 @@ void MetadataStore::Lookup_Internal(
       }
     }
     // 上面一直找到分层点，下面对hash路径进行键值对获取
-      if(context->EntryExists(hash_name))
-      {//存在这个路径的元数据项，证明就是他
+    if (context->EntryExists(hash_name))
+    { // 存在这个路径的元数据项，证明就是他
       context->GetEntry(hash_name, &entry);
-      LOG(ERROR)<<hash_name<<" 's entry!";
-      }
-      else
-      {
-        LOG(ERROR)<<hash_name<<" dont's exists!";
-      }
+      LOG(ERROR) << hash_name << " 's entry!";
+    }
+    else
+    {
+      LOG(ERROR) << hash_name << " dont's exists!";
+    }
     // TODO(agt): Check permissions.
 
     // Return entry.
@@ -1863,7 +2554,7 @@ void MetadataStore::Lookup_Internal(
   }
   else
   {
-    LOG(ERROR)<<"don't split level";
+    //  LOG(ERROR)<<"don't split level";
     // 不分层，只是树
     //  gaoxuan --use BFS to add new metadata entry
     std::queue<string> queue1;
@@ -1874,12 +2565,12 @@ void MetadataStore::Lookup_Internal(
       string front = queue1.front(); // gaoxuan --get the front in queue
       queue1.pop();
       uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
-      if(context->EntryExists(front))
-      {//存在这个路径的元数据项，证明就是他
-      context->GetEntry(front, &entry);
-      break;
+      if (context->EntryExists(front))
+      { // 存在这个路径的元数据项，证明就是他
+        context->GetEntry(front, &entry);
+        break;
       }
-      
+
       else
       {
         Header *header = new Header();
@@ -1906,7 +2597,7 @@ void MetadataStore::Lookup_Internal(
         delete serialized;
         MetadataAction::LookupOutput out;
         out.ParseFromString(b.output());
-        if(front == in.path())
+        if (front == in.path())
         {
           entry = out.entry();
           break;
@@ -1917,7 +2608,6 @@ void MetadataStore::Lookup_Internal(
           queue1.push(full_path);
         }
       }
-
     }
 
     // TODO(agt): Check permissions.
