@@ -1615,10 +1615,10 @@ void MetadataStore::Lookup_Internal(
 
   string path = in.path();
   string hash_name;
-
+  LOG(ERROR)<<path.data()<<" in"<<" lookup";
   if (path.find("b") != std::string::npos)
   {
-
+  
     // 要分层
     int pos = path.find('b');
     string name = path.substr(pos);
