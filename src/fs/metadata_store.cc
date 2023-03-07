@@ -46,7 +46,26 @@ public:
   {
     for (int i = 0; i < action->readset_size(); i++)
     {
-      if (!store_->Get(action->readset(i),
+      string path = action->readset(i);
+       // 判断涉不涉及分层，目前是看有没有b，如果有b就分层
+      char pattern = 'b';
+      string hash_name;
+      if (path.find(pattern) != std::string::npos)
+      {
+        // 对路径进行处理，搞成初始化那时候的规则
+        int pos = path.find(pattern);
+        string name = path.substr(pos);
+        int pos_1 = path.find('a');
+        string temp = path.substr(pos_1);
+        int pos_2 = temp.find('/');
+        string flag_level = temp.substr(1, pos_2);
+        hash_name = "/" + flag_level + name;
+      }
+      else
+      { // 不涉及分层，这半部分就是上面那样直接获取即可
+        hash_name = path;
+      }     
+      if (!store_->Get(hash_name,
                        version_,
                        &reads_[action->readset(i)]))
       {
@@ -192,7 +211,7 @@ public:
         int pos_1 = path.find('a');
         string temp = path.substr(pos_1);
         int pos_2 = temp.find('/');
-        string flag_level = temp.substr(0, pos_2);
+        string flag_level = temp.substr(1, pos_2);
         hash_name = "/" + flag_level + name;
       }
       else
@@ -230,13 +249,13 @@ public:
       string hash_name;
       if (path.find(pattern) != std::string::npos)
       {
-         // 对路径进行处理，搞成初始化那时候的规则
+        // 对路径进行处理，搞成初始化那时候的规则
         int pos = path.find(pattern);
         string name = path.substr(pos);
         int pos_1 = path.find('a');
         string temp = path.substr(pos_1);
         int pos_2 = temp.find('/');
-        string flag_level = temp.substr(0, pos_2);
+        string flag_level = temp.substr(1, pos_2);
         hash_name = "/" + flag_level + name;
       }
       else
@@ -1597,30 +1616,19 @@ void MetadataStore::Lookup_Internal(
   string path = in.path();
   string hash_name;
 
-
   if (path.find("b") != std::string::npos)
   {
-    /*
-        // 对路径进行处理，搞成初始化那时候的规则
-        int pos = path.find(pattern);
-        string name = path.substr(pos);
-        int pos_1 = path.find('a');
-        string temp = path.substr(pos_1);
-        int pos_2 = temp.find('/');
-        string flag_level = temp.substr(0, pos_2);
-        hash_name = "/" + flag_level + name;    
-    */
 
     // 要分层
-        int pos = path.find('b');
-        string name = path.substr(pos);
-        int pos_1 = path.find('a');
-        string temp = path.substr(pos_1);
-        int pos_2 = temp.find('/');
-        string flag_level = temp.substr(0, pos_2);
-        hash_name = "/" + flag_level + name; 
+    int pos = path.find('b');
+    string name = path.substr(pos);
+    int pos_1 = path.find('a');
+    string temp = path.substr(pos_1);
+    int pos_2 = temp.find('/');
+    string flag_level = temp.substr(1, pos_2);
+    hash_name = "/" + flag_level + name;
     // gaoxuan --use BFS to add new metadata entry
-    string before = path.substr(0, pos-1);
+    string before = path.substr(0, pos - 1);
     std::queue<string> queue1;
     string root = "";
     queue1.push(root);
@@ -1654,9 +1662,9 @@ void MetadataStore::Lookup_Internal(
       MetadataAction::LookupOutput out;
       out.ParseFromString(b.output());
 
-      if(front==before)
+      if (front == before)
       {
-        //找到了分层点
+        // 找到了分层点
         break;
       }
       for (int i = 0; i < out.entry().dir_contents_size(); i++)
@@ -1664,9 +1672,8 @@ void MetadataStore::Lookup_Internal(
         string full_path = front + "/" + out.entry().dir_contents(i);
         queue1.push(full_path);
       }
-
     }
-    //上面一直找到分层点，下面对hash路径进行键值对获取
+    // 上面一直找到分层点，下面对hash路径进行键值对获取
     context->GetEntry(hash_name, &entry);
     // TODO(agt): Check permissions.
 
@@ -1675,8 +1682,8 @@ void MetadataStore::Lookup_Internal(
   }
   else
   {
-    //不分层，只是树
-        // gaoxuan --use BFS to add new metadata entry
+    // 不分层，只是树
+    //  gaoxuan --use BFS to add new metadata entry
     std::queue<string> queue1;
     string root = "";
     queue1.push(root);
@@ -1685,41 +1692,48 @@ void MetadataStore::Lookup_Internal(
       string front = queue1.front(); // gaoxuan --get the front in queue
       queue1.pop();
       uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
-      Header *header = new Header();
-      header->set_from(machine_->machine_id());
-      header->set_to(mds_machine);
-      header->set_type(Header::RPC);
-      header->set_app("client");
-      header->set_rpc("LOOKUP");
-      header->add_misc_string(front.c_str(), strlen(front.c_str()));
-      // 这一行之前是gaoxuan添加的
-
-      MessageBuffer *m = NULL;
-      header->set_data_ptr(reinterpret_cast<uint64>(&m));
-      machine_->SendMessage(header, new MessageBuffer());
-      while (m == NULL)
-      {
-        usleep(10);
-        Noop<MessageBuffer *>(m);
+      if(context->EntryExists(front))
+      {//存在这个路径的元数据项，证明就是他
+      context->GetEntry(front, &entry);
+      break;
       }
-
-      MessageBuffer *serialized = m;
-      Action b;
-      b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
-      delete serialized;
-      MetadataAction::LookupOutput out;
-      out.ParseFromString(b.output());
-
-      if(front==path)
+      
+      else
       {
-        //找到了路径的元数据
-        entry = out.entry();
-        break;
-      }
-      for (int i = 0; i < out.entry().dir_contents_size(); i++)
-      {
-        string full_path = front + "/" + out.entry().dir_contents(i);
-        queue1.push(full_path);
+        Header *header = new Header();
+        header->set_from(machine_->machine_id());
+        header->set_to(mds_machine);
+        header->set_type(Header::RPC);
+        header->set_app("client");
+        header->set_rpc("LOOKUP");
+        header->add_misc_string(front.c_str(), strlen(front.c_str()));
+        // 这一行之前是gaoxuan添加的
+
+        MessageBuffer *m = NULL;
+        header->set_data_ptr(reinterpret_cast<uint64>(&m));
+        machine_->SendMessage(header, new MessageBuffer());
+        while (m == NULL)
+        {
+          usleep(10);
+          Noop<MessageBuffer *>(m);
+        }
+
+        MessageBuffer *serialized = m;
+        Action b;
+        b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
+        delete serialized;
+        MetadataAction::LookupOutput out;
+        out.ParseFromString(b.output());
+        if(front == in.path())
+        {
+          entry = out.entry();
+          break;
+        }
+        for (int i = 0; i < out.entry().dir_contents_size(); i++)
+        {
+          string full_path = front + "/" + out.entry().dir_contents(i);
+          queue1.push(full_path);
+        }
       }
 
     }
