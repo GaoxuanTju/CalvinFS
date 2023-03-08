@@ -2515,7 +2515,7 @@ void MetadataStore::Tree_Lookup_Internal(
   string path = in.path();
   string hash_name;
 
-  if (path.find("b") != std::string::npos)
+  if (path.find("e") != std::string::npos)
   {
 
     // 要分层
