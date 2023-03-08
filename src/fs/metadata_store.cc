@@ -2509,6 +2509,7 @@ void MetadataStore::Tree_Lookup_Internal(
     const MetadataAction::Tree_LookupInput &in,
     MetadataAction::Tree_LookupOutput *out)
 {
+  LOG(ERROR)<<"in TRELOOKUP";
   // Look up existing entry.
   MetadataEntry entry;
 
@@ -2517,7 +2518,7 @@ void MetadataStore::Tree_Lookup_Internal(
 
   if (path.find("e") != std::string::npos)
   {
-
+    
     // 要分层
     int pos = path.find('b');
     string name = path.substr(pos);
