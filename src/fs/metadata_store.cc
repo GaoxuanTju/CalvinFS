@@ -2478,7 +2478,7 @@ void MetadataStore::Lookup_Internal(
 
   string path = in.path();
   string hash_name;
-  // LOG(ERROR)<<path.data()<<" in"<<" lookup";
+  LOG(ERROR)<<path.data()<<" in"<<" lookup";
   if (path.find("b") != std::string::npos)
   {
 
@@ -2554,7 +2554,7 @@ void MetadataStore::Lookup_Internal(
   }
   else
   {
-    //  LOG(ERROR)<<"don't split level";
+      LOG(ERROR)<<path.data()<<" don't split level";
     // 不分层，只是树
     //  gaoxuan --use BFS to add new metadata entry
     std::queue<string> queue1;
@@ -2614,6 +2614,7 @@ void MetadataStore::Lookup_Internal(
 
     // Return entry.
     out->mutable_entry()->CopyFrom(entry);
+    LOG(ERROR)<<path.data()<<"  finished!";
   }
 }
 
