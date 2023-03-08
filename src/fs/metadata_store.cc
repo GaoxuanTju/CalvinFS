@@ -2636,6 +2636,7 @@ void MetadataStore::Tree_Lookup_Internal(
         {
 
           string full_path = front + "/" + out.entry().dir_contents(i);
+          LOG(ERROR)<<front<<"  's  "<<"entry  :"<<out.entry().dir_contents(i);
           if(in.path().find(full_path) == 0 || in.path() == full_path)
           {
                 queue1.push(full_path);
