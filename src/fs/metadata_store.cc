@@ -2493,7 +2493,7 @@ void MetadataStore::Lookup_Internal(
   if (!context->GetEntry(in.path(), &entry))
   {
     // File doesn't exist!
-
+    LOG(ERROR)<<in.path()<<" can't lookup";
     out->set_success(false);
     out->add_errors(MetadataAction::FileDoesNotExist);
     return;
@@ -2590,7 +2590,7 @@ void MetadataStore::Tree_Lookup_Internal(
   }
   else
   {
-  
+    LOG(ERROR)<<in.path()<<" in Tree_lookup";
     // 不分层，只是树
     //  gaoxuan --use BFS to add new metadata entry
     std::queue<string> queue1;
@@ -2636,7 +2636,7 @@ void MetadataStore::Tree_Lookup_Internal(
         {
 
           string full_path = front + "/" + out.entry().dir_contents(i);
-          if(in.path().find(full_path) == 0)
+          if(in.path().find(full_path) == 0 || in.path() == full_path)
           {
                 queue1.push(full_path);
                 break;
