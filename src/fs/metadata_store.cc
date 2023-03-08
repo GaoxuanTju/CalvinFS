@@ -2507,7 +2507,7 @@ void MetadataStore::Lookup_Internal(
 void MetadataStore::Tree_Lookup_Internal(
     ExecutionContext *context,
     const MetadataAction::LookupInput &in,
-    MetadataAction::LookupOutput *out)
+    MetadataAction::Tree_LookupOutput *out)
 {
   // Look up existing entry.
   MetadataEntry entry;
