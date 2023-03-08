@@ -2072,7 +2072,7 @@ void MetadataStore::Run(Action *action)
     delete context;
     return;
   }
-
+  LOG(ERROR)<<"在run吗";
   // Execute action.
   MetadataAction::Type type =
       static_cast<MetadataAction::Type>(action->action_type());
@@ -2122,6 +2122,7 @@ void MetadataStore::Run(Action *action)
   }
   else if (type == MetadataAction::TREE_LOOKUP)
   {
+    LOG(ERROR)<<"在TREE——LOOKUP吗";
     MetadataAction::Tree_LookupInput in;
     MetadataAction::Tree_LookupOutput out;
     in.ParseFromString(action->input());
@@ -2518,7 +2519,7 @@ void MetadataStore::Tree_Lookup_Internal(
 
   if (path.find("e") != std::string::npos)
   {
-    
+
     // 要分层
     int pos = path.find('b');
     string name = path.substr(pos);
