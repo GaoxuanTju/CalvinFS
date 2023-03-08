@@ -160,6 +160,18 @@ message LookupOutput {
 }
 
 
+message Tree_LookupInput {
+  required string path = 1;
+  optional Permissions permissions = 2;
+}
+message Tree_LookupOutput {
+  optional bool success = 1 [default = true];
+  repeated Error errors = 2;
+
+  // Entry that was looked up. This field should appear iff success == true.
+  optional MetadataEntry entry = 3;
+}
+
 /////////////////////////////////////////////
 //
 // Resize (DATA file)

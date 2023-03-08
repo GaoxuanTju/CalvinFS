@@ -2012,7 +2012,7 @@ void MetadataStore::GetRWSets(Action *action)
   }
   else if (type == MetadataAction::TREE_LOOKUP)
   {
-    MetadataAction::LookupInput in;
+    MetadataAction::Tree_LookupInput in;
     in.ParseFromString(action->input());
     action->add_readset(in.path());
     action->add_writeset(in.path());
@@ -2122,8 +2122,8 @@ void MetadataStore::Run(Action *action)
   }
   else if (type == MetadataAction::TREE_LOOKUP)
   {
-    MetadataAction::LookupInput in;
-    MetadataAction::LookupOutput out;
+    MetadataAction::Tree_LookupInput in;
+    MetadataAction::Tree_LookupOutput out;
     in.ParseFromString(action->input());
     Tree_Lookup_Internal(context, in, &out);
     out.SerializeToString(action->mutable_output());

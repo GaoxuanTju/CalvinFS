@@ -308,7 +308,7 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
   a->set_client_machine(machine()->machine_id());
   a->set_client_channel(channel_name);
   a->set_action_type(MetadataAction::TREE_LOOKUP);
-  MetadataAction::LookupInput in;
+  MetadataAction::Tree_LookupInput in;
   in.set_path(path.data(), path.size());
   in.SerializeToString(a->mutable_input());
   metadata_->GetRWSets(a);
@@ -324,7 +324,7 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
   Action result;
   result.ParseFromArray((*m)[0].data(), (*m)[0].size());
   delete m;  
-  MetadataAction::LookupOutput out;
+  MetadataAction::Tree_LookupOutput out;
   out.ParseFromString(result.output());
 
 
