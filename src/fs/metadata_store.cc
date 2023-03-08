@@ -2065,14 +2065,13 @@ void MetadataStore::Run(Action *action)
     context =
         new DistributedExecutionContext(machine_, config_, store_, action);
   }
-  LOG(ERROR)<<"不是Writer？";
   if (!context->IsWriter())
   {
 
     delete context;
     return;
   }
-  LOG(ERROR)<<"在run吗";
+
   // Execute action.
   MetadataAction::Type type =
       static_cast<MetadataAction::Type>(action->action_type());
@@ -2122,7 +2121,7 @@ void MetadataStore::Run(Action *action)
   }
   else if (type == MetadataAction::TREE_LOOKUP)
   {
-    LOG(ERROR)<<"在TREE——LOOKUP吗";
+
     MetadataAction::Tree_LookupInput in;
     MetadataAction::Tree_LookupOutput out;
     in.ParseFromString(action->input());
@@ -2510,7 +2509,7 @@ void MetadataStore::Tree_Lookup_Internal(
     const MetadataAction::Tree_LookupInput &in,
     MetadataAction::Tree_LookupOutput *out)
 {
-  LOG(ERROR)<<"in TRELOOKUP";
+ 
   // Look up existing entry.
   MetadataEntry entry;
 
@@ -2592,7 +2591,7 @@ void MetadataStore::Tree_Lookup_Internal(
   }
   else
   {
-    LOG(ERROR)<<in.path()<<" in Tree_lookup";
+    
     // 不分层，只是树
     //  gaoxuan --use BFS to add new metadata entry
     std::queue<string> queue1;
@@ -2602,7 +2601,7 @@ void MetadataStore::Tree_Lookup_Internal(
     {
       string front = queue1.front(); // gaoxuan --get the front in queue
       queue1.pop();
-      LOG(ERROR)<<"front is "<<front;
+
       uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
       Header *header = new Header();
       header->set_from(machine_->machine_id());
@@ -2639,7 +2638,7 @@ void MetadataStore::Tree_Lookup_Internal(
         {
 
           string full_path = front + "/" + out.entry().dir_contents(i);
-          LOG(ERROR)<<front<<"  's  "<<"entry  :"<<out.entry().dir_contents(i);
+
           if(in.path().find(full_path) == 0 || in.path() == full_path)
           {
                 queue1.push(full_path);
