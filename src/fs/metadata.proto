@@ -58,6 +58,7 @@ enum Type {
   WRITE              = 6;
   APPEND             = 7;
   CHANGE_PERMISSIONS = 8;
+  TREE_LOOKUP        = 9;//gaoxuan --
 }
 
 // Possible error conditions.

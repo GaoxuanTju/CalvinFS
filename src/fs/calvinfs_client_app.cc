@@ -298,13 +298,34 @@ MessageBuffer *CalvinFSClientApp::ReadFile(const Slice &path)
 
 MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
 {
-  MessageBuffer *serialized = GetMetadataEntry(path);
-  Action a;
-  a.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
-  delete serialized;
 
+  uint64 distinct_id = machine()->GetGUID();
+  string channel_name = "action-result-" + UInt64ToString(distinct_id);
+  auto channel = machine()->DataChannel(channel_name);
+  CHECK(!channel->Pop(NULL));
+
+  Action *a = new Action();
+  a->set_client_machine(machine()->machine_id());
+  a->set_client_channel(channel_name);
+  a->set_action_type(MetadataAction::TREE_LOOKUP);
+  MetadataAction::LookupInput in;
+  in.set_path(path.data(), path.size());
+  in.SerializeToString(a.mutable_input());
+  metadata_->GetRWSets(&a);
+  log_->Append(a);
+
+
+  MessageBuffer *m = NULL;
+  while (!channel->Pop(&m))
+  {
+    // Wait for action to complete and be sent back.
+    usleep(100);
+  }
+  Action result;
+  result.ParseFromArray((*m)[0].data(), (*m)[0].size());
+  delete m;  
   MetadataAction::LookupOutput out;
-  out.ParseFromString(a.output());
+  out.ParseFromString(result.output());
 
 
   if(out.entry().type() == DIR)

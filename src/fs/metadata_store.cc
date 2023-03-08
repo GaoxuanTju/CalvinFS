@@ -2010,6 +2010,13 @@ void MetadataStore::GetRWSets(Action *action)
     action->add_readset(in.path());
     action->add_writeset(in.path());
   }
+  else if (type == MetadataAction::TREE_LOOKUP)
+  {
+    MetadataAction::LookupInput in;
+    in.ParseFromString(action->input());
+    action->add_readset(in.path());
+    action->add_writeset(in.path());
+  }
   else if (type == MetadataAction::RESIZE)
   {
     MetadataAction::ResizeInput in;
@@ -2111,6 +2118,14 @@ void MetadataStore::Run(Action *action)
     // LOG(ERROR)<<"The logic of LOOKUP in Run ";
     in.ParseFromString(action->input());
     Lookup_Internal(context, in, &out);
+    out.SerializeToString(action->mutable_output());
+  }
+  else if (type == MetadataAction::TREE_LOOKUP)
+  {
+    MetadataAction::LookupInput in;
+    MetadataAction::LookupOutput out;
+    in.ParseFromString(action->input());
+    Tree_Lookup_Internal(context, in, &out);
     out.SerializeToString(action->mutable_output());
   }
   else if (type == MetadataAction::RESIZE)
@@ -2475,10 +2490,31 @@ void MetadataStore::Lookup_Internal(
 {
   // Look up existing entry.
   MetadataEntry entry;
+  if (!context->GetEntry(in.path(), &entry))
+  {
+    // File doesn't exist!
+
+    out->set_success(false);
+    out->add_errors(MetadataAction::FileDoesNotExist);
+    return;
+  }
+
+  // TODO(agt): Check permissions.
+
+  // Return entry.
+  out->mutable_entry()->CopyFrom(entry);
+}
+void MetadataStore::Tree_Lookup_Internal(
+    ExecutionContext *context,
+    const MetadataAction::LookupInput &in,
+    MetadataAction::LookupOutput *out)
+{
+  // Look up existing entry.
+  MetadataEntry entry;
 
   string path = in.path();
   string hash_name;
-  LOG(ERROR)<<path.data()<<" in"<<" lookup";
+
   if (path.find("b") != std::string::npos)
   {
 
@@ -2554,7 +2590,7 @@ void MetadataStore::Lookup_Internal(
   }
   else
   {
-      LOG(ERROR)<<path.data()<<" don't split level";
+    LOG(ERROR) << path.data() << " don't split level";
     // 不分层，只是树
     //  gaoxuan --use BFS to add new metadata entry
     std::queue<string> queue1;
@@ -2565,59 +2601,57 @@ void MetadataStore::Lookup_Internal(
       string front = queue1.front(); // gaoxuan --get the front in queue
       queue1.pop();
       uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
-      if (context->EntryExists(front))
-      { // 存在这个路径的元数据项，证明就是他
-        context->GetEntry(front, &entry);
+      Header *header = new Header();
+      header->set_from(machine_->machine_id());
+      header->set_to(mds_machine);
+      header->set_type(Header::RPC);
+      header->set_app("client");
+      header->set_rpc("LOOKUP");
+      header->add_misc_string(front.c_str(), strlen(front.c_str()));
+      // 这一行之前是gaoxuan添加的
+
+      MessageBuffer *m = NULL;
+      header->set_data_ptr(reinterpret_cast<uint64>(&m));
+      machine_->SendMessage(header, new MessageBuffer());
+      while (m == NULL)
+      {
+        usleep(10);
+        Noop<MessageBuffer *>(m);
+      }
+
+      MessageBuffer *serialized = m;
+      Action b;
+      b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
+      delete serialized;
+      MetadataAction::LookupOutput out;
+      out.ParseFromString(b.output());
+      if (front == in.path())
+      {
+        entry = out.entry();
         break;
       }
-
       else
-      {
-        Header *header = new Header();
-        header->set_from(machine_->machine_id());
-        header->set_to(mds_machine);
-        header->set_type(Header::RPC);
-        header->set_app("client");
-        header->set_rpc("LOOKUP");
-        header->add_misc_string(front.c_str(), strlen(front.c_str()));
-        // 这一行之前是gaoxuan添加的
-
-        MessageBuffer *m = NULL;
-        header->set_data_ptr(reinterpret_cast<uint64>(&m));
-        machine_->SendMessage(header, new MessageBuffer());
-        while (m == NULL)
-        {
-          usleep(10);
-          Noop<MessageBuffer *>(m);
-        }
-
-        MessageBuffer *serialized = m;
-        Action b;
-        b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
-        delete serialized;
-        MetadataAction::LookupOutput out;
-        out.ParseFromString(b.output());
-        if (front == in.path())
-        {
-          entry = out.entry();
-          break;
-        }
+      { // gaoxuan --还没有找到 
         for (int i = 0; i < out.entry().dir_contents_size(); i++)
         {
+
           string full_path = front + "/" + out.entry().dir_contents(i);
-          queue1.push(full_path);
+          if(in.path().find(full_path) == 0)
+          {
+                queue1.push(full_path);
+                break;
+          }
+
         }
+
       }
     }
-
     // TODO(agt): Check permissions.
-
     // Return entry.
     out->mutable_entry()->CopyFrom(entry);
-    LOG(ERROR)<<path.data()<<"  finished!";
+    LOG(ERROR) << path.data() << "  finished!";
   }
 }
-
 void MetadataStore::Resize_Internal(
     ExecutionContext *context,
     const MetadataAction::ResizeInput &in,
