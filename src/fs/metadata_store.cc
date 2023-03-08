@@ -1700,6 +1700,9 @@ void MetadataStore::Init_for_depth(BTNode *dir_tree)
       }
     }
   }
+    LOG(ERROR) << "[" << machine_->machine_id() << "] "
+             << "MDS::Init() complete. Elapsed time: "
+             << GetTime() - start << " seconds";
 }
 
 void MetadataStore::InitSmall()
