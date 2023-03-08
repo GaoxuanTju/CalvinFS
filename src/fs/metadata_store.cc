@@ -2600,6 +2600,7 @@ void MetadataStore::Tree_Lookup_Internal(
     {
       string front = queue1.front(); // gaoxuan --get the front in queue
       queue1.pop();
+      LOG(ERROR)<<"front is "<<front;
       uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
       Header *header = new Header();
       header->set_from(machine_->machine_id());
