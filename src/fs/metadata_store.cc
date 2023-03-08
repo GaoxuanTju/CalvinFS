@@ -67,7 +67,7 @@ public:
       }
       if (!store_->Get(hash_name,
                        version_,
-                       &reads_[action->readset(i)]))
+                       &reads_[hash_name]))
       {
         reads_.erase(action->readset(i));
       }
@@ -201,7 +201,7 @@ public:
 
       string path = action->readset(i); // 获取这个路径
       // 判断涉不涉及分层，目前是看有没有b，如果有b就分层
-      char pattern = 'b';
+      char pattern = 'e';
       string hash_name;
       if (path.find(pattern) != std::string::npos)
       {
