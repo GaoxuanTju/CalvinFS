@@ -93,7 +93,7 @@ class MetadataStore : public Store {
   void Tree_Lookup_Internal(
       ExecutionContext* context,
       const MetadataAction::LookupInput& in,
-      MetadataAction::LookupOutput* out);
+      MetadataAction::Tree_LookupOutput* out);
   void Resize_Internal(
       ExecutionContext* context,
       const MetadataAction::ResizeInput& in,
