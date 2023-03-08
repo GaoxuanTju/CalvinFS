@@ -2065,7 +2065,7 @@ void MetadataStore::Run(Action *action)
     context =
         new DistributedExecutionContext(machine_, config_, store_, action);
   }
-
+  LOG(ERROR)<<"不是Writer？";
   if (!context->IsWriter())
   {
 
