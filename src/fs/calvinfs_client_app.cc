@@ -311,7 +311,9 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
   MetadataAction::Tree_LookupInput in;
   in.set_path(path.data(), path.size());
   in.SerializeToString(a->mutable_input());
+  metadata_->setAPPname(name());
   metadata_->GetRWSets(a);
+  
   log_->Append(a);
 
 
@@ -327,7 +329,7 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
   MetadataAction::Tree_LookupOutput out;
   out.ParseFromString(result.output());
 
-
+  
   if(out.entry().type() == DIR)
   {
     LOG(ERROR)<<path.data()<<"  is DIR";
