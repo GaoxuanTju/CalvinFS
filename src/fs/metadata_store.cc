@@ -245,7 +245,7 @@ public:
 
       string path = action->writeset(i);
       // 判断涉不涉及分层，目前是看有没有b，如果有b就分层
-      char pattern = 'b';
+      char pattern = 'e';
       string hash_name;
       if (path.find(pattern) != std::string::npos)
       {
