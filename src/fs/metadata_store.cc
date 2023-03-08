@@ -2597,13 +2597,12 @@ void MetadataStore::Tree_Lookup_Internal(
     
     // 不分层，只是树
     //  gaoxuan --use BFS to add new metadata entry
-    std::queue<string> queue1;
+
     string root = "";
-    queue1.push(root);
-    while (!queue1.empty())
+
+    while (1)
     {
-      string front = queue1.front(); // gaoxuan --get the front in queue
-      queue1.pop();
+      string front = root; 
 
       uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
       Header *header = new Header();
@@ -2613,8 +2612,7 @@ void MetadataStore::Tree_Lookup_Internal(
       header->set_app("client");
       header->set_rpc("LOOKUP");
       header->add_misc_string(front.c_str(), strlen(front.c_str()));
-      // 这一行之前是gaoxuan添加的
-
+ 
       MessageBuffer *m = NULL;
       header->set_data_ptr(reinterpret_cast<uint64>(&m));
       machine_->SendMessage(header, new MessageBuffer());
@@ -2642,9 +2640,9 @@ void MetadataStore::Tree_Lookup_Internal(
 
           string full_path = front + "/" + out.entry().dir_contents(i);
 
-          if(in.path().find(full_path) == 0 || in.path() == full_path)
-          {
-                queue1.push(full_path);
+          if(in.path().find(full_path) == 0 )
+          {//Todo:这里可以添加一点细节，关于搜不到的路径
+                root = full_path;
                 break;
           }
 
