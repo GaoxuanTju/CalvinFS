@@ -310,8 +310,8 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
   a->set_action_type(MetadataAction::TREE_LOOKUP);
   MetadataAction::LookupInput in;
   in.set_path(path.data(), path.size());
-  in.SerializeToString(a.mutable_input());
-  metadata_->GetRWSets(&a);
+  in.SerializeToString(a->mutable_input());
+  metadata_->GetRWSets(a);
   log_->Append(a);
 
 
