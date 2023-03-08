@@ -965,15 +965,16 @@ public:
   { // gaoxuan --删除文件的实验
     Spin(1);
     dir_tree = new BTNode;
-    metadata_->Init_for_depth(dir_tree);
+    metadata_->Init(dir_tree);
     Spin(1);
     machine()->GlobalBarrier();
     Spin(1);
 
     double start = GetTime();
 
-    string from_path = "/a_0" + IntToString(machine()->machine_id())+"/a_1" + IntToString(machine()->machine_id());
+   // string from_path = "/a_0" + IntToString(machine()->machine_id())+"/a_1" + IntToString(machine()->machine_id());
     //+"/a_2" + IntToString(machine()->machine_id())+"/a_3" + IntToString(machine()->machine_id())+"/a_4" + IntToString(machine()->machine_id());
+    string from_path = "/a" + IntToString(machine()->machine_id())+"/b" + IntToString(machine()->machine_id());
     BackgroundLS(from_path);
     LOG(ERROR) << "[" << machine()->machine_id() << "] "
                << "LS file " << from_path;

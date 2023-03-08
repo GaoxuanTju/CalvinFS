@@ -2590,7 +2590,7 @@ void MetadataStore::Tree_Lookup_Internal(
   }
   else
   {
-    LOG(ERROR) << path.data() << " don't split level";
+  
     // 不分层，只是树
     //  gaoxuan --use BFS to add new metadata entry
     std::queue<string> queue1;
@@ -2649,7 +2649,7 @@ void MetadataStore::Tree_Lookup_Internal(
     // TODO(agt): Check permissions.
     // Return entry.
     out->mutable_entry()->CopyFrom(entry);
-    LOG(ERROR) << path.data() << "  finished!";
+
   }
 }
 void MetadataStore::Resize_Internal(
