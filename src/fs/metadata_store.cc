@@ -922,7 +922,7 @@ void MetadataStore::Init_for_depth(BTNode *dir_tree)
     BTNode *a_1_level = NULL; // 这个就指向该层第一个节点
     for (int i_1 = 0; i_1 < a_1; i_1++)
     {
-      string a_1_dir("/a_1" + IntToString(i_1));
+      string a_1_dir(a_0_dir +"/a_1" + IntToString(i_1));
       string a_1_dir_("a_1" + IntToString(i_1));
       BTNode *temp_a = new BTNode;
       temp_a->child = NULL;
@@ -956,7 +956,7 @@ void MetadataStore::Init_for_depth(BTNode *dir_tree)
       BTNode *a_2_level = NULL; // 这个就指向该层第一个节点
       for (int i_2 = 0; i_2 < a_2; i_2++)
       {
-        string a_2_dir("/a_2" + IntToString(i_2));
+        string a_2_dir(a_1_dir +"/a_2" + IntToString(i_2));
         string a_2_dir_("a_2" + IntToString(i_2));
         BTNode *temp_a = new BTNode;
         temp_a->child = NULL;
@@ -990,7 +990,7 @@ void MetadataStore::Init_for_depth(BTNode *dir_tree)
         BTNode *a_3_level = NULL; // 这个就指向该层第一个节点
         for (int i_3 = 0; i_3 < a_3; i_3++)
         {
-          string a_3_dir("/a_3" + IntToString(i_3));
+          string a_3_dir(a_2_dir +"/a_3" + IntToString(i_3));
           string a_3_dir_("a_3" + IntToString(i_3));
           BTNode *temp_a = new BTNode;
           temp_a->child = NULL;
@@ -1024,7 +1024,7 @@ void MetadataStore::Init_for_depth(BTNode *dir_tree)
           BTNode *a_4_level = NULL; // 这个就指向该层第一个节点
           for (int i_4 = 0; i_4 < a_4; i_4++)
           {
-            string a_4_dir("/a_4" + IntToString(i_4));
+            string a_4_dir(a_3_dir +"/a_4" + IntToString(i_4));
             string a_4_dir_("a_4" + IntToString(i_4));
             BTNode *temp_a = new BTNode;
             temp_a->child = NULL;
@@ -1058,7 +1058,7 @@ void MetadataStore::Init_for_depth(BTNode *dir_tree)
             BTNode *a_5_level = NULL; // 这个就指向该层第一个节点
             for (int i_5 = 0; i_5 < a_5; i_5++)
             {
-              string a_5_dir("/a_5" + IntToString(i_5));
+              string a_5_dir(a_4_dir +"/a_5" + IntToString(i_5));
               string a_5_dir_("a_5" + IntToString(i_5));
               BTNode *temp_a = new BTNode;
               temp_a->child = NULL;
@@ -1092,7 +1092,7 @@ void MetadataStore::Init_for_depth(BTNode *dir_tree)
               BTNode *a_6_level = NULL; // 这个就指向该层第一个节点
               for (int i_6 = 0; i_6 < a_6; i_6++)
               {
-                string a_6_dir("/a_6" + IntToString(i_6));
+                string a_6_dir(a_5_dir +"/a_6" + IntToString(i_6));
                 string a_6_dir_("a_6" + IntToString(i_6));
                 BTNode *temp_a = new BTNode;
                 temp_a->child = NULL;
@@ -1126,7 +1126,7 @@ void MetadataStore::Init_for_depth(BTNode *dir_tree)
                 BTNode *a_7_level = NULL; // 这个就指向该层第一个节点
                 for (int i_7 = 0; i_7 < a_7; i_7++)
                 {
-                  string a_7_dir("/a_7" + IntToString(i_7));
+                  string a_7_dir(a_6_dir +"/a_7" + IntToString(i_7));
                   string a_7_dir_("a_7" + IntToString(i_7));
                   BTNode *temp_a = new BTNode;
                   temp_a->child = NULL;
@@ -1160,7 +1160,7 @@ void MetadataStore::Init_for_depth(BTNode *dir_tree)
                   BTNode *a_8_level = NULL; // 这个就指向该层第一个节点
                   for (int i_8 = 0; i_8 < a_8; i_8++)
                   {
-                    string a_8_dir("/a_8" + IntToString(i_8));
+                    string a_8_dir(a_7_dir +"/a_8" + IntToString(i_8));
                     string a_8_dir_("a_8" + IntToString(i_8));
                     BTNode *temp_a = new BTNode;
                     temp_a->child = NULL;
@@ -1194,7 +1194,7 @@ void MetadataStore::Init_for_depth(BTNode *dir_tree)
                     BTNode *a_9_level = NULL; // 这个就指向该层第一个节点
                     for (int i_9 = 0; i_9 < a_9; i_9++)
                     {
-                      string a_9_dir("/a_9" + IntToString(i_9));
+                      string a_9_dir(a_8_dir +"/a_9" + IntToString(i_9));
                       string a_9_dir_("a_9" + IntToString(i_9));
                       BTNode *temp_a = new BTNode;
                       temp_a->child = NULL;
@@ -1228,7 +1228,7 @@ void MetadataStore::Init_for_depth(BTNode *dir_tree)
                       BTNode *a_10_level = NULL; // 这个就指向该层第一个节点
                       for (int i_10 = 0; i_10 < a_10; i_10++)
                       {
-                        string a_10_dir("/a_10" + IntToString(i_10));
+                        string a_10_dir(a_9_dir +"/a_10" + IntToString(i_10));
                         string a_10_dir_("a_10" + IntToString(i_10));
                         BTNode *temp_a = new BTNode;
                         temp_a->child = NULL;
@@ -1262,7 +1262,7 @@ void MetadataStore::Init_for_depth(BTNode *dir_tree)
                         BTNode *a_11_level = NULL; // 这个就指向该层第一个节点
                         for (int i_11 = 0; i_11 < a_11; i_11++)
                         {
-                          string a_11_dir("/a_11" + IntToString(i_11));
+                          string a_11_dir(a_10_dir +"/a_11" + IntToString(i_11));
                           string a_11_dir_("a_11" + IntToString(i_11));
                           BTNode *temp_a = new BTNode;
                           temp_a->child = NULL;
@@ -1296,7 +1296,7 @@ void MetadataStore::Init_for_depth(BTNode *dir_tree)
                           BTNode *a_12_level = NULL; // 这个就指向该层第一个节点
                           for (int i_12 = 0; i_12 < a_12; i_12++)
                           {
-                            string a_12_dir("/a_12" + IntToString(i_12));
+                            string a_12_dir(a_11_dir +"/a_12" + IntToString(i_12));
                             string a_12_dir_("a_12" + IntToString(i_12));
                             BTNode *temp_a = new BTNode;
                             temp_a->child = NULL;
@@ -1330,7 +1330,7 @@ void MetadataStore::Init_for_depth(BTNode *dir_tree)
                             BTNode *a_13_level = NULL; // 这个就指向该层第一个节点
                             for (int i_13 = 0; i_13 < a_13; i_13++)
                             {
-                              string a_13_dir("/a_13" + IntToString(i_13));
+                              string a_13_dir(a_12_dir +"/a_13" + IntToString(i_13));
                               string a_13_dir_("a_13" + IntToString(i_13));
                               BTNode *temp_a = new BTNode;
                               temp_a->child = NULL;
@@ -1364,7 +1364,7 @@ void MetadataStore::Init_for_depth(BTNode *dir_tree)
                               BTNode *a_14_level = NULL; // 这个就指向该层第一个节点
                               for (int i_14 = 0; i_14 < a_14; i_14++)
                               {
-                                string a_14_dir("/a_14" + IntToString(i_14));
+                                string a_14_dir(a_13_dir +"/a_14" + IntToString(i_14));
                                 string a_14_dir_("a_14" + IntToString(i_14));
                                 BTNode *temp_a = new BTNode;
                                 temp_a->child = NULL;
@@ -1398,7 +1398,7 @@ void MetadataStore::Init_for_depth(BTNode *dir_tree)
                                 BTNode *a_15_level = NULL; // 这个就指向该层第一个节点
                                 for (int i_15 = 0; i_15 < a_15; i_15++)
                                 {
-                                  string a_15_dir("/a_15" + IntToString(i_15));
+                                  string a_15_dir(a_14_dir +"/a_15" + IntToString(i_15));
                                   string a_15_dir_("a_15" + IntToString(i_15));
                                   BTNode *temp_a = new BTNode;
                                   temp_a->child = NULL;
@@ -1432,7 +1432,7 @@ void MetadataStore::Init_for_depth(BTNode *dir_tree)
                                   BTNode *a_16_level = NULL; // 这个就指向该层第一个节点
                                   for (int i_16 = 0; i_16 < a_16; i_16++)
                                   {
-                                    string a_16_dir("/a_16" + IntToString(i_16));
+                                    string a_16_dir(a_15_dir +"/a_16" + IntToString(i_16));
                                     string a_16_dir_("a_16" + IntToString(i_16));
                                     BTNode *temp_a = new BTNode;
                                     temp_a->child = NULL;
@@ -1466,7 +1466,7 @@ void MetadataStore::Init_for_depth(BTNode *dir_tree)
                                     BTNode *a_17_level = NULL; // 这个就指向该层第一个节点
                                     for (int i_17 = 0; i_17 < a_17; i_17++)
                                     {
-                                      string a_17_dir("/a_17" + IntToString(i_17));
+                                      string a_17_dir(a_16_dir +"/a_17" + IntToString(i_17));
                                       string a_17_dir_("a_17" + IntToString(i_17));
                                       BTNode *temp_a = new BTNode;
                                       temp_a->child = NULL;
@@ -1500,7 +1500,7 @@ void MetadataStore::Init_for_depth(BTNode *dir_tree)
                                       BTNode *a_18_level = NULL; // 这个就指向该层第一个节点
                                       for (int i_18 = 0; i_18 < a_18; i_18++)
                                       {
-                                        string a_18_dir("/a_18" + IntToString(i_18));
+                                        string a_18_dir(a_17_dir +"/a_18" + IntToString(i_18));
                                         string a_18_dir_("a_18" + IntToString(i_18));
                                         BTNode *temp_a = new BTNode;
                                         temp_a->child = NULL;
@@ -1534,7 +1534,7 @@ void MetadataStore::Init_for_depth(BTNode *dir_tree)
                                         BTNode *a_19_level = NULL; // 这个就指向该层第一个节点
                                         for (int i_19 = 0; i_19 < a_19; i_19++)
                                         {
-                                          string a_19_dir("/a_19" + IntToString(i_19));
+                                          string a_19_dir(a_18_dir +"/a_19" + IntToString(i_19));
                                           string a_19_dir_("a_19" + IntToString(i_19));
                                           BTNode *temp_a = new BTNode;
                                           temp_a->child = NULL;
@@ -1568,7 +1568,7 @@ void MetadataStore::Init_for_depth(BTNode *dir_tree)
                                           BTNode *a_20_level = NULL; // 这个就指向该层第一个节点
                                           for (int i_20 = 0; i_20 < a_20; i_20++)
                                           {
-                                            string a_20_dir("/a_20" + IntToString(i_20));
+                                            string a_20_dir(a_19_dir +"/a_20" + IntToString(i_20));
                                             string a_20_dir_("a_20" + IntToString(i_20));
                                             BTNode *temp_a = new BTNode;
                                             temp_a->child = NULL;
