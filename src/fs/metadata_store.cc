@@ -1944,7 +1944,7 @@ void MetadataStore::Init_for_8(BTNode *dir_tree)
               {
                 string a_6_dir(a_5_dir + "/b" + IntToString(i_6));
                 string a_6_dir_("b" + IntToString(i_6));
-                string subdir__("/" + flag_level + subdir_);
+                string subdir__("/" + flag_level + a_6_dir_);
                 BTNode *temp_a = new BTNode;
                 temp_a->child = NULL;
                 temp_a->path = a_6_dir_;
