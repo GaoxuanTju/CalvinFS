@@ -996,13 +996,13 @@ public:
     double start = GetTime();
 
  //  string from_path = "/a_0" + IntToString(machine()->machine_id())+"/a_1" + IntToString(a1)+"/a_2" + IntToString(a2)+"/a_3" + IntToString(a3)+"/a_4" + IntToString(a4);
-string from_path = "/a_0" + IntToString(machine()->machine_id())+"/a_1" + IntToString(a1)+"/a_2" + IntToString(a2)+"/a_3" + IntToString(a3)+"/a_4" + IntToString(a4)+"/a_5" + IntToString(a5)+"/a_6" + IntToString(a6)+"/a_7" + IntToString(a7)+"/a_8" + IntToString(a8)+"/a_9" + IntToString(a9);   
+//string from_path = "/a_0" + IntToString(machine()->machine_id())+"/a_1" + IntToString(a1)+"/a_2" + IntToString(a2)+"/a_3" + IntToString(a3)+"/a_4" + IntToString(a4)+"/a_5" + IntToString(a5)+"/a_6" + IntToString(a6)+"/a_7" + IntToString(a7)+"/a_8" + IntToString(a8)+"/a_9" + IntToString(a9);   
 
+
+string from_path = "/a_0" + IntToString(machine()->machine_id())+"/a_1" + IntToString(a1)+"/a_2" + IntToString(a2)+"/a_3" + IntToString(a3)+"/a_4" + IntToString(a4)
++"/a_5" + IntToString(a5)+"/a_6" + IntToString(a6)+"/a_7" + IntToString(a7)+"/a_8" + IntToString(a8)+"/a_9" + IntToString(a9) 
++"/a_10" + IntToString(a10)+"/a_11" + IntToString(a11)+"/a_12" + IntToString(a12)+"/a_13" + IntToString(a13)+"/a_14" + IntToString(a14) ;
 /*
-string from_path = "/a_0" + IntToString(machine()->machine_id())+"/a_1" + IntToString(machine()->machine_id())+"/a_2" + IntToString(machine()->machine_id())+"/a_3" + IntToString(machine()->machine_id())+"/a_4" + IntToString(machine()->machine_id())
-+"/a_5" + IntToString(machine()->machine_id())+"/a_6" + IntToString(machine()->machine_id())+"/a_7" + IntToString(machine()->machine_id())+"/a_8" + IntToString(machine()->machine_id())+"/a_9" + IntToString(machine()->machine_id()) 
-+"/a_10" + IntToString(machine()->machine_id())+"/a_11" + IntToString(machine()->machine_id())+"/a_12" + IntToString(machine()->machine_id())+"/a_13" + IntToString(machine()->machine_id())+"/a_14" + IntToString(machine()->machine_id()) ;
-
 string from_path = "/a_0" + IntToString(machine()->machine_id())+"/a_1" + IntToString(machine()->machine_id())+"/a_2" + IntToString(machine()->machine_id())+"/a_3" + IntToString(machine()->machine_id())+"/a_4" + IntToString(machine()->machine_id())
 +"/a_5" + IntToString(machine()->machine_id())+"/a_6" + IntToString(machine()->machine_id())+"/a_7" + IntToString(machine()->machine_id())+"/a_8" + IntToString(machine()->machine_id())+"/a_9" + IntToString(machine()->machine_id()) 
 +"/a_10" + IntToString(machine()->machine_id())+"/a_11" + IntToString(machine()->machine_id())+"/a_12" + IntToString(machine()->machine_id())+"/a_13" + IntToString(machine()->machine_id())+"/a_14" + IntToString(machine()->machine_id())
