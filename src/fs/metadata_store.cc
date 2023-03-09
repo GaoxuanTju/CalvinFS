@@ -2108,7 +2108,7 @@ void MetadataStore::Run(Action *action)
   }
   else if (type == MetadataAction::TREE_LOOKUP)
   {
-
+    LOG(ERROR)<<"TREE LOOKUP在run了";
     MetadataAction::Tree_LookupInput in;
     MetadataAction::Tree_LookupOutput out;
     in.ParseFromString(action->input());
@@ -2496,7 +2496,7 @@ void MetadataStore::Tree_Lookup_Internal(
     const MetadataAction::Tree_LookupInput &in,
     MetadataAction::Tree_LookupOutput *out)
 {
- 
+  LOG(ERROR)<<in.path()<<"进入Internal了";
   // Look up existing entry.
   MetadataEntry entry;
 
@@ -2613,7 +2613,7 @@ void MetadataStore::Tree_Lookup_Internal(
     // 不分层，只是树
     //  gaoxuan --use BFS to add new metadata entry
     string root = "";
-
+    LOG(ERROR)<<"不分层";
     while (1)
     {
       string front = root; 
@@ -2702,6 +2702,7 @@ void MetadataStore::Tree_Lookup_Internal(
 
       }
     }
+    LOG(ERROR)<<"从循环退出来了";
     // TODO(agt): Check permissions.
     // Return entry.
     out->mutable_entry()->CopyFrom(entry);

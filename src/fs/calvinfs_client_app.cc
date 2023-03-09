@@ -298,7 +298,7 @@ MessageBuffer *CalvinFSClientApp::ReadFile(const Slice &path)
 
 MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
 {
-
+  LOG(ERROR)<<"start LS";
   uint64 distinct_id = machine()->GetGUID();
   string channel_name = "action-result-" + UInt64ToString(distinct_id);
   auto channel = machine()->DataChannel(channel_name);
@@ -316,7 +316,7 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
   
   log_->Append(a);
 
-
+  LOG(ERROR)<<"run 完了";
   MessageBuffer *m = NULL;
   while (!channel->Pop(&m))
   {

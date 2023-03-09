@@ -985,7 +985,7 @@ string from_path = "/a_0" + IntToString(machine()->machine_id())+"/a_1" + IntToS
 +"/a_10" + IntToString(machine()->machine_id())+"/a_11" + IntToString(machine()->machine_id())+"/a_12" + IntToString(machine()->machine_id())+"/a_13" + IntToString(machine()->machine_id())+"/a_14" + IntToString(machine()->machine_id())
 +"/a_15" + IntToString(machine()->machine_id())+"/a_16" + IntToString(machine()->machine_id())+"/a_17" + IntToString(machine()->machine_id())+"/a_18" + IntToString(machine()->machine_id())+"/a_19" + IntToString(machine()->machine_id()) ;
 */
-
+    LOG(ERROR)<<from_path;
     BackgroundLS(from_path);
     LOG(ERROR) << "[" << machine()->machine_id() << "] "
                << "LS file " << from_path;
@@ -1346,6 +1346,7 @@ string from_path = "/a_0" + IntToString(machine()->machine_id())+"/a_1" + IntToS
 
   void BackgroundLS(const Slice &path)
   {
+    LOG(ERROR)<<"In backgroundLS";
     Header *header = new Header();
     header->set_from(machine()->machine_id());
     header->set_to((machine()->machine_id() + 1) % 2);
