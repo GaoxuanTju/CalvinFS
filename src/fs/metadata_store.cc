@@ -828,28 +828,28 @@ void MetadataStore::Init_for_depth(BTNode *dir_tree)
 {
   // gaoxuan --这里面会涉及到目录树的建立初始化。
   int a_0 = machine_->config().size();
-  int a_1 = 1;
-  int a_2 = 1;
-  int a_3 = 1;
-  int a_4 = 1;
-  int a_5 = 1;
-  int a_6 = 1;
-  int a_7 = 1;
-  int a_8 = 1;
-  int a_9 = 1;
-  int a_10 = 1;
-  int a_11 = 1;
-  int a_12 = 1;
-  int a_13 = 1;
-  int a_14 = 1;
-  int a_15 = 1;
-  int a_16 = 1;
-  int a_17 = 1;
-  int a_18 = 1;
-  int a_19 = 1;
-  int a_20 = 1;
-  int bsize = 1;
-  int csize = 1;
+  int a_1 = 2;
+  int a_2 = 2;
+  int a_3 = 2;
+  int a_4 = 2;
+  int a_5 = 2;
+  int a_6 = 2;
+  int a_7 = 2;
+  int a_8 = 2;
+  int a_9 = 2;
+  int a_10 = 2;
+  int a_11 = 2;
+  int a_12 = 2;
+  int a_13 = 2;
+  int a_14 = 2;
+  int a_15 = 2;
+  int a_16 = 2;
+  int a_17 = 2;
+  int a_18 = 2;
+  int a_19 = 2;
+  int a_20 = 2;
+  int bsize = 2;
+  int csize = 2;
   // 改成5,5测试的时候容易看出来
   double start = GetTime();
   // gaoxuan --根节点的指针
@@ -2613,7 +2613,7 @@ void MetadataStore::Tree_Lookup_Internal(
     // 不分层，只是树
     //  gaoxuan --use BFS to add new metadata entry
     string root = "";
-    LOG(ERROR)<<"不分层";
+
     while (1)
     {
       string front = root; 
@@ -2667,7 +2667,7 @@ void MetadataStore::Tree_Lookup_Internal(
 
       }
     }
-    LOG(ERROR)<<"从循环退出来了";
+
     // TODO(agt): Check permissions.
     // Return entry.
     out->mutable_entry()->CopyFrom(entry);
