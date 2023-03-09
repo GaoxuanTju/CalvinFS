@@ -1029,6 +1029,7 @@ string from_path = "/a_0" + IntToString(machine()->machine_id())+"/a_1" + IntToS
     LOG(ERROR) << "[" << machine()->machine_id() << "] "
                << "LS " << 10000 << " files. Elapsed time: "
                << (GetTime() - start) << " seconds";
+    print_dir_tree(dir_tree);
   }
 
   void LatencyExperimentRenameFile()
