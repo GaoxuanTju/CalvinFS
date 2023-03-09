@@ -995,8 +995,8 @@ public:
 
     double start = GetTime();
 
-   string from_path = "/a_0" + IntToString(machine()->machine_id())+"/a_1" + IntToString(a1)+"/a_2" + IntToString(a2)+"/a_3" + IntToString(a3)+"/a_4" + IntToString(a4);
-//string from_path = "/a_0" + IntToString(machine()->machine_id())+"/a_1" + IntToString(0)+"/a_2" + IntToString(0)+"/a_3" + IntToString(0)+"/a_4" + IntToString(0)+"/a_5" + IntToString(0)+"/a_6" + IntToString(0)+"/a_7" + IntToString(0)+"/a_8" + IntToString(0)+"/a_9" + IntToString(0);   
+ //  string from_path = "/a_0" + IntToString(machine()->machine_id())+"/a_1" + IntToString(a1)+"/a_2" + IntToString(a2)+"/a_3" + IntToString(a3)+"/a_4" + IntToString(a4);
+string from_path = "/a_0" + IntToString(machine()->machine_id())+"/a_1" + IntToString(a1)+"/a_2" + IntToString(a2)+"/a_3" + IntToString(a3)+"/a_4" + IntToString(a4)+"/a_5" + IntToString(a5)+"/a_6" + IntToString(a6)+"/a_7" + IntToString(a7)+"/a_8" + IntToString(a8)+"/a_9" + IntToString(a9);   
 
 /*
 string from_path = "/a_0" + IntToString(machine()->machine_id())+"/a_1" + IntToString(machine()->machine_id())+"/a_2" + IntToString(machine()->machine_id())+"/a_3" + IntToString(machine()->machine_id())+"/a_4" + IntToString(machine()->machine_id())
