@@ -969,10 +969,33 @@ public:
     Spin(1);
     machine()->GlobalBarrier();
     Spin(1);
+    
+    int a1 = rand()%2;
+    int a2 = rand()%2;
+    int a3 = rand()%2;
+    int a4 = rand()%2;
+    int a5 = rand()%2;
+    int a6 = rand()%2;
+    int a7 = rand()%2;
+    int a8 = rand()%2;
+    int a9 = rand()%2;
+    int a10 = rand()%2;
+    int a11 = rand()%2;
+    int a12 = rand()%2;
+    int a13 = rand()%2;
+    int a14 = rand()%2;
+    int a15 = rand()%2;
+    int a16 = rand()%2;
+    int a17 = rand()%2;
+    int a18 = rand()%2;
+    int a19 = rand()%2;
+    int a20 = rand()%2;
+
+
 
     double start = GetTime();
 
-   string from_path = "/a_0" + IntToString(machine()->machine_id())+"/a_1" + IntToString(0)+"/a_2" + IntToString(0)+"/a_3" + IntToString(0)+"/a_4" + IntToString(0);
+   string from_path = "/a_0" + IntToString(machine()->machine_id())+"/a_1" + IntToString(a1)+"/a_2" + IntToString(a2)+"/a_3" + IntToString(a3)+"/a_4" + IntToString(a4);
 //string from_path = "/a_0" + IntToString(machine()->machine_id())+"/a_1" + IntToString(0)+"/a_2" + IntToString(0)+"/a_3" + IntToString(0)+"/a_4" + IntToString(0)+"/a_5" + IntToString(0)+"/a_6" + IntToString(0)+"/a_7" + IntToString(0)+"/a_8" + IntToString(0)+"/a_9" + IntToString(0);   
 
 /*

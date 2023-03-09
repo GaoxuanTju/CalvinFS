@@ -2496,7 +2496,7 @@ void MetadataStore::Tree_Lookup_Internal(
     const MetadataAction::Tree_LookupInput &in,
     MetadataAction::Tree_LookupOutput *out)
 {
-  LOG(ERROR)<<in.path()<<"进入Internal了";
+ 
   // Look up existing entry.
   MetadataEntry entry;
 

@@ -329,15 +329,6 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
   MetadataAction::Tree_LookupOutput out;
   out.ParseFromString(result.output());
 
-  
-  if(out.entry().type() == DIR)
-  {
-    LOG(ERROR)<<path.data()<<"  is DIR";
-  }
-  else
-  {
-    LOG(ERROR)<<path.data()<<"  is DATA";
-  }
 
   if (out.success() && out.entry().type() == DIR)
   {
