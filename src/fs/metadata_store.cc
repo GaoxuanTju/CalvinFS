@@ -54,7 +54,7 @@ public:
       {
         // TODO：获取相对路径
 
-        hash_name = ;
+        hash_name = "" ;
       }
       else
       { // 不涉及分层，这半部分就是上面那样直接获取即可
@@ -201,7 +201,7 @@ public:
       if (path.find(pattern) != std::string::npos)
       {
         //TODO:获取相对路径
-        hash_name = ;
+        hash_name = "";
       }
       else
       { // 不涉及分层，这半部分就是上面那样直接获取即可
@@ -240,7 +240,7 @@ public:
       {
         // TODO：获取相对路径
 
-        hash_name = ;
+        hash_name ="" ;
       }
       else
       { // 不涉及分层，这半部分就是上面那样直接获取即可
@@ -2508,7 +2508,7 @@ void MetadataStore::Tree_Lookup_Internal(
 
     // 要分层
     //Todo:获取分层后的相对路径
-    hash_name = ;
+    hash_name = "";
     //
 
     string root = "";
@@ -2533,7 +2533,7 @@ void MetadataStore::Tree_Lookup_Internal(
     int flag = 0;       // 用来标识此时split_string 里面有多少子串
     char pattern = '/'; // 根据/进行字符串拆分
 
-    string temp_from = top.c_str();
+    string temp_from = front.c_str();
     temp_from = temp_from.substr(1, temp_from.size()); // 这一行是为了去除最前面的/
     temp_from = temp_from + pattern;                   // 在最后面添加一个/便于处理
     int pos = temp_from.find(pattern);                 // 找到第一个/的位置
@@ -2634,7 +2634,7 @@ void MetadataStore::Tree_Lookup_Internal(
     int flag = 0;       // 用来标识此时split_string 里面有多少子串
     char pattern = '/'; // 根据/进行字符串拆分
 
-    string temp_from = top.c_str();
+    string temp_from = front.c_str();
     temp_from = temp_from.substr(1, temp_from.size()); // 这一行是为了去除最前面的/
     temp_from = temp_from + pattern;                   // 在最后面添加一个/便于处理
     int pos = temp_from.find(pattern);                 // 找到第一个/的位置
