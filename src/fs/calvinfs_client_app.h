@@ -1011,7 +1011,7 @@ string from_path = "/a_0" + IntToString(machine()->machine_id())+"/a_1" + IntToS
    for(int i = 0; i < 10000 ; i++)
    {
         BackgroundLS(from_path);
-        if(i % 1000 = 0)
+        if(i % 1000 == 0)
         {
           LOG(ERROR) << "[" << machine()->machine_id() << "]  "<<i<<" / "<<10000;
         }
