@@ -2626,10 +2626,9 @@ void MetadataStore::Tree_Lookup_Internal(
       header->set_rpc("LOOKUP");
       header->add_misc_string(front.c_str(), strlen(front.c_str()));
 
-      if(front != "")
-      {
-          
-    
+
+
+    // 这一行之前是gaoxuan添加的
  
       MessageBuffer *m = NULL;
       header->set_data_ptr(reinterpret_cast<uint64>(&m));
