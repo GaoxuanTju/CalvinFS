@@ -2840,9 +2840,9 @@ void MetadataStore::Tree_Lookup_Internal(
     //  gaoxuan --use BFS to add new metadata entry
 
     //先把路径拆分开，根据这个b
-    int pos = path.find("b");
-    string tree_name = path.substr(0, pos -1);
-    string hash_name = path.substr(pos);
+    int p = path.find("b");
+    string tree_name = path.substr(0, p -1);
+    string hash_name = path.substr(p);
     //
     string root = "";
     string root1 = "";
@@ -2950,12 +2950,12 @@ void MetadataStore::Tree_Lookup_Internal(
     //现在entry中存放的是分层点的元数据项
     hash_name = "/" +  entry.dir_contents(0) + hash_name;//获取需要hash的相对路径
     //这个路径直接去lookup一下
-
+    uint64 to_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(hash_name)), config_->LookupReplica(machine_->machine_id()));
     Header *header = new Header();
-    header->set_from(machine()->machine_id());
-    header->set_to(mds_machine);
+    header->set_from(machine_->machine_id());
+    header->set_to(to_machine);
     header->set_type(Header::RPC);
-    header->set_app(name());
+    header->set_app("client");
     header->set_rpc("LOOKUP");
     header->add_misc_string(hash_name.c_str(), strlen(hash_name.c_str()));
 
@@ -3001,10 +3001,10 @@ void MetadataStore::Tree_Lookup_Internal(
       Action b;
       b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
       delete serialized;
-      MetadataAction::LookupOutput out;
-      out.ParseFromString(b.output());    
+      MetadataAction::LookupOutput o;
+      o.ParseFromString(b.output());    
     // TODO(agt): Check permissions.
-    MetadataEntry entry1 = out.entry();
+    MetadataEntry entry1 = o.entry();
     // Return entry.
     out->mutable_entry()->CopyFrom(entry1);
   }
