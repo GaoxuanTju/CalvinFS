@@ -2949,13 +2949,14 @@ void MetadataStore::Tree_Lookup_Internal(
 
     // 不分层，只是树
     //  gaoxuan --use BFS to add new metadata entry
-    string path = in.path();
+
     string root = "";
-    string full_path = "";
+    string root1 = "";
     LOG(ERROR)<<"还没进入循环";
     while (1)
     {
       string front = root;
+      string front1 = root1;
       uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
       Header *header = new Header();
       header->set_from(machine_->machine_id());
@@ -3030,7 +3031,7 @@ void MetadataStore::Tree_Lookup_Internal(
       delete serialized;
       MetadataAction::LookupOutput out;
       out.ParseFromString(b.output());
-      if (full_path == in.path())//单独用全路径来判断是否搜索完成
+      if (front1 == in.path())//单独用全路径来判断是否搜索完成,可以肯定是这里没执行，才退不出去
       {
         entry = out.entry();
         break;
@@ -3040,11 +3041,12 @@ void MetadataStore::Tree_Lookup_Internal(
         for (int i = 0; i < out.entry().dir_contents_size(); i++)
         {
 
-          full_path = full_path + "/" + out.entry().dir_contents(i);//拼接获取全路径
+          string full_path = front + "/" + out.entry().dir_contents(i);//拼接获取全路径
 
           if (in.path().find(full_path) == 0)
           { // Todo:这里需要用相对路径
           //进入这个分支就代表此时，恰好搜到了，此时i代表的就是所需的相对路径，我们只需要用0位置的id拼一下就好
+            root1 = full_path;
             root = "/" + out.entry().dir_contents(0) + out.entry().dir_contents(i);
             break;
           }
