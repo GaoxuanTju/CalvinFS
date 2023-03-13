@@ -330,7 +330,7 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
   out.ParseFromString(result.output());
 
 
-  if (out.success() && out.entry().type() == DIR)
+  if (out.success() )
   {
     LOG(ERROR)<<"metadata entry of "<<path.data()<<" is :";
     string *result = new string();
