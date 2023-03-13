@@ -3041,7 +3041,7 @@ void MetadataStore::Tree_Lookup_Internal(
         for (int i = 0; i < out.entry().dir_contents_size(); i++)
         {
 
-          string full_path = front + "/" + out.entry().dir_contents(i);//拼接获取全路径
+          string full_path = front1 + "/" + out.entry().dir_contents(i);//拼接获取全路径
 
           if (in.path().find(full_path) == 0)
           { // Todo:这里需要用相对路径
