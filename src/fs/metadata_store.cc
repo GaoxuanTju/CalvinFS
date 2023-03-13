@@ -1690,6 +1690,7 @@ void MetadataStore::Init_for_depth(BTNode *dir_tree)
 }
 void MetadataStore::Init_for_8(BTNode *dir_tree)
 {
+  
   // gaoxuan --这里面会涉及到目录树的建立初始化。
   int a_0 = machine_->config().size();
   int a_1 = 2;
@@ -1697,9 +1698,21 @@ void MetadataStore::Init_for_8(BTNode *dir_tree)
   int a_3 = 2;
   int a_4 = 2;
   int a_5 = 2;
-
   int bsize = 2;
   int csize = 2;
+  //一种很蠢的方式
+  int uid_a0 = 1;
+  int uid_a1 = a_0 + 1;
+  int uid_a2 = a_0 + a_0*a_1 + 1;
+  int uid_a3 = a_0 + a_0*a_1 + a_0*a_1*a_2 + 1;
+  int uid_a4 = a_0 + a_0*a_1 + a_0*a_1*a_2 + a_0*a_1*a_2*a_3 + 1;
+  int uid_a5 = a_0 + a_0*a_1 + a_0*a_1*a_2 + a_0*a_1*a_2*a_3 + a_0*a_1*a_2*a_3*a_4 + 1;
+  int uid_a6 = a_0 + a_0*a_1 + a_0*a_1*a_2 + a_0*a_1*a_2*a_3 + a_0*a_1*a_2*a_3*a_4 +a_0*a_1*a_2*a_3*a_4*a_5+ 1; 
+  int uid_a7 = a_0 + a_0*a_1 + a_0*a_1*a_2 + a_0*a_1*a_2*a_3 + a_0*a_1*a_2*a_3*a_4 +a_0*a_1*a_2*a_3*a_4*a_5+a_0*a_1*a_2*a_3*a_4*a_5*bsize+ 1;   
+  //
+
+
+
   // 改成5,5测试的时候容易看出来
   double start = GetTime();
   // gaoxuan --根节点的指针
@@ -1742,7 +1755,7 @@ void MetadataStore::Init_for_8(BTNode *dir_tree)
       a_0_level->sibling = temp_a;
       a_0_level = a_0_level->sibling; // a_level移动到下一个兄弟节点
     }
-    string a0_uid = IntToString(i_0 +1); //第一层的uid，
+    string a0_uid = IntToString(uid_a0++); //第一层的uid，
     if (IsLocal(a_0_dir))
     {
       MetadataEntry entry;
@@ -1758,6 +1771,7 @@ void MetadataStore::Init_for_8(BTNode *dir_tree)
       store_->Put(a_0_dir, serialized_entry, 0);
     }
     BTNode *a_1_level = NULL; // 这个就指向该层第一个节点
+    
     for (int i_1 = 0; i_1 < a_1; i_1++)
     {
       string a_1_dir("/" + a0_uid + "a_1" + IntToString(i_1));
@@ -1778,7 +1792,8 @@ void MetadataStore::Init_for_8(BTNode *dir_tree)
         a_1_level->sibling = temp_a;
         a_1_level = a_1_level->sibling; // a_level移动到下一个兄弟节点
       }
-      string a1_uid = IntToString(a_0 + i_0*a_1 + i_1 + 1);//第二层的uid
+     
+      string a1_uid = IntToString(uid_a1++);//第二层的uid,这个也没错
       if (IsLocal(a_1_dir))
       {
         MetadataEntry entry;
@@ -1814,7 +1829,9 @@ void MetadataStore::Init_for_8(BTNode *dir_tree)
           a_2_level->sibling = temp_a;
           a_2_level = a_2_level->sibling; // a_level移动到下一个兄弟节点
         }
-        string a2_uid = IntToString(a_0 + a_0*a_1 + a_2 * i_1 + i_2 + 1);//第三层的uid
+
+        //从这层开始不对劲
+        string a2_uid = IntToString(uid_a2++);//第三层的uid
         if (IsLocal(a_2_dir))
         {
           MetadataEntry entry;
@@ -1850,7 +1867,7 @@ void MetadataStore::Init_for_8(BTNode *dir_tree)
             a_3_level->sibling = temp_a;
             a_3_level = a_3_level->sibling; // a_level移动到下一个兄弟节点
           }
-          string a3_uid = IntToString(a_0 + a_0*a_1 +  a_0*a_1*a_2 + a_3*i_2 +i_3 +1);//第四层
+          string a3_uid = IntToString(uid_a3++);//第四层
           if (IsLocal(a_3_dir))
           {
             MetadataEntry entry;
@@ -1886,7 +1903,7 @@ void MetadataStore::Init_for_8(BTNode *dir_tree)
               a_4_level->sibling = temp_a;
               a_4_level = a_4_level->sibling; // a_level移动到下一个兄弟节点
             }
-            string a4_uid = IntToString(a_0 + a_0*a_1 +  a_0*a_1*a_2 +a_0*a_1*a_2*a_3 + a_4*i_3 +i_4 +1);//第四层
+            string a4_uid = IntToString(uid_a4++);//第四层
             if (IsLocal(a_4_dir))
             {
               MetadataEntry entry;
@@ -1922,7 +1939,7 @@ void MetadataStore::Init_for_8(BTNode *dir_tree)
                 a_5_level->sibling = temp_a;
                 a_5_level = a_5_level->sibling; // a_level移动到下一个兄弟节点
               }
-              string a5_uid = IntToString(a_0 + a_0*a_1 +  a_0*a_1*a_2 +a_0*a_1*a_2*a_3 + a_0*a_1*a_2 +a_0*a_1*a_2*a_3*a_4+ a_5*i_4 +i_5 +1);//第五层
+              string a5_uid = IntToString(uid_a5++);//第五层
               if (IsLocal(a_5_dir))
               {
                 MetadataEntry entry;
@@ -1959,7 +1976,7 @@ void MetadataStore::Init_for_8(BTNode *dir_tree)
                   b_level->sibling = temp_a;
                   b_level = b_level->sibling; // a_level移动到下一个兄弟节点
                 }
-                string a6_uid = IntToString(a_0 + a_0*a_1 +  a_0*a_1*a_2 +a_0*a_1*a_2*a_3 + a_0*a_1*a_2 +a_0*a_1*a_2*a_3*a_4+a_0*a_1*a_2 +a_0*a_1*a_2*a_3*a_4*a_5+ bsize*i_5 +i_6 +1);//第五层 
+                string a6_uid = IntToString(uid_a6++);//第五层 
                 if (IsLocal(a_6_dir))
                 {
                   MetadataEntry entry;
@@ -1996,7 +2013,7 @@ void MetadataStore::Init_for_8(BTNode *dir_tree)
                     c_level->sibling = temp_c;
                     c_level = c_level->sibling;
                   }
-                  string a7_uid = IntToString(a_0 + a_0*a_1 +  a_0*a_1*a_2 +a_0*a_1*a_2*a_3 + a_0*a_1*a_2 +a_0*a_1*a_2*a_3*a_4+a_0*a_1*a_2 +a_0*a_1*a_2*a_3*a_4*a_5+a_0*a_1*a_2 +a_0*a_1*a_2*a_3*a_4*a_5*bsize+ csize*i_6 +k +1);//第五层 
+                  string a7_uid = IntToString(uid_a7++);//第五层 
                   if (IsLocal(file))
                   {
                     MetadataEntry entry;
@@ -2952,7 +2969,7 @@ void MetadataStore::Tree_Lookup_Internal(
 
     string root = "";
     string root1 = "";
-    LOG(ERROR)<<"还没进入循环";
+    //LOG(ERROR)<<"还没进入循环";
     while (1)
     {
       string front = root;
@@ -3053,7 +3070,7 @@ void MetadataStore::Tree_Lookup_Internal(
         }
       }
     }
-    LOG(ERROR)<<"跳出了循环";
+    //LOG(ERROR)<<"跳出了循环";
     // TODO(agt): Check permissions.
     // Return entry.
     out->mutable_entry()->CopyFrom(entry);
