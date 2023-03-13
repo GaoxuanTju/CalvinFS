@@ -2387,14 +2387,14 @@ void MetadataStore::Run(Action *action)
     context =
         new DistributedExecutionContext(machine_, config_, store_, action);
   }
-  LOG(ERROR)<<"是不是不是writer";
+  
   if (!context->IsWriter())
   {
 
     delete context;
     return;
   }
-  LOG(ERROR)<<"是WRITER";
+  
 
   // Execute action.
   MetadataAction::Type type =
@@ -3044,7 +3044,7 @@ void MetadataStore::Tree_Lookup_Internal(
           if (in.path().find(full_path) == 0)
           { // Todo:这里需要用相对路径
           //进入这个分支就代表此时，恰好搜到了，此时i代表的就是所需的相对路径，我们只需要用0位置的id拼一下就好
-            root = "/" + out.entry().dir_contents(0) + out.entry().dir_contents(0);
+            root = "/" + out.entry().dir_contents(0) + out.entry().dir_contents(i);
             break;
           }
         }
