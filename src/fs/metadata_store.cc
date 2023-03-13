@@ -48,18 +48,10 @@ public:
     {
       string path = action->readset(i);
       // 判断涉不涉及分层，目前是看有没有b，如果有b就分层
-      char pattern = 'e';
-      string hash_name;
-      if (path.find(pattern) != std::string::npos)
-      {
-        // TODO：获取相对路径
 
-        hash_name = "";
-      }
-      else
-      { // 不涉及分层，这半部分就是上面那样直接获取即可
+      string hash_name;
         hash_name = path;
-      }
+      
       if (!store_->Get(hash_name,
                        version_,
                        &reads_[hash_name]))
@@ -196,17 +188,10 @@ public:
 
       string path = action->readset(i); // 获取这个路径
       // 判断涉不涉及分层，目前是看有没有b，如果有b就分层
-      char pattern = 'e';
+
       string hash_name;
-      if (path.find(pattern) != std::string::npos)
-      {
-        // TODO:获取相对路径
-        hash_name = "";
-      }
-      else
-      { // 不涉及分层，这半部分就是上面那样直接获取即可
         hash_name = path;
-      }
+      
       uint64 mds = config_->HashFileName(hash_name);
       uint64 machine = config_->LookupMetadataShard(mds, replica_); // gaoxuan --get right machine of the path
       if (machine == machine_->machine_id())
@@ -233,19 +218,11 @@ public:
     {
 
       string path = action->writeset(i);
-      // 判断涉不涉及分层，目前是看有没有b，如果有b就分层
-      char pattern = 'e';
-      string hash_name;
-      if (path.find(pattern) != std::string::npos)
-      {
-        // TODO：获取相对路径
 
-        hash_name = "";
-      }
-      else
-      { // 不涉及分层，这半部分就是上面那样直接获取即可
+      string hash_name;
+
         hash_name = path;
-      }
+      
 
       uint64 mds = config_->HashFileName(hash_name);
       uint64 machine = config_->LookupMetadataShard(mds, replica_);
@@ -2857,7 +2834,7 @@ void MetadataStore::Tree_Lookup_Internal(
   string path = in.path();
   string hash_name;
 
-  if (path.find("e") != std::string::npos)
+  if (path.find("b") != std::string::npos)//我这里是从b开始才是分层的地方了
   {
 
     // 要分层
