@@ -332,10 +332,11 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
 
   if (out.success() && out.entry().type() == DIR)
   {
+    LOG(ERROR)<<"metadata entry of "<<path.data()<<" is :";
     string *result = new string();
     for (int i = 0; i < out.entry().dir_contents_size(); i++)
     {
-
+      LOG(ERROR)<<out.entry().dir_contents(i);
       result->append(out.entry().dir_contents(i));
       result->append("\n");
     }
