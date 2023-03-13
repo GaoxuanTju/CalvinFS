@@ -2991,7 +2991,7 @@ void MetadataStore::Tree_Lookup_Internal(
 
     MessageBuffer *m = NULL;
     header->set_data_ptr(reinterpret_cast<uint64>(&m));
-    machine()->SendMessage(header, new MessageBuffer());
+    machine_->SendMessage(header, new MessageBuffer());
     while (m == NULL)
     {
       usleep(10);
