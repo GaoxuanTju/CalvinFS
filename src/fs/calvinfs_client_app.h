@@ -965,7 +965,7 @@ public:
   { // gaoxuan --删除文件的实验
     Spin(1);
     dir_tree = new BTNode;
-    metadata_->Init_for_depth(dir_tree);
+    metadata_->Init_for_8(dir_tree);
     Spin(1);
     machine()->GlobalBarrier();
     Spin(1);
