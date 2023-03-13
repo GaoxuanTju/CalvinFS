@@ -1009,8 +1009,10 @@ string from_path = "/a_0" + IntToString(machine()->machine_id())+"/a_1" + IntToS
 +"/a_5" + IntToString(a5)+"/a_6" + IntToString(a6)+"/a_7" + IntToString(a7)+"/a_8" + IntToString(a8)+"/a_9" + IntToString(a9) 
 +"/a_10" + IntToString(a10)+"/a_11" + IntToString(a11)+"/a_12" + IntToString(a12)+"/a_13" + IntToString(a13)+"/a_14" + IntToString(a14)
 +"/a_15" + IntToString(a15)+"/a_16" + IntToString(a16)+"/a_17" + IntToString(a17)+"/a_18" + IntToString(a18)+"/a_19" + IntToString(a19) ;
- */ LOG(ERROR)<<machine()->machine_id()<<" path: "<<from_path<<" in "<<config_->LookupMetadataShard(config_->HashFileName(from_path),config_->LookupReplica(machine()->machine_id()));
-   for(int i = 0; i < 1000 ; i++)
+ */ 
+/*
+  LOG(ERROR)<<machine()->machine_id()<<" path: "<<from_path<<" in "<<config_->LookupMetadataShard(config_->HashFileName(from_path),config_->LookupReplica(machine()->machine_id()));
+   for(int i = 0; i < 1 ; i++)
    {
         BackgroundLS(from_path);
         if(i % 100 == 0)
@@ -1018,7 +1020,7 @@ string from_path = "/a_0" + IntToString(machine()->machine_id())+"/a_1" + IntToS
           LOG(ERROR) << "[" << machine()->machine_id() << "]  "<<i<<" / "<<1000;
         }
    }
-
+*/
 
     // Wait for all operations to finish.
     while (capacity_.load() < kMaxCapacity)
