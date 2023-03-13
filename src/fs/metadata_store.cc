@@ -1996,7 +1996,7 @@ void MetadataStore::Init_for_8(BTNode *dir_tree)
                     c_level->sibling = temp_c;
                     c_level = c_level->sibling;
                   }
-                  string a7_uid = IntToString(a_0 + a_0*a_1 +  a_0*a_1*a_2 +a_0*a_1*a_2*a_3 + a_0*a_1*a_2 +a_0*a_1*a_2*a_3*a_4+a_0*a_1*a_2 +a_0*a_1*a_2*a_3*a_4*a_5+a_0*a_1*a_2 +a_0*a_1*a_2*a_3*a_4*a_5*bsize+ csize*i_6 +i_7 +1);//第五层 
+                  string a7_uid = IntToString(a_0 + a_0*a_1 +  a_0*a_1*a_2 +a_0*a_1*a_2*a_3 + a_0*a_1*a_2 +a_0*a_1*a_2*a_3*a_4+a_0*a_1*a_2 +a_0*a_1*a_2*a_3*a_4*a_5+a_0*a_1*a_2 +a_0*a_1*a_2*a_3*a_4*a_5*bsize+ csize*i_6 +k +1);//第五层 
                   if (IsLocal(file))
                   {
                     MetadataEntry entry;
