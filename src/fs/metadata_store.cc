@@ -2387,12 +2387,14 @@ void MetadataStore::Run(Action *action)
     context =
         new DistributedExecutionContext(machine_, config_, store_, action);
   }
+  LOG(ERROR)<<"是不是不是writer";
   if (!context->IsWriter())
   {
 
     delete context;
     return;
   }
+  LOG(ERROR)<<"是WRITER";
 
   // Execute action.
   MetadataAction::Type type =
