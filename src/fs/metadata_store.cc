@@ -1972,7 +1972,7 @@ void MetadataStore::Init_for_8(BTNode *dir_tree)
                   }
                   string serialized_entry;
                   entry.SerializeToString(&serialized_entry);
-                  store_->Put(subdir__, serialized_entry, 0);
+                  store_->Put(a_6_dir, serialized_entry, 0);
                 }
                 // Add files.
                 BTNode *c_level = NULL; // 这个就指向该层第三个节点
