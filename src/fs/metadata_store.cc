@@ -2952,7 +2952,7 @@ void MetadataStore::Tree_Lookup_Internal(
 
     string root = "";
     string root1 = "";
-    
+    LOG(ERROR)<<"还没进入循环";
     while (1)
     {
       string front = root;
@@ -3053,7 +3053,7 @@ void MetadataStore::Tree_Lookup_Internal(
         }
       }
     }
-    
+    LOG(ERROR)<<"跳出了循环";
     // TODO(agt): Check permissions.
     // Return entry.
     out->mutable_entry()->CopyFrom(entry);
