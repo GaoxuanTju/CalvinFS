@@ -2485,7 +2485,7 @@ void MetadataStore::GetRWSets(Action *action)
           header->add_misc_string(front.c_str(), strlen(front.c_str()));
           int flag = 0;       // 用来标识此时split_string 里面有多少子串
           char pattern = '/'; // 根据/进行字符串拆分
-          string temp_from = top.c_str();
+          string temp_from = front.c_str();
           temp_from = temp_from.substr(1, temp_from.size()); // 这一行是为了去除最前面的/
           temp_from = temp_from + pattern;                   // 在最后面添加一个/便于处理
           int pos = temp_from.find(pattern);                 // 找到第一个/的位置
@@ -2753,7 +2753,7 @@ void MetadataStore::GetRWSets(Action *action)
           delete serialized;
           MetadataAction::LookupOutput out;
           out.ParseFromString(b.output());
-          if (front1 == tree_name) // 判断树部分是否搜索完成
+          if (front1 == tree_name1) // 判断树部分是否搜索完成
           {
             to_split_entry = out.entry();
             break;
@@ -2837,7 +2837,7 @@ void MetadataStore::GetRWSets(Action *action)
           header->add_misc_string(front.c_str(), strlen(front.c_str()));
           int flag = 0;       // 用来标识此时split_string 里面有多少子串
           char pattern = '/'; // 根据/进行字符串拆分
-          string temp_from = top.c_str();
+          string temp_from = front.c_str();
           temp_from = temp_from.substr(1, temp_from.size()); // 这一行是为了去除最前面的/
           temp_from = temp_from + pattern;                   // 在最后面添加一个/便于处理
           int pos = temp_from.find(pattern);                 // 找到第一个/的位置
@@ -3174,7 +3174,7 @@ void MetadataStore::GetRWSets(Action *action)
           header->add_misc_string(front.c_str(), strlen(front.c_str()));
           int flag = 0;       // 用来标识此时split_string 里面有多少子串
           char pattern = '/'; // 根据/进行字符串拆分
-          string temp_from = top.c_str();
+          string temp_from = front.c_str();
           temp_from = temp_from.substr(1, temp_from.size()); // 这一行是为了去除最前面的/
           temp_from = temp_from + pattern;                   // 在最后面添加一个/便于处理
           int pos = temp_from.find(pattern);                 // 找到第一个/的位置
@@ -3507,7 +3507,7 @@ void MetadataStore::GetRWSets(Action *action)
           header->add_misc_string(front.c_str(), strlen(front.c_str()));
           int flag = 0;       // 用来标识此时split_string 里面有多少子串
           char pattern = '/'; // 根据/进行字符串拆分
-          string temp_from = top.c_str();
+          string temp_from = front.c_str();
           temp_from = temp_from.substr(1, temp_from.size()); // 这一行是为了去除最前面的/
           temp_from = temp_from + pattern;                   // 在最后面添加一个/便于处理
           int pos = temp_from.find(pattern);                 // 找到第一个/的位置
@@ -4737,7 +4737,7 @@ void MetadataStore::Rename_Internal(
       delete serialized;
       MetadataAction::LookupOutput out;
       out.ParseFromString(b.output());
-      if (front1 == tree_name) // 判断树部分是否搜索完成
+      if (front1 == tree_name1) // 判断树部分是否搜索完成
       {
         to_split_entry = out.entry();
         break;
