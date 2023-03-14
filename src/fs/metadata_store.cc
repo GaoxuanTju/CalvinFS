@@ -50,8 +50,8 @@ public:
       // 判断涉不涉及分层，目前是看有没有b，如果有b就分层
 
       string hash_name;
-        hash_name = path;
-      
+      hash_name = path;
+
       if (!store_->Get(hash_name,
                        version_,
                        &reads_[hash_name]))
@@ -190,8 +190,8 @@ public:
       // 判断涉不涉及分层，目前是看有没有b，如果有b就分层
 
       string hash_name;
-        hash_name = path;
-      
+      hash_name = path;
+
       uint64 mds = config_->HashFileName(hash_name);
       uint64 machine = config_->LookupMetadataShard(mds, replica_); // gaoxuan --get right machine of the path
       if (machine == machine_->machine_id())
@@ -221,8 +221,7 @@ public:
 
       string hash_name;
 
-        hash_name = path;
-      
+      hash_name = path;
 
       uint64 mds = config_->HashFileName(hash_name);
       uint64 machine = config_->LookupMetadataShard(mds, replica_);
@@ -1667,7 +1666,7 @@ void MetadataStore::Init_for_depth(BTNode *dir_tree)
 }
 void MetadataStore::Init_for_8(BTNode *dir_tree)
 {
-  
+
   // gaoxuan --这里面会涉及到目录树的建立初始化。
   int a_0 = machine_->config().size();
   int a_1 = 2;
@@ -1677,18 +1676,16 @@ void MetadataStore::Init_for_8(BTNode *dir_tree)
   int a_5 = 2;
   int bsize = 2;
   int csize = 2;
-  //一种很蠢的方式
+  // 一种很蠢的方式
   int uid_a0 = 1;
   int uid_a1 = a_0 + 1;
-  int uid_a2 = a_0 + a_0*a_1 + 1;
-  int uid_a3 = a_0 + a_0*a_1 + a_0*a_1*a_2 + 1;
-  int uid_a4 = a_0 + a_0*a_1 + a_0*a_1*a_2 + a_0*a_1*a_2*a_3 + 1;
-  int uid_a5 = a_0 + a_0*a_1 + a_0*a_1*a_2 + a_0*a_1*a_2*a_3 + a_0*a_1*a_2*a_3*a_4 + 1;
-  int uid_a6 = a_0 + a_0*a_1 + a_0*a_1*a_2 + a_0*a_1*a_2*a_3 + a_0*a_1*a_2*a_3*a_4 +a_0*a_1*a_2*a_3*a_4*a_5+ 1; 
-  int uid_a7 = a_0 + a_0*a_1 + a_0*a_1*a_2 + a_0*a_1*a_2*a_3 + a_0*a_1*a_2*a_3*a_4 +a_0*a_1*a_2*a_3*a_4*a_5+a_0*a_1*a_2*a_3*a_4*a_5*bsize+ 1;   
+  int uid_a2 = a_0 + a_0 * a_1 + 1;
+  int uid_a3 = a_0 + a_0 * a_1 + a_0 * a_1 * a_2 + 1;
+  int uid_a4 = a_0 + a_0 * a_1 + a_0 * a_1 * a_2 + a_0 * a_1 * a_2 * a_3 + 1;
+  int uid_a5 = a_0 + a_0 * a_1 + a_0 * a_1 * a_2 + a_0 * a_1 * a_2 * a_3 + a_0 * a_1 * a_2 * a_3 * a_4 + 1;
+  int uid_a6 = a_0 + a_0 * a_1 + a_0 * a_1 * a_2 + a_0 * a_1 * a_2 * a_3 + a_0 * a_1 * a_2 * a_3 * a_4 + a_0 * a_1 * a_2 * a_3 * a_4 * a_5 + 1;
+  int uid_a7 = a_0 + a_0 * a_1 + a_0 * a_1 * a_2 + a_0 * a_1 * a_2 * a_3 + a_0 * a_1 * a_2 * a_3 * a_4 + a_0 * a_1 * a_2 * a_3 * a_4 * a_5 + a_0 * a_1 * a_2 * a_3 * a_4 * a_5 * bsize + 1;
   //
-
-
 
   // 改成5,5测试的时候容易看出来
   double start = GetTime();
@@ -1732,7 +1729,7 @@ void MetadataStore::Init_for_8(BTNode *dir_tree)
       a_0_level->sibling = temp_a;
       a_0_level = a_0_level->sibling; // a_level移动到下一个兄弟节点
     }
-    string a0_uid = IntToString(uid_a0++); //第一层的uid，
+    string a0_uid = IntToString(uid_a0++); // 第一层的uid，
     if (IsLocal(a_0_dir))
     {
       MetadataEntry entry;
@@ -1748,7 +1745,7 @@ void MetadataStore::Init_for_8(BTNode *dir_tree)
       store_->Put(a_0_dir, serialized_entry, 0);
     }
     BTNode *a_1_level = NULL; // 这个就指向该层第一个节点
-    
+
     for (int i_1 = 0; i_1 < a_1; i_1++)
     {
       string a_1_dir("/" + a0_uid + "a_1" + IntToString(i_1));
@@ -1769,8 +1766,8 @@ void MetadataStore::Init_for_8(BTNode *dir_tree)
         a_1_level->sibling = temp_a;
         a_1_level = a_1_level->sibling; // a_level移动到下一个兄弟节点
       }
-     
-      string a1_uid = IntToString(uid_a1++);//第二层的uid,这个也没错
+
+      string a1_uid = IntToString(uid_a1++); // 第二层的uid,这个也没错
       if (IsLocal(a_1_dir))
       {
         MetadataEntry entry;
@@ -1807,8 +1804,8 @@ void MetadataStore::Init_for_8(BTNode *dir_tree)
           a_2_level = a_2_level->sibling; // a_level移动到下一个兄弟节点
         }
 
-        //从这层开始不对劲
-        string a2_uid = IntToString(uid_a2++);//第三层的uid
+        // 从这层开始不对劲
+        string a2_uid = IntToString(uid_a2++); // 第三层的uid
         if (IsLocal(a_2_dir))
         {
           MetadataEntry entry;
@@ -1844,7 +1841,7 @@ void MetadataStore::Init_for_8(BTNode *dir_tree)
             a_3_level->sibling = temp_a;
             a_3_level = a_3_level->sibling; // a_level移动到下一个兄弟节点
           }
-          string a3_uid = IntToString(uid_a3++);//第四层
+          string a3_uid = IntToString(uid_a3++); // 第四层
           if (IsLocal(a_3_dir))
           {
             MetadataEntry entry;
@@ -1880,7 +1877,7 @@ void MetadataStore::Init_for_8(BTNode *dir_tree)
               a_4_level->sibling = temp_a;
               a_4_level = a_4_level->sibling; // a_level移动到下一个兄弟节点
             }
-            string a4_uid = IntToString(uid_a4++);//第四层
+            string a4_uid = IntToString(uid_a4++); // 第四层
             if (IsLocal(a_4_dir))
             {
               MetadataEntry entry;
@@ -1916,7 +1913,7 @@ void MetadataStore::Init_for_8(BTNode *dir_tree)
                 a_5_level->sibling = temp_a;
                 a_5_level = a_5_level->sibling; // a_level移动到下一个兄弟节点
               }
-              string a5_uid = IntToString(uid_a5++);//第五层
+              string a5_uid = IntToString(uid_a5++); // 第五层
               if (IsLocal(a_5_dir))
               {
                 MetadataEntry entry;
@@ -1953,13 +1950,13 @@ void MetadataStore::Init_for_8(BTNode *dir_tree)
                   b_level->sibling = temp_a;
                   b_level = b_level->sibling; // a_level移动到下一个兄弟节点
                 }
-                string a6_uid = IntToString(uid_a6++);//第五层 
+                string a6_uid = IntToString(uid_a6++); // 第五层
                 if (IsLocal(a_6_dir))
                 {
                   MetadataEntry entry;
                   entry.mutable_permissions();
                   entry.set_type(DIR);
-                  entry.add_dir_contents(a6_uid);//这个用不上，因为分层开始
+                  entry.add_dir_contents(a6_uid); // 这个用不上，因为分层开始
                   for (int k = 0; k < csize; k++)
                   {
                     entry.add_dir_contents("c" + IntToString(k));
@@ -1972,7 +1969,7 @@ void MetadataStore::Init_for_8(BTNode *dir_tree)
                 BTNode *c_level = NULL; // 这个就指向该层第三个节点
                 for (int k = 0; k < csize; k++)
                 {
-                  string file(a_6_dir + "/c" + IntToString(k));//从b开始分层，下面的只需要相对路径就好
+                  string file(a_6_dir + "/c" + IntToString(k)); // 从b开始分层，下面的只需要相对路径就好
                   string file_("c" + IntToString(k));
 
                   BTNode *temp_c = new BTNode;
@@ -1990,13 +1987,13 @@ void MetadataStore::Init_for_8(BTNode *dir_tree)
                     c_level->sibling = temp_c;
                     c_level = c_level->sibling;
                   }
-                  string a7_uid = IntToString(uid_a7++);//第五层 
+                  string a7_uid = IntToString(uid_a7++); // 第五层
                   if (IsLocal(file))
                   {
                     MetadataEntry entry;
                     entry.mutable_permissions();
                     entry.set_type(DATA);
-                    entry.add_dir_contents(a7_uid);//这个用不上，因为分层开始
+                    entry.add_dir_contents(a7_uid); // 这个用不上，因为分层开始
                     FilePart *fp = entry.add_file_parts();
                     fp->set_length(RandomSize());
                     fp->set_block_id(0);
@@ -2218,105 +2215,676 @@ void MetadataStore::GetRWSets(Action *action)
   }
   else if (type == MetadataAction::RENAME)
   { // the version of gaoxuan
-    // gaoxuan --this part is rewrited by gaoxuan
     // gaoxuan --add read/write set in the way of DFS
     MetadataAction::RenameInput in;
     in.ParseFromString(action->input());
-    std::stack<string> stack1;   // gaoxuan --the stack is used for tranversing  the file tree
-    stack1.push(in.from_path()); // gaoxuan --we want to tranverse all children of this path to add read/write set
-    string To_path = in.to_path();
-    while (!stack1.empty())
+    string from_path = in.from_path();
+    string to_path = in.to_path();
+
+    if (in.from_path().find("b") == std::string::npos)
     {
-      string top = stack1.top(); // get the top
-      stack1.pop();              // pop the top
-      action->add_readset(top);
-      action->add_writeset(top);
-
-      string s = top.substr(in.from_path().size()); // gaoxuan --s is used to get the path without from_path
-      To_path = in.to_path() + s;                   // gaoxuan --To_path is the path that needed to add writeset
-      action->add_writeset(To_path);
-
-      uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(top)), config_->LookupReplica(machine_->machine_id()));
-      Header *header = new Header();
-      header->set_from(machine_->machine_id());
-      header->set_to(mds_machine);
-      header->set_type(Header::RPC);
-      header->set_app(getAPPname());
-      header->set_rpc("LOOKUP");
-      header->add_misc_string(top.c_str(), strlen(top.c_str()));
-      // gaoxuan --在这里发出消息之前，把from_path.data()和to_path.data()拆分一下
-
-      // 第一步：将from_path.data()拆分放进split_string里面，拆完后，不够八个格子的，使用空格填充上
-      // 拆分的算法，遇到一个/就把之前的字符串放进去
-      // 将拆分后的元素添加去的方法：header->add_split_string(拆分的字符串)
-      int flag = 0;       // 用来标识此时split_string 里面有多少子串
-      char pattern = '/'; // 根据/进行字符串拆分
-
-      string temp_from = top.c_str();
-      temp_from = temp_from.substr(1, temp_from.size()); // 这一行是为了去除最前面的/
-      temp_from = temp_from + pattern;                   // 在最后面添加一个/便于处理
-      int pos = temp_from.find(pattern);                 // 找到第一个/的位置
-      while (pos != std::string::npos)                   // 循环不断找/，找到一个拆分一次
+      if (in.to_path().find("b") == std::string::npos)
       {
-        string temp1 = temp_from.substr(0, pos); // temp里面就是拆分出来的第一个子串
-        string temp = temp1;
-        for (int i = temp.size(); i < 5; i++)
+        // 这一部分是从树rename到树的过程
+        //  在rename的节点在分层点之上
+        //  1、首先要用循环，找到源和目的两个位置的父目录的和父亲的父亲的元数据项（因为父目录也要加读写集）
+        //  1.1 找到原位置的父目录就好，以及父父目录
+        MetadataEntry Parent_from_entry;
+        MetadataEntry PParent_from_entry;
+        string parent_from_path = ParentDir(in.from_path());
+        string root = "";
+        string root1 = "";
+        // LOG(ERROR)<<"还没进入循环";
+        while (1)
         {
-          temp = temp + " ";
+          string front = root;
+          string front1 = root1;
+          uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
+          Header *header = new Header();
+          header->set_from(machine_->machine_id());
+          header->set_to(mds_machine);
+          header->set_type(Header::RPC);
+          header->set_app("client");
+          header->set_rpc("LOOKUP");
+          header->add_misc_string(front.c_str(), strlen(front.c_str()));
+          // 下面是路径拆分
+          if (front != "")
+          {
+            int flag = 0;       // 用来标识此时split_string 里面有多少子串
+            char pattern = '/'; // 根据/进行字符串拆分
+            string temp_from = front.c_str();
+            temp_from = temp_from.substr(1, temp_from.size()); // 这一行是为了去除最前面的/
+            temp_from = temp_from + pattern;                   // 在最后面添加一个/便于处理
+            int pos = temp_from.find(pattern);                 // 找到第一个/的位置
+            while (pos != std::string::npos)                   // 循环不断找/，找到一个拆分一次
+            {
+              string temp1 = temp_from.substr(0, pos); // temp里面就是拆分出来的第一个子串
+              string temp = temp1;
+              for (int i = temp.size(); i < 5; i++)
+              {
+                temp = temp + " ";
+              }
+              header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+              flag++;                              // 拆分的字符串数量++
+              temp_from = temp_from.substr(pos + 1, temp_from.size());
+              pos = temp_from.find(pattern);
+            }
+            header->set_from_length(flag);
+            while (flag != 8)
+            {
+              string temp = "     ";               // 用五个空格填充一下
+              header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+              flag++;                              // 拆分的字符串数量++
+            }
+
+            // 这一行之前是gaoxuan添加的
+          }
+          else
+          {
+
+            int flag = 0; // 用来标识此时split_string 里面有多少子串
+            while (flag != 8)
+            {
+              string temp = "     ";               // 用五个空格填充一下
+              header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+              flag++;                              // 拆分的字符串数量++
+            }
+            header->set_from_length(flag);
+          }
+
+          MessageBuffer *m = NULL;
+          header->set_data_ptr(reinterpret_cast<uint64>(&m));
+          machine_->SendMessage(header, new MessageBuffer());
+          while (m == NULL)
+          {
+            usleep(10);
+            Noop<MessageBuffer *>(m);
+          }
+
+          MessageBuffer *serialized = m;
+          Action b;
+          b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
+          delete serialized;
+          MetadataAction::LookupOutput out;
+          out.ParseFromString(b.output());
+          if (front1 == ParentDir(parent_from_path)) // 找到了from_path父目录的父目录的元数据项
+          {
+            PParent_from_entry = out.entry(); // 这里爷爷目录用来确定父目录的
+          }
+          if (front1 == parent_from_path) // 找到了from_path父目录的元数据项
+          {
+            Parent_from_entry = out.entry();
+            break;
+          }
+          else
+          { // gaoxuan --还没有找到
+            for (int i = 0; i < out.entry().dir_contents_size(); i++)
+            {
+              string full_path = front1 + "/" + out.entry().dir_contents(i); // 拼接获取全路径
+
+              if (parent_from_path.find(full_path) == 0)
+              {
+                // 进入这个分支就代表此时，恰好搜到了，此时i代表的就是所需的相对路径，我们只需要用0位置的id拼一下就好
+                root1 = full_path;
+                root = "/" + out.entry().dir_contents(0) + out.entry().dir_contents(i);
+                break;
+              }
+            }
+          }
         }
-        header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
-        flag++;                              // 拆分的字符串数量++
-        temp_from = temp_from.substr(pos + 1, temp_from.size());
-        pos = temp_from.find(pattern);
-      }
-      header->set_from_length(flag);
-      while (flag != 8)
-      {
-        string temp = "     ";               // 用空格填充一下
-        header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
-        flag++;                              // 拆分的字符串数量++
-      }
+        // PParent_from_entry中存放原位置的爷爷的元数据项，Parent_from_entry存放父亲的元数据项
 
-      // 这一行之前是gaoxuan添加的
-
-      MessageBuffer *m = NULL;
-      header->set_data_ptr(reinterpret_cast<uint64>(&m));
-      machine_->SendMessage(header, new MessageBuffer());
-      while (m == NULL)
-      {
-        usleep(10);
-        Noop<MessageBuffer *>(m);
-      }
-
-      MessageBuffer *serialized = m;
-      Action b;
-      b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
-      delete serialized;
-      MetadataAction::LookupOutput out;
-      out.ParseFromString(b.output());
-      if (out.success() && out.entry().type() == DIR)
-      {
-
-        for (int i = 0; i < out.entry().dir_contents_size(); i++)
+        // 1.1 找到目的位置的父目录以及父父目录
+        MetadataEntry Parent_to_entry;
+        MetadataEntry PParent_to_entry;
+        string parent_to_path = ParentDir(in.to_path());
+        root = "";
+        root1 = "";
+        // LOG(ERROR)<<"还没进入循环";
+        while (1)
         {
-          string full_path = top + "/" + out.entry().dir_contents(i);
-          stack1.push(full_path);
+          string front = root;
+          string front1 = root1;
+          uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
+          Header *header = new Header();
+          header->set_from(machine_->machine_id());
+          header->set_to(mds_machine);
+          header->set_type(Header::RPC);
+          header->set_app("client");
+          header->set_rpc("LOOKUP");
+          header->add_misc_string(front.c_str(), strlen(front.c_str()));
+          // 下面是路径拆分
+          if (front != "")
+          {
+            int flag = 0;       // 用来标识此时split_string 里面有多少子串
+            char pattern = '/'; // 根据/进行字符串拆分
+            string temp_from = front.c_str();
+            temp_from = temp_from.substr(1, temp_from.size()); // 这一行是为了去除最前面的/
+            temp_from = temp_from + pattern;                   // 在最后面添加一个/便于处理
+            int pos = temp_from.find(pattern);                 // 找到第一个/的位置
+            while (pos != std::string::npos)                   // 循环不断找/，找到一个拆分一次
+            {
+              string temp1 = temp_from.substr(0, pos); // temp里面就是拆分出来的第一个子串
+              string temp = temp1;
+              for (int i = temp.size(); i < 5; i++)
+              {
+                temp = temp + " ";
+              }
+              header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+              flag++;                              // 拆分的字符串数量++
+              temp_from = temp_from.substr(pos + 1, temp_from.size());
+              pos = temp_from.find(pattern);
+            }
+            header->set_from_length(flag);
+            while (flag != 8)
+            {
+              string temp = "     ";               // 用五个空格填充一下
+              header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+              flag++;                              // 拆分的字符串数量++
+            }
+
+            // 这一行之前是gaoxuan添加的
+          }
+          else
+          {
+
+            int flag = 0; // 用来标识此时split_string 里面有多少子串
+            while (flag != 8)
+            {
+              string temp = "     ";               // 用五个空格填充一下
+              header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+              flag++;                              // 拆分的字符串数量++
+            }
+            header->set_from_length(flag);
+          }
+
+          MessageBuffer *m = NULL;
+          header->set_data_ptr(reinterpret_cast<uint64>(&m));
+          machine_->SendMessage(header, new MessageBuffer());
+          while (m == NULL)
+          {
+            usleep(10);
+            Noop<MessageBuffer *>(m);
+          }
+
+          MessageBuffer *serialized = m;
+          Action b;
+          b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
+          delete serialized;
+          MetadataAction::LookupOutput out;
+          out.ParseFromString(b.output());
+          if (front1 == ParentDir(parent_to_path)) // 找到了to_path父目录的父目录的元数据项
+          {
+            PParent_to_entry = out.entry(); // 这里爷爷目录用来确定父目录的
+          }
+          if (front1 == parent_to_path) // 找到了from_path父目录的元数据项
+          {
+            Parent_to_entry = out.entry();
+            break;
+          }
+          else
+          { // gaoxuan --还没有找到
+            for (int i = 0; i < out.entry().dir_contents_size(); i++)
+            {
+              string full_path = front1 + "/" + out.entry().dir_contents(i); // 拼接获取全路径
+
+              if (parent_to_path.find(full_path) == 0)
+              {
+                // 进入这个分支就代表此时，恰好搜到了，此时i代表的就是所需的相对路径，我们只需要用0位置的id拼一下就好
+                root1 = full_path;
+                root = "/" + out.entry().dir_contents(0) + out.entry().dir_contents(i);
+                break;
+              }
+            }
+          }
         }
+        // PParent_to_entry中存放目的位置的爷爷的元数据项，Parent_to_entry存放父亲的元数据项
+
+        // 2、将父目录的元数据的键加入读写集
+        string from_parent = "/" + PParent_from_entry.dir_contents(0) + FileName(parent_from_path);
+        string to_parent = "/" + PParent_to_entry.dir_contents(0) + FileName(parent_to_path);
+        if (parent_from_path == parent_to_path) // 父目录相同
+        {
+          action->add_readset(from_parent);
+          action->add_writeset(to_parent);
+        }
+        else
+        {
+          action->add_readset(from_parent);
+          action->add_writeset(from_parent);
+
+          action->add_readset(to_parent);
+          action->add_writeset(to_parent);
+        }
+        // 3、用广度优先遍历，将原位置向下所有子目录都做路径解析拼接，添加读写集
+
+        string origin_path = "/" + Parent_from_entry.dir_contents(0) + FileName(from_path);
+        string desti_path = "/" + Parent_to_entry.dir_contents(0) + FileName(to_path);
+        action->add_writeset(desti_path); // gaoxuan --这里是我觉得涉及分层的一个不同点，如果是树，那么rename的目的地只需要加入目的的父亲和目的路径这两个即可
+                                          // 也就是说这里目的地的写集只需要加目的路径这一个路径即可（分层点之下则不同，需要对之下都要修改）
+                                          // 做法
+        std::queue<string> queue1;
+        string from_root = origin_path;
+        queue1.push(from_root);
+        while (!queue1.empty())
+        {
+          string front = queue1.front();
+          queue1.pop();
+          // 一系列操作
+          // 给from这个子树节点添加读写集
+          action->add_readset(front);
+          action->add_writeset(front);
+          // 下面是获取这个路径的元数据项的过程
+          uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
+          Header *header = new Header();
+          header->set_from(machine_->machine_id());
+          header->set_to(mds_machine);
+          header->set_type(Header::RPC);
+          header->set_app(getAPPname());
+          header->set_rpc("LOOKUP");
+          header->add_misc_string(front.c_str(), strlen(front.c_str()));
+          int flag = 0;       // 用来标识此时split_string 里面有多少子串
+          char pattern = '/'; // 根据/进行字符串拆分
+          string temp_from = top.c_str();
+          temp_from = temp_from.substr(1, temp_from.size()); // 这一行是为了去除最前面的/
+          temp_from = temp_from + pattern;                   // 在最后面添加一个/便于处理
+          int pos = temp_from.find(pattern);                 // 找到第一个/的位置
+          while (pos != std::string::npos)                   // 循环不断找/，找到一个拆分一次
+          {
+            string temp1 = temp_from.substr(0, pos); // temp里面就是拆分出来的第一个子串
+            string temp = temp1;
+            for (int i = temp.size(); i < 5; i++)
+            {
+              temp = temp + " ";
+            }
+            header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+            flag++;                              // 拆分的字符串数量++
+            temp_from = temp_from.substr(pos + 1, temp_from.size());
+            pos = temp_from.find(pattern);
+          }
+          header->set_from_length(flag);
+          while (flag != 8)
+          {
+            string temp = "     ";               // 用空格填充一下
+            header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+            flag++;                              // 拆分的字符串数量++
+          }
+          MessageBuffer *m = NULL;
+          header->set_data_ptr(reinterpret_cast<uint64>(&m));
+          machine_->SendMessage(header, new MessageBuffer());
+          while (m == NULL)
+          {
+            usleep(10);
+            Noop<MessageBuffer *>(m);
+          }
+
+          MessageBuffer *serialized = m;
+          Action b;
+          b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
+          delete serialized;
+          MetadataAction::LookupOutput out;
+          out.ParseFromString(b.output());
+          // 上面是获取这个路径的元数据项的过程
+          // 当前路径的元数据项就在out.entry()里面
+          // 将这一层的元数据项都拼接一下放入队列
+          // 这样做到分层点之下的没加入读写集，也没必要加入？分层点之下的修改，这是要修改的
+
+          if (front.find("b") == std::string::npos)
+          {
+            // 不是分层点
+            if (out.success() && out.entry().type() == DIR)
+            {
+              string uid = out.entry().dir_contents(0);
+              for (int i = 1; i < out.entry().dir_contents_size(); i++)
+              {
+                string child_path = "/" + uid + out.entry().dir_contents(i);
+                stack1.push(child_path);
+              }
+            }
+          }
+          else
+          {
+            if (out.success() && out.entry().type() == DIR)
+            {
+              // 相比树状，也就是路径加入方式换一下
+              for (int i = 1; i < out.entry().dir_contents_size(); i++)
+              {
+                string child_path = front + "/" + out.entry().dir_contents(i);
+                stack1.push(child_path);
+              }
+            }
+          }
+        }
+        // 这之前是广度优先遍历的代码
       }
-    }
-    // gaoxuan --in case that add read/write set repeatedly when form_path and to_path have same parent dir
-    if (ParentDir(in.from_path()) == ParentDir(in.to_path()))
-    {
-      action->add_readset(ParentDir(in.from_path()));
-      action->add_writeset(ParentDir(in.from_path()));
+      else
+      {
+        //上面是从树rename到树
+      }
     }
     else
     {
-      action->add_readset(ParentDir(in.from_path()));
-      action->add_writeset(ParentDir(in.from_path()));
+       
+      if(in.to_path().find("b") != std::string::npos)
+      {
+        // 这部分是需要分层的代码
+      // 1.1搜到原位置的分层点
+      int p = from_path.find("b");
+      string tree_name = from_path.substr(0, p - 1);
+      string hash_name = from_path.substr(p);
+      //
+      string root = "";
+      string root1 = "";
+      MetadataEntry from_split_entry;
+      // LOG(ERROR)<<"还没进入循环";
+      while (1)
+      {
+        string front = root;
+        string front1 = root1;
+        uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
+        Header *header = new Header();
+        header->set_from(machine_->machine_id());
+        header->set_to(mds_machine);
+        header->set_type(Header::RPC);
+        header->set_app("client");
+        header->set_rpc("LOOKUP");
+        header->add_misc_string(front.c_str(), strlen(front.c_str()));
 
-      action->add_readset(ParentDir(in.to_path()));
-      action->add_writeset(ParentDir(in.to_path()));
+        if (front != "")
+        {
+          int flag = 0;       // 用来标识此时split_string 里面有多少子串
+          char pattern = '/'; // 根据/进行字符串拆分
+
+          string temp_from = front.c_str();
+          temp_from = temp_from.substr(1, temp_from.size()); // 这一行是为了去除最前面的/
+          temp_from = temp_from + pattern;                   // 在最后面添加一个/便于处理
+          int pos = temp_from.find(pattern);                 // 找到第一个/的位置
+          while (pos != std::string::npos)                   // 循环不断找/，找到一个拆分一次
+          {
+            string temp1 = temp_from.substr(0, pos); // temp里面就是拆分出来的第一个子串
+            string temp = temp1;
+            for (int i = temp.size(); i < 5; i++)
+            {
+              temp = temp + " ";
+            }
+            header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+            flag++;                              // 拆分的字符串数量++
+            temp_from = temp_from.substr(pos + 1, temp_from.size());
+            pos = temp_from.find(pattern);
+          }
+          header->set_from_length(flag);
+          while (flag != 8)
+          {
+            string temp = "     ";               // 用五个空格填充一下
+            header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+            flag++;                              // 拆分的字符串数量++
+          }
+        }
+        else
+        {
+
+          int flag = 0; // 用来标识此时split_string 里面有多少子串
+          while (flag != 8)
+          {
+            string temp = "     ";               // 用五个空格填充一下
+            header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+            flag++;                              // 拆分的字符串数量++
+          }
+          header->set_from_length(flag);
+        }
+
+        MessageBuffer *m = NULL;
+        header->set_data_ptr(reinterpret_cast<uint64>(&m));
+        machine_->SendMessage(header, new MessageBuffer());
+        while (m == NULL)
+        {
+          usleep(10);
+          Noop<MessageBuffer *>(m);
+        }
+
+        MessageBuffer *serialized = m;
+        Action b;
+        b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
+        delete serialized;
+        MetadataAction::LookupOutput out;
+        out.ParseFromString(b.output());
+        if (front1 == tree_name) // 判断树部分是否搜索完成
+        {
+          from_split_entry = out.entry();
+          break;
+        }
+        else
+        { // gaoxuan --还没有找到
+          for (int i = 0; i < out.entry().dir_contents_size(); i++)
+          {
+
+            string full_path = front1 + "/" + out.entry().dir_contents(i); // 拼接获取全路径
+
+            if (from_path.find(full_path) == 0)
+            { // Todo:这里需要用相对路径
+              // 进入这个分支就代表此时，恰好搜到了，此时i代表的就是所需的相对路径，我们只需要用0位置的id拼一下就好
+              root1 = full_path;
+              root = "/" + out.entry().dir_contents(0) + out.entry().dir_contents(i);
+              break;
+            }
+          }
+        }
+      }
+      // 原位置的分层点元数据项就在from_split_entry这个里面
+      // 1.2搜到目的位置的分层点
+      int p1 = to_path.find("b");
+      string tree_name1 = to_path.substr(0, p1 - 1);
+      string hash_name1 = to_path.substr(p1);
+      //
+      root = "";
+      root1 = "";
+      MetadataEntry to_split_entry;
+      // LOG(ERROR)<<"还没进入循环";
+      while (1)
+      {
+        string front = root;
+        string front1 = root1;
+        uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
+        Header *header = new Header();
+        header->set_from(machine_->machine_id());
+        header->set_to(mds_machine);
+        header->set_type(Header::RPC);
+        header->set_app("client");
+        header->set_rpc("LOOKUP");
+        header->add_misc_string(front.c_str(), strlen(front.c_str()));
+
+        if (front != "")
+        {
+          int flag = 0;       // 用来标识此时split_string 里面有多少子串
+          char pattern = '/'; // 根据/进行字符串拆分
+
+          string temp_from = front.c_str();
+          temp_from = temp_from.substr(1, temp_from.size()); // 这一行是为了去除最前面的/
+          temp_from = temp_from + pattern;                   // 在最后面添加一个/便于处理
+          int pos = temp_from.find(pattern);                 // 找到第一个/的位置
+          while (pos != std::string::npos)                   // 循环不断找/，找到一个拆分一次
+          {
+            string temp1 = temp_from.substr(0, pos); // temp里面就是拆分出来的第一个子串
+            string temp = temp1;
+            for (int i = temp.size(); i < 5; i++)
+            {
+              temp = temp + " ";
+            }
+            header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+            flag++;                              // 拆分的字符串数量++
+            temp_from = temp_from.substr(pos + 1, temp_from.size());
+            pos = temp_from.find(pattern);
+          }
+          header->set_from_length(flag);
+          while (flag != 8)
+          {
+            string temp = "     ";               // 用五个空格填充一下
+            header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+            flag++;                              // 拆分的字符串数量++
+          }
+        }
+        else
+        {
+
+          int flag = 0; // 用来标识此时split_string 里面有多少子串
+          while (flag != 8)
+          {
+            string temp = "     ";               // 用五个空格填充一下
+            header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+            flag++;                              // 拆分的字符串数量++
+          }
+          header->set_from_length(flag);
+        }
+
+        MessageBuffer *m = NULL;
+        header->set_data_ptr(reinterpret_cast<uint64>(&m));
+        machine_->SendMessage(header, new MessageBuffer());
+        while (m == NULL)
+        {
+          usleep(10);
+          Noop<MessageBuffer *>(m);
+        }
+
+        MessageBuffer *serialized = m;
+        Action b;
+        b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
+        delete serialized;
+        MetadataAction::LookupOutput out;
+        out.ParseFromString(b.output());
+        if (front1 == tree_name) // 判断树部分是否搜索完成
+        {
+          to_split_entry = out.entry();
+          break;
+        }
+        else
+        { // gaoxuan --还没有找到
+          for (int i = 0; i < out.entry().dir_contents_size(); i++)
+          {
+
+            string full_path = front1 + "/" + out.entry().dir_contents(i); // 拼接获取全路径
+
+            if (to_path.find(full_path) == 0)
+            { // Todo:这里需要用相对路径
+              // 进入这个分支就代表此时，恰好搜到了，此时i代表的就是所需的相对路径，我们只需要用0位置的id拼一下就好
+              root1 = full_path;
+              root = "/" + out.entry().dir_contents(0) + out.entry().dir_contents(i);
+              break;
+            }
+          }
+        }
+      }
+      // 目的位置的分层点元数据项就在to_split_entry这个里面
+
+      string from_uid = from_split_entry.dir_contents(0);
+      string to_uid = to_split_entry.dir_contents(0);
+      // 下面要获得父目录
+      string from_parent = ParentDir(from_path);
+      string to_parent = ParentDir(to_parent);
+      int pos_from_parent = from_parent.find('b');
+      int pos_to_parent = to_parent.find('b');
+
+      from_parent = "/" + from_uid + from_parent.substr(pos_from_parent);
+      to_parent = "/" + to_uid + to_parent.substr(pos_to_parent);
+      if (from_parent == to_parent)
+      {
+        action->add_readset(from_parent);
+        action->add_writeset(to_parent);
+      }
+      else
+      {
+        action->add_readset(from_parent);
+        action->add_writeset(from_parent);
+
+        action->add_readset(to_parent);
+        action->add_writeset(to_parent);
+      }
+
+      // 这里和纯树状的存在一些不同之处，因为要将所有的目的位置的孩子同样是要加入写集
+      string origin_path = "/" + from_uid + from_path.substr(p);
+      string desti_path = "/" + to_uid + to_path.substr(p1);
+      string To_path = desti_path;
+      std::queue<string> queue1;
+      string from_root = origin_path;
+      queue1.push(from_root);
+      while (!queue1.empty())
+      {
+        string front = queue1.front();
+        queue1.pop();
+        // 一系列操作
+        // 给from这个子树节点添加读写集
+        action->add_readset(front);
+        action->add_writeset(front);
+        string s = front.substr(origin_path.size());
+        To_path = desti_path + s;
+        // 下面是获取这个路径的元数据项的过程
+        uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
+        Header *header = new Header();
+        header->set_from(machine_->machine_id());
+        header->set_to(mds_machine);
+        header->set_type(Header::RPC);
+        header->set_app(getAPPname());
+        header->set_rpc("LOOKUP");
+        header->add_misc_string(front.c_str(), strlen(front.c_str()));
+        int flag = 0;       // 用来标识此时split_string 里面有多少子串
+        char pattern = '/'; // 根据/进行字符串拆分
+        string temp_from = top.c_str();
+        temp_from = temp_from.substr(1, temp_from.size()); // 这一行是为了去除最前面的/
+        temp_from = temp_from + pattern;                   // 在最后面添加一个/便于处理
+        int pos = temp_from.find(pattern);                 // 找到第一个/的位置
+        while (pos != std::string::npos)                   // 循环不断找/，找到一个拆分一次
+        {
+          string temp1 = temp_from.substr(0, pos); // temp里面就是拆分出来的第一个子串
+          string temp = temp1;
+          for (int i = temp.size(); i < 5; i++)
+          {
+            temp = temp + " ";
+          }
+          header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+          flag++;                              // 拆分的字符串数量++
+          temp_from = temp_from.substr(pos + 1, temp_from.size());
+          pos = temp_from.find(pattern);
+        }
+        header->set_from_length(flag);
+        while (flag != 8)
+        {
+          string temp = "     ";               // 用空格填充一下
+          header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+          flag++;                              // 拆分的字符串数量++
+        }
+        MessageBuffer *m = NULL;
+        header->set_data_ptr(reinterpret_cast<uint64>(&m));
+        machine_->SendMessage(header, new MessageBuffer());
+        while (m == NULL)
+        {
+          usleep(10);
+          Noop<MessageBuffer *>(m);
+        }
+
+        MessageBuffer *serialized = m;
+        Action b;
+        b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
+        delete serialized;
+        MetadataAction::LookupOutput out;
+        out.ParseFromString(b.output());
+        // 上面是获取这个路径的元数据项的过程
+        // 当前路径的元数据项就在out.entry()里面
+        // 将这一层的元数据项都拼接一下放入队列
+        if (out.success() && out.entry().type() == DIR)
+        {
+          for (int i = 1; i < out.entry().dir_contents_size(); i++)
+          {
+            string child_path = front + out.entry().dir_contents(i);
+            stack1.push(child_path);
+          }
+        }
+      }
+      }
+      else
+      {
+      //上面是hash到hash  ，这里是hash到树      
+      }
+
+
     }
   }
   else if (type == MetadataAction::LOOKUP)
@@ -2381,14 +2949,13 @@ void MetadataStore::Run(Action *action)
     context =
         new DistributedExecutionContext(machine_, config_, store_, action);
   }
-  
+
   if (!context->IsWriter())
   {
 
     delete context;
     return;
   }
-  
 
   // Execute action.
   MetadataAction::Type type =
@@ -2833,20 +3400,19 @@ void MetadataStore::Tree_Lookup_Internal(
 
   string path = in.path();
 
-
-  if (path.find("b") != std::string::npos)//我这里是从b开始才是分层的地方了
+  if (path.find("b") != std::string::npos) // 我这里是从b开始才是分层的地方了
   {
-    //要分层
-    //  gaoxuan --use BFS to add new metadata entry
+    // 要分层
+    //   gaoxuan --use BFS to add new metadata entry
 
-    //先把路径拆分开，根据这个b
+    // 先把路径拆分开，根据这个b
     int p = path.find("b");
-    string tree_name = path.substr(0, p -1);
+    string tree_name = path.substr(0, p - 1);
     string hash_name = path.substr(p);
     //
     string root = "";
     string root1 = "";
-    //LOG(ERROR)<<"还没进入循环";
+    // LOG(ERROR)<<"还没进入循环";
     while (1)
     {
       string front = root;
@@ -2923,7 +3489,7 @@ void MetadataStore::Tree_Lookup_Internal(
       delete serialized;
       MetadataAction::LookupOutput out;
       out.ParseFromString(b.output());
-      if (front1 == tree_name)//判断树部分是否搜索完成
+      if (front1 == tree_name) // 判断树部分是否搜索完成
       {
         entry = out.entry();
         break;
@@ -2933,11 +3499,11 @@ void MetadataStore::Tree_Lookup_Internal(
         for (int i = 0; i < out.entry().dir_contents_size(); i++)
         {
 
-          string full_path = front1 + "/" + out.entry().dir_contents(i);//拼接获取全路径
+          string full_path = front1 + "/" + out.entry().dir_contents(i); // 拼接获取全路径
 
           if (in.path().find(full_path) == 0)
           { // Todo:这里需要用相对路径
-          //进入这个分支就代表此时，恰好搜到了，此时i代表的就是所需的相对路径，我们只需要用0位置的id拼一下就好
+            // 进入这个分支就代表此时，恰好搜到了，此时i代表的就是所需的相对路径，我们只需要用0位置的id拼一下就好
             root1 = full_path;
             root = "/" + out.entry().dir_contents(0) + out.entry().dir_contents(i);
             break;
@@ -2945,11 +3511,11 @@ void MetadataStore::Tree_Lookup_Internal(
         }
       }
     }
-    //LOG(ERROR)<<"跳出了循环";
+    // LOG(ERROR)<<"跳出了循环";
 
-    //现在entry中存放的是分层点的元数据项
-    hash_name = "/" +  entry.dir_contents(0) + hash_name;//获取需要hash的相对路径
-    //这个路径直接去lookup一下
+    // 现在entry中存放的是分层点的元数据项
+    hash_name = "/" + entry.dir_contents(0) + hash_name; // 获取需要hash的相对路径
+    // 这个路径直接去lookup一下
     uint64 to_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(hash_name)), config_->LookupReplica(machine_->machine_id()));
     Header *header = new Header();
     header->set_from(machine_->machine_id());
@@ -2998,11 +3564,11 @@ void MetadataStore::Tree_Lookup_Internal(
       Noop<MessageBuffer *>(m);
     }
     MessageBuffer *serialized = m;
-      Action b;
-      b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
-      delete serialized;
-      MetadataAction::LookupOutput o;
-      o.ParseFromString(b.output());    
+    Action b;
+    b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
+    delete serialized;
+    MetadataAction::LookupOutput o;
+    o.ParseFromString(b.output());
     // TODO(agt): Check permissions.
     MetadataEntry entry1 = o.entry();
     // Return entry.
@@ -3016,7 +3582,7 @@ void MetadataStore::Tree_Lookup_Internal(
 
     string root = "";
     string root1 = "";
-    //LOG(ERROR)<<"还没进入循环";
+    // LOG(ERROR)<<"还没进入循环";
     while (1)
     {
       string front = root;
@@ -3095,7 +3661,7 @@ void MetadataStore::Tree_Lookup_Internal(
       delete serialized;
       MetadataAction::LookupOutput out;
       out.ParseFromString(b.output());
-      if (front1 == in.path())//单独用全路径来判断是否搜索完成,可以肯定是这里没执行，才退不出去
+      if (front1 == in.path()) // 单独用全路径来判断是否搜索完成,可以肯定是这里没执行，才退不出去
       {
         entry = out.entry();
         break;
@@ -3105,11 +3671,11 @@ void MetadataStore::Tree_Lookup_Internal(
         for (int i = 0; i < out.entry().dir_contents_size(); i++)
         {
 
-          string full_path = front1 + "/" + out.entry().dir_contents(i);//拼接获取全路径
+          string full_path = front1 + "/" + out.entry().dir_contents(i); // 拼接获取全路径
 
           if (in.path().find(full_path) == 0)
           { // Todo:这里需要用相对路径
-          //进入这个分支就代表此时，恰好搜到了，此时i代表的就是所需的相对路径，我们只需要用0位置的id拼一下就好
+            // 进入这个分支就代表此时，恰好搜到了，此时i代表的就是所需的相对路径，我们只需要用0位置的id拼一下就好
             root1 = full_path;
             root = "/" + out.entry().dir_contents(0) + out.entry().dir_contents(i);
             break;
@@ -3117,9 +3683,9 @@ void MetadataStore::Tree_Lookup_Internal(
         }
       }
     }
-    //LOG(ERROR)<<"跳出了循环";
-    // TODO(agt): Check permissions.
-    // Return entry.
+    // LOG(ERROR)<<"跳出了循环";
+    //  TODO(agt): Check permissions.
+    //  Return entry.
     out->mutable_entry()->CopyFrom(entry);
   }
 }
