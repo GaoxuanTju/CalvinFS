@@ -1021,8 +1021,8 @@ public:
 
     string from_path8 = from_path7 + "/c" + IntToString(a7);
 
-    LOG(ERROR) << machine()->machine_id() << " path: " << from_path7 << " in " << config_->LookupMetadataShard(config_->HashFileName(from_path7), config_->LookupReplica(machine()->machine_id()));
-    BackgroundLS(from_path7);
+    LOG(ERROR) << machine()->machine_id() << " path: " << from_path8 << " in " << config_->LookupMetadataShard(config_->HashFileName(from_path8), config_->LookupReplica(machine()->machine_id()));
+    BackgroundLS(from_path8);
 
 
 /*
