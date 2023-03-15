@@ -880,13 +880,30 @@ public:
     Spin(1);
     // gaoxuan --function Init() is used to initialize the metadata of dir and file which used for Rename
     dir_tree = new BTNode;           // 老忘记，使用指针前，最少要指向一个地方
-    metadata_->Init_for_8(dir_tree); // gaoxuan --Init() is in metadat_store.cc,参数用于存储目录树
+    metadata_->Init_for_10(dir_tree); // gaoxuan --Init() is in metadat_store.cc,参数用于存储目录树
     Spin(1);
     machine()->GlobalBarrier();
     Spin(1);
+    int a1 = rand() % 2;
+    int a2 = rand() % 2;
+    int a3 = rand() % 2;
+    int a4 = rand() % 2;
+    int a5 = rand() % 2;
+    int a6 = rand() % 2;
+    int a7 = rand() % 2;
+    int a8 = rand() % 2;
+    int a9 = rand() % 2;
+
     double start = GetTime();
     string from_path;
     string to_path;
+
+    from_path = "/a_0" + IntToString(machine()->machine_id()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2) + "/a_3" + IntToString(a3) + "/a_4" + IntToString(a4);
+    to_path = "/a_0" + IntToString(rand() % machine()->config().size()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2) + "/a_3" + IntToString(a3) + "/A" + IntToString(machine()->GetGUID());
+//上面是到相同父目录下
+    BackgroundRenameFile(from_path, to_path);
+
+/*
     for (int j = 0; j < 2; j++)
     {
       int a1 = rand() % 5;
@@ -911,6 +928,8 @@ public:
                    << "Test progress : " << j / 50 << "/" << 5;
       }
     }
+*/    
+
 
     // Wait for all operations to finish.
     while (capacity_.load() < kMaxCapacity)
@@ -922,11 +941,11 @@ public:
     // Report.
 
     LOG(ERROR) << "Renamed "
-               << "10 files. Elapsed time:"
+               << "1 files. Elapsed time:"
                << (GetTime() - start) << " seconds";
 
-    Spin(1);
-    print_dir_tree(dir_tree);
+   // Spin(1);
+   // print_dir_tree(dir_tree);
   }
   void DeleteExperiment()
   { // gaoxuan --删除文件的实验

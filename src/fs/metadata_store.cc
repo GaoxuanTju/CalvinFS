@@ -2670,15 +2670,12 @@ void MetadataStore::GetRWSets(Action *action)
       if (in.to_path().find("b") == std::string::npos)
       {
         // 这一部分是从树rename到树的过程
-        //  在rename的节点在分层点之上
-        //  1、首先要用循环，找到源和目的两个位置的父目录的和父亲的父亲的元数据项（因为父目录也要加读写集）
-        //  1.1 找到原位置的父目录就好，以及父父目录
+        //  1.1 找到原位置的父目录以及爷爷目录
         MetadataEntry Parent_from_entry;
         MetadataEntry PParent_from_entry;
-        string parent_from_path = ParentDir(in.from_path());
+        string parent_from_path = ParentDir(from_path);
         string root = "";
         string root1 = "";
-        // LOG(ERROR)<<"还没进入循环";
         while (1)
         {
           string front = root;
@@ -2762,7 +2759,7 @@ void MetadataStore::GetRWSets(Action *action)
           }
           else
           { // gaoxuan --还没有找到
-            for (int i = 0; i < out.entry().dir_contents_size(); i++)
+            for (int i = 1; i < out.entry().dir_contents_size(); i++)
             {
               string full_path = front1 + "/" + out.entry().dir_contents(i); // 拼接获取全路径
 
@@ -2868,7 +2865,7 @@ void MetadataStore::GetRWSets(Action *action)
           }
           else
           { // gaoxuan --还没有找到
-            for (int i = 0; i < out.entry().dir_contents_size(); i++)
+            for (int i = 1; i < out.entry().dir_contents_size(); i++)
             {
               string full_path = front1 + "/" + out.entry().dir_contents(i); // 拼接获取全路径
 
@@ -3102,7 +3099,7 @@ void MetadataStore::GetRWSets(Action *action)
           }
           else
           { // gaoxuan --还没有找到
-            for (int i = 0; i < out.entry().dir_contents_size(); i++)
+            for (int i = 1; i < out.entry().dir_contents_size(); i++)
             {
               string full_path = front1 + "/" + out.entry().dir_contents(i); // 拼接获取全路径
 
@@ -3204,7 +3201,7 @@ void MetadataStore::GetRWSets(Action *action)
           }
           else
           { // gaoxuan --还没有找到
-            for (int i = 0; i < out.entry().dir_contents_size(); i++)
+            for (int i = 1; i < out.entry().dir_contents_size(); i++)
             {
 
               string full_path = front1 + "/" + out.entry().dir_contents(i); // 拼接获取全路径
@@ -3445,7 +3442,7 @@ void MetadataStore::GetRWSets(Action *action)
           }
           else
           { // gaoxuan --还没有找到
-            for (int i = 0; i < out.entry().dir_contents_size(); i++)
+            for (int i = 1; i < out.entry().dir_contents_size(); i++)
             {
 
               string full_path = front1 + "/" + out.entry().dir_contents(i); // 拼接获取全路径
@@ -3548,7 +3545,7 @@ void MetadataStore::GetRWSets(Action *action)
           }
           else
           { // gaoxuan --还没有找到
-            for (int i = 0; i < out.entry().dir_contents_size(); i++)
+            for (int i = 1; i < out.entry().dir_contents_size(); i++)
             {
 
               string full_path = front1 + "/" + out.entry().dir_contents(i); // 拼接获取全路径
@@ -3770,7 +3767,7 @@ void MetadataStore::GetRWSets(Action *action)
           }
           else
           { // gaoxuan --还没有找到
-            for (int i = 0; i < out.entry().dir_contents_size(); i++)
+            for (int i = 1; i < out.entry().dir_contents_size(); i++)
             {
 
               string full_path = front1 + "/" + out.entry().dir_contents(i); // 拼接获取全路径
@@ -3883,7 +3880,7 @@ void MetadataStore::GetRWSets(Action *action)
           }
           else
           { // gaoxuan --还没有找到
-            for (int i = 0; i < out.entry().dir_contents_size(); i++)
+            for (int i = 1; i < out.entry().dir_contents_size(); i++)
             {
               string full_path = front1 + "/" + out.entry().dir_contents(i); // 拼接获取全路径
 
@@ -4433,7 +4430,7 @@ void MetadataStore::Rename_Internal(
       }
       else
       { // gaoxuan --还没有找到
-        for (int i = 0; i < out.entry().dir_contents_size(); i++)
+        for (int i = 1; i < out.entry().dir_contents_size(); i++)
         {
           string full_path = front1 + "/" + out.entry().dir_contents(i); // 拼接获取全路径
 
@@ -4539,7 +4536,7 @@ void MetadataStore::Rename_Internal(
       }
       else
       { // gaoxuan --还没有找到
-        for (int i = 0; i < out.entry().dir_contents_size(); i++)
+        for (int i = 1; i < out.entry().dir_contents_size(); i++)
         {
           string full_path = front1 + "/" + out.entry().dir_contents(i); // 拼接获取全路径
 
@@ -4716,7 +4713,7 @@ void MetadataStore::Rename_Internal(
       }
       else
       { // gaoxuan --还没有找到
-        for (int i = 0; i < out.entry().dir_contents_size(); i++)
+        for (int i = 1; i < out.entry().dir_contents_size(); i++)
         {
 
           string full_path = front1 + "/" + out.entry().dir_contents(i); // 拼接获取全路径
@@ -4819,7 +4816,7 @@ void MetadataStore::Rename_Internal(
       }
       else
       { // gaoxuan --还没有找到
-        for (int i = 0; i < out.entry().dir_contents_size(); i++)
+        for (int i = 1; i < out.entry().dir_contents_size(); i++)
         {
 
           string full_path = front1 + "/" + out.entry().dir_contents(i); // 拼接获取全路径
@@ -4871,7 +4868,7 @@ void MetadataStore::Rename_Internal(
     // If file already exists, fail.
     // gaoxuan --check if exist a file with same name in the Parent dir of to_path
     string to_filename = FileName(in.to_path());
-    for (int i = 0; i < parent_to_entry.dir_contents_size(); i++)
+    for (int i = 1; i < parent_to_entry.dir_contents_size(); i++)
     {
       if (parent_to_entry.dir_contents(i) == to_filename)
       {
@@ -5086,7 +5083,7 @@ void MetadataStore::Rename_Internal(
       }
       else
       { // gaoxuan --还没有找到
-        for (int i = 0; i < out.entry().dir_contents_size(); i++)
+        for (int i = 1; i < out.entry().dir_contents_size(); i++)
         {
           string full_path = front1 + "/" + out.entry().dir_contents(i); // 拼接获取全路径
 
@@ -5188,7 +5185,7 @@ void MetadataStore::Rename_Internal(
       }
       else
       { // gaoxuan --还没有找到
-        for (int i = 0; i < out.entry().dir_contents_size(); i++)
+        for (int i = 1; i < out.entry().dir_contents_size(); i++)
         {
 
           string full_path = front1 + "/" + out.entry().dir_contents(i); // 拼接获取全路径
@@ -5449,7 +5446,7 @@ void MetadataStore::Rename_Internal(
       }
       else
       { // gaoxuan --还没有找到
-        for (int i = 0; i < out.entry().dir_contents_size(); i++)
+        for (int i = 1; i < out.entry().dir_contents_size(); i++)
         {
 
           string full_path = front1 + "/" + out.entry().dir_contents(i); // 拼接获取全路径
@@ -5557,7 +5554,7 @@ void MetadataStore::Rename_Internal(
       }
       else
       { // gaoxuan --还没有找到
-        for (int i = 0; i < out.entry().dir_contents_size(); i++)
+        for (int i = 1; i < out.entry().dir_contents_size(); i++)
         {
           string full_path = front1 + "/" + out.entry().dir_contents(i); // 拼接获取全路径
 
