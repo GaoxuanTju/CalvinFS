@@ -2965,10 +2965,6 @@ void MetadataStore::GetRWSets(Action *action)
           delete serialized;
           MetadataAction::LookupOutput out;
           out.ParseFromString(b.output());
-          // 上面是获取这个路径的元数据项的过程
-          // 当前路径的元数据项就在out.entry()里面
-          // 将这一层的元数据项都拼接一下放入队列
-          // 这样做到分层点之下的没加入读写集，也没必要加入？分层点之下的修改，这是要修改的
 
           if (front.find("b") == std::string::npos)
           {
@@ -4591,16 +4587,16 @@ void MetadataStore::Rename_Internal(
     context->PutEntry(to_parent, parent_to_entry);
     string from_filename = FileName(in.from_path());
     // 源父目录删除
-    for (int i = 1; i < Parent_from_entry.dir_contents_size(); i++)
+    for (int i = 1; i < parent_from_entry.dir_contents_size(); i++)
     {
-      if (Parent_from_entry.dir_contents(i) == from_filename)
+      if (parent_from_entry.dir_contents(i) == from_filename)
       {
         // Remove reference to target file entry from dir contents.
-        Parent_from_entry.mutable_dir_contents()
-            ->SwapElements(i, Parent_from_entry.dir_contents_size() - 1);
-        Parent_from_entry.mutable_dir_contents()->RemoveLast();
+        parent_from_entry.mutable_dir_contents()
+            ->SwapElements(i, parent_from_entry.dir_contents_size() - 1);
+        parent_from_entry.mutable_dir_contents()->RemoveLast();
         // Write updated parent entry.
-        context->PutEntry(from_parent, Parent_from_entry);
+        context->PutEntry(from_parent, parent_from_entry);
         break;
       }
     }
