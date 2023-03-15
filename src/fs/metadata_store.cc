@@ -4584,12 +4584,12 @@ void MetadataStore::Rename_Internal(
       out->add_errors(MetadataAction::FileDoesNotExist);
       return;
     }
-
+    //注意在这里，如果父目录完全一样，parent_from_entry和parent_to_entry是一样的
     // 现在原位置和目的位置的父目录的元数据项都拿到了
     // 判断目的路径的父目录下是不是重复
     string to_filename = FileName(in.to_path());
     for (int i = 1; i < parent_to_entry.dir_contents_size(); i++)
-    {
+    {//这一步不会有问题，
       if (parent_to_entry.dir_contents(i) == to_filename)
       {
         LOG(ERROR) << "file already exists, fail.";
@@ -4598,13 +4598,19 @@ void MetadataStore::Rename_Internal(
         return;
       }
     }
+
     // 目的父目录添加到最后的元数据项
+    //所以问题出现在这一步了，写回没写回去，原因呢
     parent_to_entry.add_dir_contents(to_filename);
-    context->PutEntry(to_parent, parent_to_entry);
+    if(from_parent != to_parent)
+    {//如果键相同，只add，不put
+          context->PutEntry(to_parent, parent_to_entry);
+    }
+
     string from_filename = FileName(in.from_path());
     // 源父目录删除
     for (int i = 1; i < parent_from_entry.dir_contents_size(); i++)
-    {
+    {//这一步正常进行了，反而是上面一步没正常进行，猜测是这一步给上一步覆盖了，那么就区分开
       if (parent_from_entry.dir_contents(i) == from_filename)
       {
         // Remove reference to target file entry from dir contents.
@@ -4615,7 +4621,9 @@ void MetadataStore::Rename_Internal(
         context->PutEntry(from_parent, parent_from_entry);
         break;
       }
-    }
+    }  
+
+
 
     // 将原位置的拷贝过来，创建新的目的目录的元数据项
     string origin_path = "/" + Parent_from_entry.dir_contents(0) + FileName(from_path);
