@@ -4598,15 +4598,12 @@ void MetadataStore::Rename_Internal(
         return;
       }
     }
-
+if(from_parent != to_parent)
+{
     // 目的父目录添加到最后的元数据项
     //所以问题出现在这一步了，写回没写回去，原因呢
     parent_to_entry.add_dir_contents(to_filename);
-    if(from_parent != to_parent)
-    {//如果键相同，只add，不put
-          context->PutEntry(to_parent, parent_to_entry);
-    }
-
+    context->PutEntry(to_parent, parent_to_entry);
     string from_filename = FileName(in.from_path());
     // 源父目录删除
     for (int i = 1; i < parent_from_entry.dir_contents_size(); i++)
@@ -4622,7 +4619,27 @@ void MetadataStore::Rename_Internal(
         break;
       }
     }  
+}
+else
+{
 
+    parent_from_entry.add_dir_contents(to_filename);
+    string from_filename = FileName(in.from_path());
+    // 源父目录删除
+    for (int i = 1; i < parent_from_entry.dir_contents_size(); i++)
+    {//这一步正常进行了，反而是上面一步没正常进行，猜测是这一步给上一步覆盖了，那么就区分开
+      if (parent_from_entry.dir_contents(i) == from_filename)
+      {
+        // Remove reference to target file entry from dir contents.
+        parent_from_entry.mutable_dir_contents()
+            ->SwapElements(i, parent_from_entry.dir_contents_size() - 1);
+        parent_from_entry.mutable_dir_contents()->RemoveLast();
+        // Write updated parent entry.
+        context->PutEntry(from_parent, parent_from_entry);
+        break;
+      }
+    }    
+}
 
 
     // 将原位置的拷贝过来，创建新的目的目录的元数据项
