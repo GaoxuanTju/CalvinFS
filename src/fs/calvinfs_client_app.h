@@ -879,7 +879,7 @@ public:
 
     Spin(1);
     // gaoxuan --function Init() is used to initialize the metadata of dir and file which used for Rename
-    dir_tree = new BTNode;           // 老忘记，使用指针前，最少要指向一个地方
+    dir_tree = new BTNode;            // 老忘记，使用指针前，最少要指向一个地方
     metadata_->Init_for_10(dir_tree); // gaoxuan --Init() is in metadat_store.cc,参数用于存储目录树
     Spin(1);
     machine()->GlobalBarrier();
@@ -897,42 +897,44 @@ public:
     double start = GetTime();
     string from_path;
     string to_path;
-
+    while (a3 == a5)
+    {
+      a5 = rand() % 2;
+    }
     from_path = "/a_0" + IntToString(machine()->machine_id()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2) + "/a_3" + IntToString(a3) + "/a_4" + IntToString(a4);
-    to_path = "/a_0" + IntToString(rand() % machine()->config().size()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2) + "/a_3" + IntToString(a3) + "/A" + IntToString(machine()->GetGUID());
-//上面是到相同父目录下
-      uint64 from_id = config_->LookupMetadataShard(config_->HashFileName(from_path), config_->LookupReplica(machine()->machine_id()));
-      uint64 to_id = config_->LookupMetadataShard(config_->HashFileName(to_path), config_->LookupReplica(machine()->machine_id()));
-      LOG(ERROR) << from_path << " in machine[" << from_id << "]  renamed to   " << to_path << " in machine[" << to_id << "]";
+    to_path = "/a_0" + IntToString(rand() % machine()->config().size()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2) + "/a_3" + IntToString(a5) + "/A" + IntToString(machine()->GetGUID());
+    // 上面是到相同父目录下
+    uint64 from_id = config_->LookupMetadataShard(config_->HashFileName(from_path), config_->LookupReplica(machine()->machine_id()));
+    uint64 to_id = config_->LookupMetadataShard(config_->HashFileName(to_path), config_->LookupReplica(machine()->machine_id()));
+    LOG(ERROR) << from_path << " in machine[" << from_id << "]  renamed to   " << to_path << " in machine[" << to_id << "]";
     BackgroundRenameFile(from_path, to_path);
 
-/*
-    for (int j = 0; j < 2; j++)
-    {
-      int a1 = rand() % 5;
-      int a2 = rand() % 5;
-      while (a2 == a1)
-      {
-        a2 = rand() % 5;
-      }
+    /*
+        for (int j = 0; j < 2; j++)
+        {
+          int a1 = rand() % 5;
+          int a2 = rand() % 5;
+          while (a2 == a1)
+          {
+            a2 = rand() % 5;
+          }
 
-      string from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1) + "/c" + IntToString(j);
-      string to_path = "/a" + IntToString(rand() % machine()->config().size()) + "/b" + IntToString(a2) + "/d" + IntToString(machine()->GetGUID());
-      uint64 from_id = config_->LookupMetadataShard(config_->HashFileName(from_path), config_->LookupReplica(machine()->machine_id()));
-      uint64 to_id = config_->LookupMetadataShard(config_->HashFileName(to_path), config_->LookupReplica(machine()->machine_id()));
-      LOG(ERROR) << from_path << " in machine[" << from_id << "]  renamed to   " << to_path << " in machine[" << to_id << "]";
-      BackgroundRenameFile(from_path,
-                           to_path);
+          string from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1) + "/c" + IntToString(j);
+          string to_path = "/a" + IntToString(rand() % machine()->config().size()) + "/b" + IntToString(a2) + "/d" + IntToString(machine()->GetGUID());
+          uint64 from_id = config_->LookupMetadataShard(config_->HashFileName(from_path), config_->LookupReplica(machine()->machine_id()));
+          uint64 to_id = config_->LookupMetadataShard(config_->HashFileName(to_path), config_->LookupReplica(machine()->machine_id()));
+          LOG(ERROR) << from_path << " in machine[" << from_id << "]  renamed to   " << to_path << " in machine[" << to_id << "]";
+          BackgroundRenameFile(from_path,
+                               to_path);
 
-      if (j % 50 == 0)
-      {
+          if (j % 50 == 0)
+          {
 
-        LOG(ERROR) << "[" << machine()->machine_id() << "] "
-                   << "Test progress : " << j / 50 << "/" << 5;
-      }
-    }
-*/    
-
+            LOG(ERROR) << "[" << machine()->machine_id() << "] "
+                       << "Test progress : " << j / 50 << "/" << 5;
+          }
+        }
+    */
 
     // Wait for all operations to finish.
     while (capacity_.load() < kMaxCapacity)
@@ -946,10 +948,10 @@ public:
     LOG(ERROR) << "Renamed "
                << "1 files. Elapsed time:"
                << (GetTime() - start) << " seconds";
-Spin(10);               
-metadata_->getLOOKUP("");
-   // Spin(1);
-   // print_dir_tree(dir_tree);
+    Spin(10);
+    metadata_->getLOOKUP("");
+    // Spin(1);
+    // print_dir_tree(dir_tree);
   }
   void DeleteExperiment()
   { // gaoxuan --删除文件的实验
@@ -1028,18 +1030,13 @@ metadata_->getLOOKUP("");
     LOG(ERROR) << machine()->machine_id() << " path: " << from_path8 << " in " << config_->LookupMetadataShard(config_->HashFileName(from_path8), config_->LookupReplica(machine()->machine_id()));
     BackgroundLS(from_path8);
 
+    /*
+        LOG(ERROR) << machine()->machine_id() << " path: " << from_path7 << " in " << config_->LookupMetadataShard(config_->HashFileName(from_path7), config_->LookupReplica(machine()->machine_id()));
+        BackgroundLS(from_path7);
+        LOG(ERROR) << machine()->machine_id() << " path: " << from_path8 << " in " << config_->LookupMetadataShard(config_->HashFileName(from_path8), config_->LookupReplica(machine()->machine_id()));
+        BackgroundLS(from_path8);
 
-/*
-    LOG(ERROR) << machine()->machine_id() << " path: " << from_path7 << " in " << config_->LookupMetadataShard(config_->HashFileName(from_path7), config_->LookupReplica(machine()->machine_id()));
-    BackgroundLS(from_path7);
-    LOG(ERROR) << machine()->machine_id() << " path: " << from_path8 << " in " << config_->LookupMetadataShard(config_->HashFileName(from_path8), config_->LookupReplica(machine()->machine_id()));
-    BackgroundLS(from_path8);
-
-*/
-
-
-
-
+    */
 
     /*
        for(int i = 0; i < 10000 ; i++)
