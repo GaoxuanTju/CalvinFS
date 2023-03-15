@@ -2345,7 +2345,7 @@ void MetadataStore::Init_for_10(BTNode *dir_tree)
                   if (i_7 == 0)
                   {
                     // gaoxuan --如果是第一个节点，就将他作为上一层的孩子
-                    a_6_level->child = temp_a;
+                    b_level->child = temp_a;
                     a_7_level = temp_a; // a_level指针作为上一个兄弟节点
                   }
                   else
