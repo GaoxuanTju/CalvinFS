@@ -1017,7 +1017,7 @@ public:
 
     string from_path6 = from_path5 + "/a_5" + IntToString(a5);
 
-    string from_path7 = from_path6 "/b" + IntToString(a6);
+    string from_path7 = from_path6 + "/b" + IntToString(a6);
 
     string from_path8 = from_path7 + "/c" + IntToString(a7);
 
