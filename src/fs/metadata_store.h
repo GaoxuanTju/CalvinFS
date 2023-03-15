@@ -13,38 +13,39 @@
 #include "components/store/store.h"
 #include "fs/metadata.pb.h"
 
-//gaoxuan --下面的二叉链表用于存储目录树
+// gaoxuan --下面的二叉链表用于存储目录树
 typedef struct BTNode
 {
-  string path;//路径名字
-  struct BTNode *child;//该节点的孩子节点
-  struct BTNode *sibling;//该节点的兄弟节点
-}BTNode;
+  string path;            // 路径名字
+  struct BTNode *child;   // 该节点的孩子节点
+  struct BTNode *sibling; // 该节点的兄弟节点
+} BTNode;
 
 class CalvinFSConfigMap;
 class Machine;
 class VersionedKVStore;
 class ExecutionContext;
-class MetadataStore : public Store {
- public:
+class MetadataStore : public Store
+{
+public:
   // Takes ownership of '*store'.
   // Requires: '*store' is entirely empty.
-  explicit MetadataStore(VersionedKVStore* store);
+  explicit MetadataStore(VersionedKVStore *store);
   virtual ~MetadataStore();
 
   // Inherited from Store, defined in fs/metadata_store.cc:
-  virtual void GetRWSets(Action* action);
-  virtual void Run(Action* action);
+  virtual void GetRWSets(Action *action);
+  virtual void Run(Action *action);
   void getLOOKUP(string path);
-  void SetMachine(Machine* m);
-  void Init();  //gaoxuan --这是原本的函数
+  void SetMachine(Machine *m);
+  void Init(); // gaoxuan --这是原本的函数
   void Init(BTNode *dir_tree);
-  void Init(BTNode *dir_tree,string level );
+  void Init(BTNode *dir_tree, string level);
   void Init_for_depth(BTNode *dir_tree);
   void Init_for_8(BTNode *dir_tree);
+  void Init_for_10(BTNode *dir_tree);
   void InitSmall();
 
-  
   string getAPPname()
   {
     return APP_name;
@@ -54,78 +55,75 @@ class MetadataStore : public Store {
     APP_name = name;
   }
   string APP_name;
- 
 
-  
-  VersionedKVStore* getStore_()
+  VersionedKVStore *getStore_()
   {
     return store_;
-  } 
-  Machine* get_machine_()
+  }
+  Machine *get_machine_()
   {
     return machine_;
-  } 
+  }
 
- private:
+private:
   void CreateFile_Internal(
-      ExecutionContext* context,
-      const MetadataAction::CreateFileInput& in,
-      MetadataAction::CreateFileOutput* out);
+      ExecutionContext *context,
+      const MetadataAction::CreateFileInput &in,
+      MetadataAction::CreateFileOutput *out);
 
   void Erase_Internal(
-      ExecutionContext* context,
-      const MetadataAction::EraseInput& in,
-      MetadataAction::EraseOutput* out);
+      ExecutionContext *context,
+      const MetadataAction::EraseInput &in,
+      MetadataAction::EraseOutput *out);
 
   void Copy_Internal(
-      ExecutionContext* context,
-      const MetadataAction::CopyInput& in,
-      MetadataAction::CopyOutput* out);
+      ExecutionContext *context,
+      const MetadataAction::CopyInput &in,
+      MetadataAction::CopyOutput *out);
 
   void Rename_Internal(
-      ExecutionContext* context,
-      const MetadataAction::RenameInput& in,
-      MetadataAction::RenameOutput* out);
+      ExecutionContext *context,
+      const MetadataAction::RenameInput &in,
+      MetadataAction::RenameOutput *out);
 
   void Lookup_Internal(
-      ExecutionContext* context,
-      const MetadataAction::LookupInput& in,
-      MetadataAction::LookupOutput* out);
+      ExecutionContext *context,
+      const MetadataAction::LookupInput &in,
+      MetadataAction::LookupOutput *out);
   void Tree_Lookup_Internal(
-      ExecutionContext* context,
-      const MetadataAction::Tree_LookupInput& in,
-      MetadataAction::Tree_LookupOutput* out);
+      ExecutionContext *context,
+      const MetadataAction::Tree_LookupInput &in,
+      MetadataAction::Tree_LookupOutput *out);
   void Resize_Internal(
-      ExecutionContext* context,
-      const MetadataAction::ResizeInput& in,
-      MetadataAction::ResizeOutput* out);
+      ExecutionContext *context,
+      const MetadataAction::ResizeInput &in,
+      MetadataAction::ResizeOutput *out);
 
   void Write_Internal(
-      ExecutionContext* context,
-      const MetadataAction::WriteInput& in,
-      MetadataAction::WriteOutput* out);
+      ExecutionContext *context,
+      const MetadataAction::WriteInput &in,
+      MetadataAction::WriteOutput *out);
 
   void Append_Internal(
-      ExecutionContext* context,
-      const MetadataAction::AppendInput& in,
-      MetadataAction::AppendOutput* out);
+      ExecutionContext *context,
+      const MetadataAction::AppendInput &in,
+      MetadataAction::AppendOutput *out);
 
   void ChangePermissions_Internal(
-      ExecutionContext* context,
-      const MetadataAction::ChangePermissionsInput& in,
-      MetadataAction::ChangePermissionsOutput* out);
+      ExecutionContext *context,
+      const MetadataAction::ChangePermissionsInput &in,
+      MetadataAction::ChangePermissionsOutput *out);
 
-  virtual bool IsLocal(const string& path);
+  virtual bool IsLocal(const string &path);
 
   // Map of file paths to serialized MetadataEntries.
-  VersionedKVStore* store_;
+  VersionedKVStore *store_;
 
   // Pointer to local machine (for distributed action execution contexts).
-  Machine* machine_;
+  Machine *machine_;
 
   // Partitioning/replication configuration. Must be set if machine_ != NULL.
-  CalvinFSConfigMap* config_;
+  CalvinFSConfigMap *config_;
 };
 
-#endif  // CALVIN_FS_METADATA_STORE_H_
-
+#endif // CALVIN_FS_METADATA_STORE_H_

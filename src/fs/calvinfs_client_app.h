@@ -879,7 +879,7 @@ public:
 
     Spin(1);
     // gaoxuan --function Init() is used to initialize the metadata of dir and file which used for Rename
-    dir_tree = new BTNode;     // 老忘记，使用指针前，最少要指向一个地方
+    dir_tree = new BTNode;           // 老忘记，使用指针前，最少要指向一个地方
     metadata_->Init_for_8(dir_tree); // gaoxuan --Init() is in metadat_store.cc,参数用于存储目录树
     Spin(1);
     machine()->GlobalBarrier();
@@ -965,57 +965,53 @@ public:
   { // gaoxuan --删除文件的实验
     Spin(1);
     dir_tree = new BTNode;
-    metadata_->Init_for_8(dir_tree);
+    metadata_->Init_for_10(dir_tree);
     Spin(1);
     machine()->GlobalBarrier();
     Spin(1);
-    
-    int a1 = rand()%2;
-    int a2 = rand()%2;
-    int a3 = rand()%2;
-    int a4 = rand()%2;
-    int a5 = rand()%2;
-    int a6 = rand()%2;
-    int a7 = rand()%2;
-    int a8 = rand()%2;
-    int a9 = rand()%2;
-    int a10 = rand()%2;
-    int a11 = rand()%2;
-    int a12 = rand()%2;
-    int a13 = rand()%2;
-    int a14 = rand()%2;
-    int a15 = rand()%2;
-    int a16 = rand()%2;
-    int a17 = rand()%2;
-    int a18 = rand()%2;
-    int a19 = rand()%2;
-    int a20 = rand()%2;
 
+    int a1 = rand() % 2;
+    int a2 = rand() % 2;
+    int a3 = rand() % 2;
+    int a4 = rand() % 2;
+    int a5 = rand() % 2;
+    int a6 = rand() % 2;
+    int a7 = rand() % 2;
+    int a8 = rand() % 2;
+    int a9 = rand() % 2;
+    int a10 = rand() % 2;
+    int a11 = rand() % 2;
+    int a12 = rand() % 2;
+    int a13 = rand() % 2;
+    int a14 = rand() % 2;
+    int a15 = rand() % 2;
+    int a16 = rand() % 2;
+    int a17 = rand() % 2;
+    int a18 = rand() % 2;
+    int a19 = rand() % 2;
+    int a20 = rand() % 2;
 
-    
     double start = GetTime();
-    //string from_path = "/a_0" + IntToString(machine()->machine_id());
-    //string from_path = "/a_0" + IntToString(machine()->machine_id())+"/a_1" + IntToString(a1);
-   string from_path5 = "/a_0" + IntToString(machine()->machine_id())+"/a_1" + IntToString(a1)+"/a_2" + IntToString(a2)+"/a_3" + IntToString(a3)+"/a_4" + IntToString(a4);
+    // string from_path = "/a_0" + IntToString(machine()->machine_id());
+    // string from_path = "/a_0" + IntToString(machine()->machine_id())+"/a_1" + IntToString(a1);
+    string from_path5 = "/a_0" + IntToString(machine()->machine_id()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2) + "/a_3" + IntToString(a3) + "/a_4" + IntToString(a4);
 
-   string from_path6 = "/a_0" + IntToString(machine()->machine_id())+"/a_1" + IntToString(a1)+"/a_2" + IntToString(a2)+"/a_3" + IntToString(a3)+"/a_4" + IntToString(a4)
-   +"/a_5" + IntToString(a5) ;
+    string from_path6 = "/a_0" + IntToString(machine()->machine_id()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2) + "/a_3" + IntToString(a3) + "/a_4" + IntToString(a4) + "/a_5" + IntToString(a5);
 
-    string from_path7 = "/a_0" + IntToString(machine()->machine_id())+"/a_1" + IntToString(a1)+"/a_2" + IntToString(a2)+"/a_3" + IntToString(a3)+"/a_4" + IntToString(a4)
-   +"/a_5" + IntToString(a5)+"/b" + IntToString(a6) ;
+    string from_path7 = "/a_0" + IntToString(machine()->machine_id()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2) + "/a_3" + IntToString(a3) + "/a_4" + IntToString(a4) + "/a_5" + IntToString(a5) + "/b" + IntToString(a6);
 
-   string from_path8 = from_path7 + "/c"+ IntToString(a7);
-      string from_path9 = from_path8 + "/c"+ IntToString(a8);
-   string from_path0 = from_path9 + "/c"+ IntToString(a9);    
-  LOG(ERROR)<<machine()->machine_id()<<" path: "<<from_path5<<" in "<<config_->LookupMetadataShard(config_->HashFileName(from_path),config_->LookupReplica(machine()->machine_id()));
-  BackgroundLS(from_path5);
-/*
-   for(int i = 0; i < 10000 ; i++)
-   {
-        BackgroundLS(from_path);
+    string from_path8 = from_path7 + "/c" + IntToString(a7);
+    string from_path9 = from_path8 + "/c" + IntToString(a8);
+    string from_path0 = from_path9 + "/c" + IntToString(a9);
+    LOG(ERROR) << machine()->machine_id() << " path: " << from_path5 << " in " << config_->LookupMetadataShard(config_->HashFileName(from_path5), config_->LookupReplica(machine()->machine_id()));
+    BackgroundLS(from_path5);
+    /*
+       for(int i = 0; i < 10000 ; i++)
+       {
+            BackgroundLS(from_path);
 
-   }
-*/
+       }
+    */
 
     // Wait for all operations to finish.
     while (capacity_.load() < kMaxCapacity)
@@ -1026,7 +1022,6 @@ public:
     LOG(ERROR) << "[" << machine()->machine_id() << "] "
                << "LS " << 1 << " files. Elapsed time: "
                << (GetTime() - start) << " seconds";
-
   }
 
   void LatencyExperimentRenameFile()
@@ -1434,7 +1429,7 @@ public:
       }
       --capacity_;
     }
- 
+
     machine()->SendMessage(header, new MessageBuffer());
   }
 
