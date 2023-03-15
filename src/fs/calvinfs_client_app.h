@@ -1005,6 +1005,9 @@ public:
     string from_path0 = from_path9 + "/c" + IntToString(a9);
     LOG(ERROR) << machine()->machine_id() << " path: " << from_path6 << " in " << config_->LookupMetadataShard(config_->HashFileName(from_path6), config_->LookupReplica(machine()->machine_id()));
     BackgroundLS(from_path6);
+
+
+/*
     LOG(ERROR) << machine()->machine_id() << " path: " << from_path7 << " in " << config_->LookupMetadataShard(config_->HashFileName(from_path7), config_->LookupReplica(machine()->machine_id()));
     BackgroundLS(from_path7);
     LOG(ERROR) << machine()->machine_id() << " path: " << from_path8 << " in " << config_->LookupMetadataShard(config_->HashFileName(from_path8), config_->LookupReplica(machine()->machine_id()));
@@ -1015,7 +1018,7 @@ public:
     LOG(ERROR) << machine()->machine_id() << " path: " << from_path0 << " in " << config_->LookupMetadataShard(config_->HashFileName(from_path0), config_->LookupReplica(machine()->machine_id()));
     BackgroundLS(from_path0);
 
-
+*/
 
 
     /*
