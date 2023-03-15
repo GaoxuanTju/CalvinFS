@@ -996,15 +996,28 @@ public:
     // string from_path = "/a_0" + IntToString(machine()->machine_id())+"/a_1" + IntToString(a1);
     string from_path5 = "/a_0" + IntToString(machine()->machine_id()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2) + "/a_3" + IntToString(a3) + "/a_4" + IntToString(a4);
 
-    string from_path6 = "/a_0" + IntToString(machine()->machine_id()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2) + "/a_3" + IntToString(a3) + "/a_4" + IntToString(a4) + "/a_5" + IntToString(a5);
+    string from_path6 = from_path5 + "/a_5" + IntToString(a5);
 
     string from_path7 = "/a_0" + IntToString(machine()->machine_id()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2) + "/a_3" + IntToString(a3) + "/a_4" + IntToString(a4) + "/a_5" + IntToString(a5) + "/b" + IntToString(a6);
 
     string from_path8 = from_path7 + "/c" + IntToString(a7);
     string from_path9 = from_path8 + "/c" + IntToString(a8);
     string from_path0 = from_path9 + "/c" + IntToString(a9);
-    LOG(ERROR) << machine()->machine_id() << " path: " << from_path5 << " in " << config_->LookupMetadataShard(config_->HashFileName(from_path5), config_->LookupReplica(machine()->machine_id()));
-    BackgroundLS(from_path5);
+    LOG(ERROR) << machine()->machine_id() << " path: " << from_path6 << " in " << config_->LookupMetadataShard(config_->HashFileName(from_path6), config_->LookupReplica(machine()->machine_id()));
+    BackgroundLS(from_path6);
+    LOG(ERROR) << machine()->machine_id() << " path: " << from_path7 << " in " << config_->LookupMetadataShard(config_->HashFileName(from_path7), config_->LookupReplica(machine()->machine_id()));
+    BackgroundLS(from_path7);
+    LOG(ERROR) << machine()->machine_id() << " path: " << from_path8 << " in " << config_->LookupMetadataShard(config_->HashFileName(from_path8), config_->LookupReplica(machine()->machine_id()));
+    BackgroundLS(from_path8);
+
+    LOG(ERROR) << machine()->machine_id() << " path: " << from_path9 << " in " << config_->LookupMetadataShard(config_->HashFileName(from_path9), config_->LookupReplica(machine()->machine_id()));
+    BackgroundLS(from_path9);
+    LOG(ERROR) << machine()->machine_id() << " path: " << from_path0 << " in " << config_->LookupMetadataShard(config_->HashFileName(from_path0), config_->LookupReplica(machine()->machine_id()));
+    BackgroundLS(from_path0);
+
+
+
+
     /*
        for(int i = 0; i < 10000 ; i++)
        {
