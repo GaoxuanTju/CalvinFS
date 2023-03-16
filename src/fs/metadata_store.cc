@@ -3575,7 +3575,7 @@ void MetadataStore::GetRWSets(Action *action)
         // 目的位置的分层点元数据项就在to_split_entry这个里面
 
         string from_uid = from_split_entry.dir_contents(0);
-        string to_uid = to_split_entry.dir_contents(0);
+        string to_uid = to_split_entry.dir_contents(0);//注意注意，这两个id很大可能相同嗷，别大意，到时候测试也是要基于这一点再思考
         // 下面要获得父目录
         string from_parent = ParentDir(from_path);
         string to_parent = ParentDir(to_path);

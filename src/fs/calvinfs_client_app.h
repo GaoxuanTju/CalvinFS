@@ -910,7 +910,7 @@ public:
     from_path = "/a_0" + IntToString(machine()->machine_id()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2) + "/a_3" + IntToString(a3) 
     + "/a_4" + IntToString(a4) + "/a_5" + IntToString(a5) + "/b" + IntToString(a6) + "/c" + IntToString(a7);
     to_path = "/a_0" + IntToString(rand() % machine()->config().size()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2) + "/a_3" + IntToString(a3) 
-    + "/a_4" + IntToString(a4) + "/a_5" + IntToString(a5) + "/b" + IntToString(a9) + "/c" + IntToString(a7);    // 上面是到相同父目录下
+    + "/a_4" + IntToString(a4) + "/a_5" + IntToString(a5) + "/b" + IntToString(a9) + IntToString(machine()->GetGUID());    // 上面是到相同父目录下
     uint64 from_id = config_->LookupMetadataShard(config_->HashFileName(from_path), config_->LookupReplica(machine()->machine_id()));
     uint64 to_id = config_->LookupMetadataShard(config_->HashFileName(to_path), config_->LookupReplica(machine()->machine_id()));
     LOG(ERROR) << from_path << " in machine[" << from_id << "]  renamed to   " << to_path << " in machine[" << to_id << "]";
