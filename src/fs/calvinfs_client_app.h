@@ -1056,8 +1056,8 @@ public:
     + "/a_15" + IntToString(a15) + "/a_16" + IntToString(a16) + "/a_17" + IntToString(a17) + "/a_18" + IntToString(a18) +"/a_19" + IntToString(a19);    
 
 
-    LOG(ERROR) << machine()->machine_id() << " path: " << from_path15 << " in " << config_->LookupMetadataShard(config_->HashFileName(from_path15), config_->LookupReplica(machine()->machine_id()));
-    BackgroundLS(from_path15);
+    LOG(ERROR) << machine()->machine_id() << " path: " << from_path20 << " in " << config_->LookupMetadataShard(config_->HashFileName(from_path20), config_->LookupReplica(machine()->machine_id()));
+    BackgroundLS(from_path20);
 
     /*
         LOG(ERROR) << machine()->machine_id() << " path: " << from_path7 << " in " << config_->LookupMetadataShard(config_->HashFileName(from_path7), config_->LookupReplica(machine()->machine_id()));
