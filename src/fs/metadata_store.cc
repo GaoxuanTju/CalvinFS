@@ -4078,6 +4078,7 @@ void MetadataStore::Run(Action *action)
 {
   // gaoxuan --this part will be executed by scheduler after action has beed append to log
   //  Prepare by performing all reads.
+  LOG(ERROR)<<"进入Run了吗？";
   ExecutionContext *context;
   if (machine_ == NULL)
   {
@@ -4095,7 +4096,7 @@ void MetadataStore::Run(Action *action)
     delete context;
     return;
   }
-
+  LOG(ERROR)<<"不是write吗？";
   // Execute action.
   MetadataAction::Type type =
       static_cast<MetadataAction::Type>(action->action_type());
@@ -5446,6 +5447,7 @@ void MetadataStore::Rename_Internal(
   { // TODO4: hash到树
     // 原位置是hash，先搜到分层点，再
     //  1.1搜到原位置的分层点
+    LOG(ERROR)<<"从hash到树";
     int p = from_path.find("b");
     string tree_name = from_path.substr(0, p - 1);
     string hash_name = from_path.substr(p);
@@ -5744,7 +5746,7 @@ void MetadataStore::Rename_Internal(
           }
         }
       }
-
+      LOG(ERROR)<<"internal 出循环了";
       //   Update to_parent (add new dir content)
       if (from_parent != to_parent)
       {
