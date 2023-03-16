@@ -2552,10 +2552,6 @@ void MetadataStore::getLOOKUP(string path)
     string front1 = queue2.front();
     queue1.pop();
     queue2.pop();
-    if(front.find("b") != std::string::npos)
-    {
-      return;
-    }
     LOG(ERROR)<<front1;
     uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
     Header *header = new Header();
@@ -2656,6 +2652,7 @@ void MetadataStore::getLOOKUP(string path)
     }
 
   }
+  LOG(ERROR)<<"finished LOOKUP";
 }
 void MetadataStore::GetRWSets(Action *action)
 { // gaoxuan --this function is called by RameFile() for RenameExperiment
