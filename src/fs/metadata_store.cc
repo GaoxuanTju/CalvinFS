@@ -2539,7 +2539,7 @@ bool MetadataStore::IsLocal(const string &path)
 }
 
 void MetadataStore::getLOOKUP(string path)
-{
+{//输出整棵树
   string root = "";
   string root1 = "";
   std::queue<string> queue1;
@@ -2565,6 +2565,8 @@ void MetadataStore::getLOOKUP(string path)
     header->set_app("client");
     header->set_rpc("LOOKUP");
     header->add_misc_string(front.c_str(), strlen(front.c_str()));
+/*
+//为了输出大于八层的树，暂时先屏蔽掉拆分
     // 下面是路径拆分
     if (front != "")
     {
@@ -2609,6 +2611,7 @@ void MetadataStore::getLOOKUP(string path)
       }
       header->set_from_length(flag);
     }
+*/
 
     MessageBuffer *m = NULL;
     header->set_data_ptr(reinterpret_cast<uint64>(&m));
@@ -2625,6 +2628,8 @@ void MetadataStore::getLOOKUP(string path)
     delete serialized;
     MetadataAction::LookupOutput out;
     out.ParseFromString(b.output());
+    if(front1.find("b") == std::string::npos)
+    {//这是树部分
             for (int i = 1; i < out.entry().dir_contents_size(); i++)
             {
               string full_path = front1 + "/" + out.entry().dir_contents(i); // 拼接获取全路径
@@ -2633,9 +2638,23 @@ void MetadataStore::getLOOKUP(string path)
                 root = "/" + out.entry().dir_contents(0) + out.entry().dir_contents(i);
                 queue1.push(root);
                 queue2.push(root1);
-               
-              
-            }
+
+            }      
+    }
+    else
+    {
+            for (int i = 1; i < out.entry().dir_contents_size(); i++)
+            {
+              string full_path = front1 + "/" + out.entry().dir_contents(i); // 拼接获取全路径
+
+                root1 = full_path;
+                root = front + "/" + out.entry().dir_contents(i);
+                queue1.push(root);
+                queue2.push(root1);
+
+            }       
+    }
+
   }
 }
 void MetadataStore::GetRWSets(Action *action)

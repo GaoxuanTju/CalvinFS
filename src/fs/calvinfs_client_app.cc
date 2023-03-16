@@ -72,33 +72,53 @@ MessageBuffer *CalvinFSClientApp::GetMetadataEntry(const Slice &path)
     // 第一步：将from_path.data()拆分放进split_string里面，拆完后，不够八个格子的，使用五个空格填充上
     // 拆分的算法，遇到一个/就把之前的字符串放进去
     // 将拆分后的元素添加去的方法：header->add_split_string(拆分的字符串)
-    int flag = 0;       // 用来标识此时split_string 里面有多少子串
-    char pattern = '/'; // 根据/进行字符串拆分
-
-    string temp_from = path.data();
-    temp_from = temp_from.substr(1, temp_from.size()); // 这一行是为了去除最前面的/
-    temp_from = temp_from + pattern;                   // 在最后面添加一个/便于处理
-    int pos = temp_from.find(pattern);                 // 找到第一个/的位置
-    while (pos != std::string::npos)                   // 循环不断找/，找到一个拆分一次
+    // 下面是路径拆分
+/*
+//为了输出超过八层的树，暂时先把拆分屏蔽掉
+    if (front != "")
     {
-      string temp1 = temp_from.substr(0, pos); // temp里面就是拆分出来的第一个子串
-      string temp = temp1;
-      for (int i = temp.size(); i < 5; i++)
+      int flag = 0;       // 用来标识此时split_string 里面有多少子串
+      char pattern = '/'; // 根据/进行字符串拆分
+      string temp_from = front.c_str();
+      temp_from = temp_from.substr(1, temp_from.size()); // 这一行是为了去除最前面的/
+      temp_from = temp_from + pattern;                   // 在最后面添加一个/便于处理
+      int pos = temp_from.find(pattern);                 // 找到第一个/的位置
+      while (pos != std::string::npos)                   // 循环不断找/，找到一个拆分一次
       {
-        temp = temp + " ";
+        string temp1 = temp_from.substr(0, pos); // temp里面就是拆分出来的第一个子串
+        string temp = temp1;
+        for (int i = temp.size(); i < 5; i++)
+        {
+          temp = temp + " ";
+        }
+        header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+        flag++;                              // 拆分的字符串数量++
+        temp_from = temp_from.substr(pos + 1, temp_from.size());
+        pos = temp_from.find(pattern);
       }
-      header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
-      flag++;                              // 拆分的字符串数量++
-      temp_from = temp_from.substr(pos + 1, temp_from.size());
-      pos = temp_from.find(pattern);
+      header->set_from_length(flag);
+      while (flag != 8)
+      {
+        string temp = "     ";               // 用五个空格填充一下
+        header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+        flag++;                              // 拆分的字符串数量++
+      }
+
+      // 这一行之前是gaoxuan添加的
     }
-    header->set_from_length(flag);
-    while (flag != 8)
+    else
     {
-      string temp = "     ";               // 用五个空格填充一下
-      header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
-      flag++;                              // 拆分的字符串数量++
+
+      int flag = 0; // 用来标识此时split_string 里面有多少子串
+      while (flag != 8)
+      {
+        string temp = "     ";               // 用五个空格填充一下
+        header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+        flag++;                              // 拆分的字符串数量++
+      }
+      header->set_from_length(flag);
     }
+*/
 
     // 这一行之前是gaoxuan添加的
 
