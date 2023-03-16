@@ -4078,7 +4078,7 @@ void MetadataStore::Run(Action *action)
 {
   // gaoxuan --this part will be executed by scheduler after action has beed append to log
   //  Prepare by performing all reads.
-  LOG(ERROR)<<"进入Run了吗？";
+
   ExecutionContext *context;
   if (machine_ == NULL)
   {
@@ -4096,7 +4096,7 @@ void MetadataStore::Run(Action *action)
     delete context;
     return;
   }
-  LOG(ERROR)<<"不是write吗？";
+
   // Execute action.
   MetadataAction::Type type =
       static_cast<MetadataAction::Type>(action->action_type());
@@ -4127,7 +4127,7 @@ void MetadataStore::Run(Action *action)
   }
   else if (type == MetadataAction::RENAME)
   {
-    // LOG(ERROR)<<"Run is executing!";
+    LOG(ERROR)<<"Rename 正在run";
     MetadataAction::RenameInput in;
     MetadataAction::RenameOutput out;
     in.ParseFromString(action->input());
