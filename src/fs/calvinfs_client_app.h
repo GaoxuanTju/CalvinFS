@@ -908,7 +908,7 @@ public:
     */
 
 
-/*
+
 
     from_path = "/a_0" + IntToString(machine()->machine_id()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2) + "/a_3" + IntToString(a3) 
     + "/a_4" + IntToString(a4) + "/a_5" + IntToString(a5) + "/b" + IntToString(a6) + "/c" + IntToString(a7);
@@ -918,7 +918,7 @@ public:
     uint64 to_id = config_->LookupMetadataShard(config_->HashFileName(to_path), config_->LookupReplica(machine()->machine_id()));
     LOG(ERROR) << from_path << " in machine[" << from_id << "]  renamed to   " << to_path << " in machine[" << to_id << "]";
     BackgroundRenameFile(from_path, to_path);
-*/
+
 
 
     /*
@@ -960,7 +960,7 @@ public:
     LOG(ERROR) << "Renamed "
                << "1 files. Elapsed time:"
                << (GetTime() - start) << " seconds";
-   // Spin(10);
+    Spin(10);
     metadata_->getLOOKUP("");
     // Spin(1);
     // print_dir_tree(dir_tree);
