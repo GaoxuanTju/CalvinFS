@@ -69,11 +69,7 @@ MessageBuffer *CalvinFSClientApp::GetMetadataEntry(const Slice &path)
     header->add_misc_string(path.data(), path.size());
     // gaoxuan --在这里发出消息之前，把from_path.data()和to_path.data()拆分一下
 
-    // 第一步：将from_path.data()拆分放进split_string里面，拆完后，不够八个格子的，使用五个空格填充上
-    // 拆分的算法，遇到一个/就把之前的字符串放进去
-    // 将拆分后的元素添加去的方法：header->add_split_string(拆分的字符串)
-    // 下面是路径拆分
-
+/*
     // 为了输出超过八层的树，暂时先把拆分屏蔽掉
     if (path.data() != "")
     {
@@ -120,6 +116,9 @@ MessageBuffer *CalvinFSClientApp::GetMetadataEntry(const Slice &path)
     }
 
     // 这一行之前是gaoxuan添加的
+*/
+
+
 
     MessageBuffer *m = NULL;
     header->set_data_ptr(reinterpret_cast<uint64>(&m));

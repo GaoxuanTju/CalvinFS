@@ -1015,7 +1015,7 @@ public:
   { // gaoxuan --删除文件的实验
     Spin(1);
     dir_tree = new BTNode;
-    metadata_->Init_for_10(dir_tree);
+    metadata_->Init_for_30(dir_tree);
     Spin(1);
     machine()->GlobalBarrier();
     Spin(1);
@@ -1052,8 +1052,8 @@ public:
 
     string from_path8 = from_path7 + "/c" + IntToString(a7);
 
-    LOG(ERROR) << machine()->machine_id() << " path: " << from_path8 << " in " << config_->LookupMetadataShard(config_->HashFileName(from_path8), config_->LookupReplica(machine()->machine_id()));
-    BackgroundLS(from_path8);
+    LOG(ERROR) << machine()->machine_id() << " path: " << from_path5 << " in " << config_->LookupMetadataShard(config_->HashFileName(from_path5), config_->LookupReplica(machine()->machine_id()));
+    BackgroundLS(from_path5);
 
     /*
         LOG(ERROR) << machine()->machine_id() << " path: " << from_path7 << " in " << config_->LookupMetadataShard(config_->HashFileName(from_path7), config_->LookupReplica(machine()->machine_id()));
@@ -1438,9 +1438,9 @@ public:
 
     // gaoxuan --在这里发出消息之前，把from_path.data()和to_path.data()拆分一下
 
-    // 第一步：将from_path.data()拆分放进split_string里面，拆完后，不够八个格子的，使用空格填充上
-    // 拆分的算法，遇到一个/就把之前的字符串放进去
-    // 将拆分后的元素添加去的方法：header->add_split_string(拆分的字符串)
+
+/*
+//拆分路径
     int flag = 0;       // 用来标识此时split_string 里面有多少子串
     char pattern = '/'; // 根据/进行字符串拆分
 
@@ -1470,6 +1470,9 @@ public:
     }
 
     // 这一行之前是gaoxuan添加的
+*/
+
+
     if (reporting_ && rand() % 2 == 0)
     {
       header->set_callback_app(name());
