@@ -5671,7 +5671,6 @@ void MetadataStore::Rename_Internal(
     string desti_path = "/" + Parent_to_entry.dir_contents(0) + FileName(to_path);
 
     MetadataEntry from_entry;
-    LOG(ERROR)<<"不存在的路径是："<<origin_path;
     if (!context->GetEntry(origin_path, &from_entry))
     {
       // File doesn't exist!
