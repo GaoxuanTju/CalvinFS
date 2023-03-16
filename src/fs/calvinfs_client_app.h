@@ -1045,15 +1045,19 @@ public:
     // string from_path = "/a_0" + IntToString(machine()->machine_id());
     // string from_path = "/a_0" + IntToString(machine()->machine_id())+"/a_1" + IntToString(a1);
     string from_path5 = "/a_0" + IntToString(machine()->machine_id()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2) + "/a_3" + IntToString(a3) + "/a_4" + IntToString(a4);
+    string from_path10 = "/a_0" + IntToString(machine()->machine_id()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2) + "/a_3" + IntToString(a3) + "/a_4" + IntToString(a4)
+    + "/a_5" + IntToString(a5) + "/a_6" + IntToString(a6) + "/a_7" + IntToString(a7) + "/a_8" + IntToString(a8) +"/a_9" + IntToString(a9);
+    string from_path15 = "/a_0" + IntToString(machine()->machine_id()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2) + "/a_3" + IntToString(a3) + "/a_4" + IntToString(a4)
+    + "/a_5" + IntToString(a5) + "/a_6" + IntToString(a6) + "/a_7" + IntToString(a7) + "/a_8" + IntToString(a8) +"/a_9" + IntToString(a9)
+    + "/a_10" + IntToString(a10) + "/a_11" + IntToString(a11) + "/a_12" + IntToString(a12) + "/a_13" + IntToString(a13) +"/a_14" + IntToString(a14);
+    string from_path20 = "/a_0" + IntToString(machine()->machine_id()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2) + "/a_3" + IntToString(a3) + "/a_4" + IntToString(a4)
+    + "/a_5" + IntToString(a5) + "/a_6" + IntToString(a6) + "/a_7" + IntToString(a7) + "/a_8" + IntToString(a8) +"/a_9" + IntToString(a9)
+    + "/a_10" + IntToString(a10) + "/a_11" + IntToString(a11) + "/a_12" + IntToString(a12) + "/a_13" + IntToString(a13) +"/a_14" + IntToString(a14)
+    + "/a_15" + IntToString(a15) + "/a_16" + IntToString(a16) + "/a_17" + IntToString(a17) + "/a_18" + IntToString(a18) +"/a_19" + IntToString(a19);    
 
-    string from_path6 = from_path5 + "/a_5" + IntToString(a5);
 
-    string from_path7 = from_path6 + "/b" + IntToString(a6);
-
-    string from_path8 = from_path7 + "/c" + IntToString(a7);
-
-    LOG(ERROR) << machine()->machine_id() << " path: " << from_path5 << " in " << config_->LookupMetadataShard(config_->HashFileName(from_path5), config_->LookupReplica(machine()->machine_id()));
-    BackgroundLS(from_path5);
+    LOG(ERROR) << machine()->machine_id() << " path: " << from_path10 << " in " << config_->LookupMetadataShard(config_->HashFileName(from_path10), config_->LookupReplica(machine()->machine_id()));
+    BackgroundLS(from_path10);
 
     /*
         LOG(ERROR) << machine()->machine_id() << " path: " << from_path7 << " in " << config_->LookupMetadataShard(config_->HashFileName(from_path7), config_->LookupReplica(machine()->machine_id()));
