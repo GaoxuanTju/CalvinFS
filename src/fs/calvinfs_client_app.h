@@ -1057,7 +1057,11 @@ public:
 
 
     LOG(ERROR) << machine()->machine_id() << " path: " << from_path20 << " in " << config_->LookupMetadataShard(config_->HashFileName(from_path20), config_->LookupReplica(machine()->machine_id()));
-    BackgroundLS(from_path20);
+   for(int i = 0; i < 10000 ; i++)
+   {
+        BackgroundLS(from_path20);
+   }
+
 
     /*
         LOG(ERROR) << machine()->machine_id() << " path: " << from_path7 << " in " << config_->LookupMetadataShard(config_->HashFileName(from_path7), config_->LookupReplica(machine()->machine_id()));
@@ -1082,7 +1086,7 @@ public:
     }
     // Report.
     LOG(ERROR) << "[" << machine()->machine_id() << "] "
-               << "LS " << 1 << " files. Elapsed time: "
+               << "LS " << 10000 << " files. Elapsed time: "
                << (GetTime() - start) << " seconds";
   }
 
