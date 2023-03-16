@@ -3550,7 +3550,7 @@ void MetadataStore::GetRWSets(Action *action)
           delete serialized;
           MetadataAction::LookupOutput out;
           out.ParseFromString(b.output());
-          if (front1 == tree_name) // 判断树部分是否搜索完成
+          if (front1 == tree_name1) // 判断树部分是否搜索完成
           {
             to_split_entry = out.entry();
             break;
@@ -4846,7 +4846,7 @@ else
       delete serialized;
       MetadataAction::LookupOutput out;
       out.ParseFromString(b.output());
-      if (front1 == tree_name) // 判断树部分是否搜索完成
+      if (front1 == tree_name1) // 判断树部分是否搜索完成
       {
         to_split_entry = out.entry();
         break;
@@ -4918,8 +4918,18 @@ else
     // gaoxuan --the part above is used to check if we can rename
     // gaoxuan --in the following part we should change it to a loop
     //  Update to_parent (add new dir content)
+    //这块可能有错误
+    int flag = 0;//用来标记父目录是不是会一样
+if(to_parent != from_parent)
+{
     parent_to_entry.add_dir_contents(to_filename);
-    context->PutEntry(to_parent, parent_to_entry);
+    context->PutEntry(to_parent, parent_to_entry);  
+}    
+else
+{
+  flag = true;
+}
+
 
     string origin_path = "/" + from_uid + from_path.substr(p);
     string desti_path = "/" + to_uid + to_path.substr(p1);
@@ -4960,6 +4970,12 @@ else
         MetadataEntry parent_from_entry1;
         context->GetEntry(parent_from_path1, &parent_from_entry1);
         // 下面实现将原位置的父目录内对应项删除
+        if(flag == true && parent_from_path1 == from_parent)
+        {
+          //
+          parent_from_entry1.add_dir_contents(to_filename);
+        }
+
         for (int i = 1; i < parent_from_entry1.dir_contents_size(); i++)
         {
           if (parent_from_entry1.dir_contents(i) == from_filename)
@@ -5010,6 +5026,11 @@ else
       MetadataEntry parent_from_entry1;
       context->GetEntry(parent_from_path1, &parent_from_entry1);
 
+      if(flag == true)
+      {
+        //原目录和目的目录都是一个父亲
+        parent_from_entry1.add_dir_contents(to_filename);
+      }
       for (int i = 1; i < parent_from_entry1.dir_contents_size(); i++)
       {
         if (parent_from_entry1.dir_contents(i) == from_filename)
