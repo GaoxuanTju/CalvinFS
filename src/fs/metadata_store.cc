@@ -4016,7 +4016,7 @@ void MetadataStore::GetRWSets(Action *action)
           {
             for (int i = 1; i < out.entry().dir_contents_size(); i++)
             {
-              string child_path = front + out.entry().dir_contents(i);
+              string child_path = front + "/" + out.entry().dir_contents(i);
               queue1.push(child_path);
               string tree_path = "/" + out.entry().dir_contents(0) + out.entry().dir_contents(i);
               queue2.push(tree_path);
@@ -5707,16 +5707,13 @@ void MetadataStore::Rename_Internal(
       }
     }
     // hash到树元数据项要怎么放置
-    //   Update to_parent (add new dir content)
-    parent_to_entry.add_dir_contents(to_filename);
-    context->PutEntry(to_parent, parent_to_entry);
 
     // 里面进行一下修改
     if ((from_entry.type() == DIR) && (from_entry.dir_contents_size() != 0)) // gaoxuan --only if the object we want to rename is DIR we need to loop,if its a file we don't need loop
     {
       // gaoxuan --use BFS to add new metadata entry
-      std::queue<string> queue1; // 这个用来遍历树
-      std::queue<string> queue2; // 这个用来遍历hash
+      std::queue<string> queue1; // 这个用来遍历hash
+      std::queue<string> queue2; // 这个用来遍历树
       string from_root = origin_path;
       queue1.push(from_root);
       queue2.push(desti_path);
@@ -5740,12 +5737,23 @@ void MetadataStore::Rename_Internal(
         {
           for (int i = 1; i < from_entry1.dir_contents_size(); i++)
           {
-            string child_path = front + from_entry1.dir_contents(i);
+            string child_path = front + "/" + from_entry1.dir_contents(i);
             queue1.push(child_path);
             string tree_path = "/" + from_entry1.dir_contents(0) + from_entry1.dir_contents(i);
             queue2.push(tree_path);
           }
         }
+      }
+
+      //   Update to_parent (add new dir content)
+      if (from_parent != to_parent)
+      {
+        parent_to_entry.add_dir_contents(to_filename);
+        context->PutEntry(to_parent, parent_to_entry);
+      }
+      else
+      {
+        parent_from_entry.add_dir_contents(to_filename);
       }
       string from_filename = FileName(in.from_path());
       // 源父目录删除
@@ -5762,6 +5770,43 @@ void MetadataStore::Rename_Internal(
           break;
         }
       }
+    }
+    else
+    {
+      // 原目录是个文件
+      MetadataEntry to_entry1;   // gaoxuan --the entry which will be added
+      MetadataEntry from_entry1; // gaoxuan --the entry which will be used to copy to to_entry
+      context->GetEntry(origin_path, &from_entry1);
+      to_entry1.CopyFrom(from_entry1);
+      context->PutEntry(desti_path, to_entry1);
+      // gaoxuan --this part is used to delete the old entry
+      //  Update from_parent(Find file and remove it from parent directory.)
+      if (from_parent != to_parent)
+      {
+        parent_to_entry.add_dir_contents(to_filename);
+        context->PutEntry(to_parent, parent_to_entry);
+      }
+      else
+      {
+        parent_from_entry.add_dir_contents(to_filename);
+      }
+      string from_filename = FileName(in.from_path());
+      // 源父目录删除
+      for (int i = 1; i < parent_from_entry.dir_contents_size(); i++)
+      {
+        if (parent_from_entry.dir_contents(i) == from_filename)
+        {
+          // Remove reference to target file entry from dir contents.
+          parent_from_entry.mutable_dir_contents()
+              ->SwapElements(i, parent_from_entry.dir_contents_size() - 1);
+          parent_from_entry.mutable_dir_contents()->RemoveLast();
+          // Write updated parent entry.
+          context->PutEntry(from_parent, parent_from_entry);
+          break;
+        }
+      }
+      // Erase the from_entry
+      context->DeleteEntry(origin_path);
     }
   }
 }
