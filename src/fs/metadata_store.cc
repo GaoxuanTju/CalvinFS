@@ -7813,6 +7813,9 @@ void MetadataStore::Tree_Lookup_Internal(
       header->set_app("client");
       header->set_rpc("LOOKUP");
       header->add_misc_string(front.c_str(), strlen(front.c_str()));
+/*
+//屏蔽掉拆分
+
 
       if (front != "")
       {
@@ -7863,6 +7866,7 @@ void MetadataStore::Tree_Lookup_Internal(
         }
         header->set_from_length(flag);
       }
+*/
 
       MessageBuffer *m = NULL;
       header->set_data_ptr(reinterpret_cast<uint64>(&m));
