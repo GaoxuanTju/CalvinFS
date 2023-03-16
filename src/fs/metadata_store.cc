@@ -3673,7 +3673,7 @@ void MetadataStore::GetRWSets(Action *action)
           {
             for (int i = 1; i < out.entry().dir_contents_size(); i++)
             {
-              string child_path = front + out.entry().dir_contents(i);
+              string child_path = front + "/" + out.entry().dir_contents(i);
               queue1.push(child_path);
             }
           }
