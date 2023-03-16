@@ -1056,10 +1056,10 @@ public:
     + "/a_15" + IntToString(a15) + "/a_16" + IntToString(a16) + "/a_17" + IntToString(a17) + "/a_18" + IntToString(a18) +"/a_19" + IntToString(a19);    
 
 
-    LOG(ERROR) << machine()->machine_id() << " path: " << from_path10 << " in " << config_->LookupMetadataShard(config_->HashFileName(from_path10), config_->LookupReplica(machine()->machine_id()));
+    LOG(ERROR) << machine()->machine_id() << " path: " << from_path5 << " in " << config_->LookupMetadataShard(config_->HashFileName(from_path5), config_->LookupReplica(machine()->machine_id()));
    for(int i = 0; i < 10000 ; i++)
    {
-        BackgroundLS(from_path10);
+        BackgroundLS(from_path5);
    }
 
 
