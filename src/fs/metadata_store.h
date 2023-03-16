@@ -42,7 +42,7 @@ public:
   void Init(BTNode *dir_tree);
   void Init(BTNode *dir_tree, string level);
   void Init_for_depth(BTNode *dir_tree);
-  void Init_for_8(BTNode *dir_tree);
+  void Init_for_30(BTNode *dir_tree);
   void Init_for_10(BTNode *dir_tree);
   void InitSmall();
 
