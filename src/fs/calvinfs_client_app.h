@@ -973,8 +973,8 @@ public:
     LOG(ERROR) << "Renamed "
                << "1 files. Elapsed time:"
                << (GetTime() - start) << " seconds";
-  //  Spin(10);
-  //  metadata_->getLOOKUP("");
+    Spin(10);
+    metadata_->getLOOKUP("");
     // Spin(1);
     // print_dir_tree(dir_tree);
   }
