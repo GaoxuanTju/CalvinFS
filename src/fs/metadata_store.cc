@@ -4130,7 +4130,7 @@ void MetadataStore::Run(Action *action)
   }
   else if (type == MetadataAction::RENAME)
   {
-    LOG(ERROR)<<"Rename 正在run";
+
     MetadataAction::RenameInput in;
     MetadataAction::RenameOutput out;
     in.ParseFromString(action->input());
@@ -5450,7 +5450,7 @@ void MetadataStore::Rename_Internal(
   { // TODO4: hash到树
     // 原位置是hash，先搜到分层点，再
     //  1.1搜到原位置的分层点
-    LOG(ERROR)<<"从hash到树";
+
     int p = from_path.find("b");
     string tree_name = from_path.substr(0, p - 1);
     string hash_name = from_path.substr(p);
@@ -5671,6 +5671,7 @@ void MetadataStore::Rename_Internal(
     string desti_path = "/" + Parent_to_entry.dir_contents(0) + FileName(to_path);
 
     MetadataEntry from_entry;
+    LOG(ERROR)<<"不存在的路径是："<<origin_path;
     if (!context->GetEntry(origin_path, &from_entry))
     {
       // File doesn't exist!
@@ -5749,7 +5750,7 @@ void MetadataStore::Rename_Internal(
           }
         }
       }
-      LOG(ERROR)<<"internal 出循环了";
+  
       //   Update to_parent (add new dir content)
       if (from_parent != to_parent)
       {
