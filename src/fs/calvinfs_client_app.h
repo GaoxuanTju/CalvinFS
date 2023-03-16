@@ -897,7 +897,7 @@ public:
     double start = GetTime();
     string from_path;
     string to_path;
-    while (a5 == a9)
+    while (a4 == a9)
     {
       a9 = rand() % 2;
     }
@@ -919,7 +919,7 @@ public:
 
     // 五层rename到八层，测试树到hash
     from_path = "/a_0" + IntToString(machine()->machine_id()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2) + "/a_3" + IntToString(a3) + "/a_4" + IntToString(a4);
-    to_path = "/a_0" + IntToString(rand() % machine()->config().size()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2) + "/a_3" + IntToString(a3) + "/a_4" + IntToString(a4) + "/a_5" + IntToString(a9) + "/b" + IntToString(a6) + "/A" + IntToString(machine()->GetGUID());
+    to_path = "/a_0" + IntToString(rand() % machine()->config().size()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2) + "/a_3" + IntToString(a3) + "/a_4" + IntToString(a9) + "/a_5" + IntToString(a5) + "/b" + IntToString(a6) + "/A" + IntToString(machine()->GetGUID());
 
     uint64 from_id = config_->LookupMetadataShard(config_->HashFileName(from_path), config_->LookupReplica(machine()->machine_id()));
     uint64 to_id = config_->LookupMetadataShard(config_->HashFileName(to_path), config_->LookupReplica(machine()->machine_id()));

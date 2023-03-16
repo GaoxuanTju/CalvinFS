@@ -3343,15 +3343,15 @@ void MetadataStore::GetRWSets(Action *action)
           MetadataAction::LookupOutput out;
           out.ParseFromString(b.output());
           if (front.find("b") == std::string::npos)
-          {
+          { // 从树一直向下搜，目前还是树
             // 不是分层点
             if (out.success() && out.entry().type() == DIR)
             {
               string uid = out.entry().dir_contents(0);
               for (int i = 1; i < out.entry().dir_contents_size(); i++)
               {
-                string child_path = "/" + uid + out.entry().dir_contents(i);
-                string full_path = writeset + "/" + out.entry().dir_contents(i);
+                string child_path = "/" + uid + out.entry().dir_contents(i);     // 树的遍历路径
+                string full_path = writeset + "/" + out.entry().dir_contents(i); // 目的地hash的拼接路径
                 queue1.push(child_path);
                 queue2.push(full_path);
               }
@@ -3361,7 +3361,8 @@ void MetadataStore::GetRWSets(Action *action)
           {
             if (out.success() && out.entry().type() == DIR)
             {
-              // 相比树状，也就是路径加入方式换一下
+              // 搜到了hash位置，那现在front里面已经是 /uid+bx,只需要在后面继续拼接，不再需要uid了
+              //  相比树状，也就是路径加入方式换一下
               for (int i = 1; i < out.entry().dir_contents_size(); i++)
               {
                 string child_path = front + "/" + out.entry().dir_contents(i);
@@ -5322,9 +5323,6 @@ void MetadataStore::Rename_Internal(
         return;
       }
     }
-    //  Update to_parent (add new dir content)
-    parent_to_entry.add_dir_contents(to_filename);
-    context->PutEntry(to_parent, parent_to_entry);
 
     if ((from_entry.type() == DIR) && (from_entry.dir_contents_size() != 0)) // gaoxuan --only if the object we want to rename is DIR we need to loop,if its a file we don't need loop
     {
@@ -5380,18 +5378,28 @@ void MetadataStore::Rename_Internal(
           }
         }
       }
+
+      if (from_parent != to_parent)
+      {
+        parent_to_entry.add_dir_contents(to_filename);
+        context->PutEntry(to_parent, parent_to_entry);
+      }
+      else
+      {
+        parent_from_entry.add_dir_contents(to_filename);
+      }
       string from_filename = FileName(in.from_path());
       // 源父目录删除
-      for (int i = 1; i < Parent_from_entry.dir_contents_size(); i++)
+      for (int i = 1; i < parent_from_entry.dir_contents_size(); i++)
       {
-        if (Parent_from_entry.dir_contents(i) == from_filename)
+        if (parent_from_entry.dir_contents(i) == from_filename)
         {
           // Remove reference to target file entry from dir contents.
-          Parent_from_entry.mutable_dir_contents()
-              ->SwapElements(i, Parent_from_entry.dir_contents_size() - 1);
-          Parent_from_entry.mutable_dir_contents()->RemoveLast();
+          parent_from_entry.mutable_dir_contents()
+              ->SwapElements(i, parent_from_entry.dir_contents_size() - 1);
+          parent_from_entry.mutable_dir_contents()->RemoveLast();
           // Write updated parent entry.
-          context->PutEntry(from_parent, Parent_from_entry);
+          context->PutEntry(from_parent, parent_from_entry);
           break;
         }
       }
@@ -5406,18 +5414,27 @@ void MetadataStore::Rename_Internal(
       context->PutEntry(desti_path, to_entry1);
       // gaoxuan --this part is used to delete the old entry
       //  Update from_parent(Find file and remove it from parent directory.)
+      if (from_parent != to_parent)
+      {
+        parent_to_entry.add_dir_contents(to_filename);
+        context->PutEntry(to_parent, parent_to_entry);
+      }
+      else
+      {
+        parent_from_entry.add_dir_contents(to_filename);
+      }
       string from_filename = FileName(in.from_path());
       // 源父目录删除
-      for (int i = 1; i < Parent_from_entry.dir_contents_size(); i++)
+      for (int i = 1; i < parent_from_entry.dir_contents_size(); i++)
       {
-        if (Parent_from_entry.dir_contents(i) == from_filename)
+        if (parent_from_entry.dir_contents(i) == from_filename)
         {
           // Remove reference to target file entry from dir contents.
-          Parent_from_entry.mutable_dir_contents()
-              ->SwapElements(i, Parent_from_entry.dir_contents_size() - 1);
-          Parent_from_entry.mutable_dir_contents()->RemoveLast();
+          parent_from_entry.mutable_dir_contents()
+              ->SwapElements(i, parent_from_entry.dir_contents_size() - 1);
+          parent_from_entry.mutable_dir_contents()->RemoveLast();
           // Write updated parent entry.
-          context->PutEntry(from_parent, Parent_from_entry);
+          context->PutEntry(from_parent, parent_from_entry);
           break;
         }
       }
