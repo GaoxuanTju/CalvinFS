@@ -2539,7 +2539,7 @@ bool MetadataStore::IsLocal(const string &path)
 }
 
 void MetadataStore::getLOOKUP(string path)
-{//输出整棵树
+{ // 输出整棵树
   string root = "";
   string root1 = "";
   std::queue<string> queue1;
@@ -2552,7 +2552,7 @@ void MetadataStore::getLOOKUP(string path)
     string front1 = queue2.front();
     queue1.pop();
     queue2.pop();
-    LOG(ERROR)<<front1;
+    LOG(ERROR) << front1;
     uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
     Header *header = new Header();
     header->set_from(machine_->machine_id());
@@ -2561,53 +2561,53 @@ void MetadataStore::getLOOKUP(string path)
     header->set_app("client");
     header->set_rpc("LOOKUP");
     header->add_misc_string(front.c_str(), strlen(front.c_str()));
-/*
-//为了输出大于八层的树，暂时先屏蔽掉拆分
-    // 下面是路径拆分
-    if (front != "")
-    {
-      int flag = 0;       // 用来标识此时split_string 里面有多少子串
-      char pattern = '/'; // 根据/进行字符串拆分
-      string temp_from = front.c_str();
-      temp_from = temp_from.substr(1, temp_from.size()); // 这一行是为了去除最前面的/
-      temp_from = temp_from + pattern;                   // 在最后面添加一个/便于处理
-      int pos = temp_from.find(pattern);                 // 找到第一个/的位置
-      while (pos != std::string::npos)                   // 循环不断找/，找到一个拆分一次
-      {
-        string temp1 = temp_from.substr(0, pos); // temp里面就是拆分出来的第一个子串
-        string temp = temp1;
-        for (int i = temp.size(); i < 5; i++)
+    /*
+    //为了输出大于八层的树，暂时先屏蔽掉拆分
+        // 下面是路径拆分
+        if (front != "")
         {
-          temp = temp + " ";
+          int flag = 0;       // 用来标识此时split_string 里面有多少子串
+          char pattern = '/'; // 根据/进行字符串拆分
+          string temp_from = front.c_str();
+          temp_from = temp_from.substr(1, temp_from.size()); // 这一行是为了去除最前面的/
+          temp_from = temp_from + pattern;                   // 在最后面添加一个/便于处理
+          int pos = temp_from.find(pattern);                 // 找到第一个/的位置
+          while (pos != std::string::npos)                   // 循环不断找/，找到一个拆分一次
+          {
+            string temp1 = temp_from.substr(0, pos); // temp里面就是拆分出来的第一个子串
+            string temp = temp1;
+            for (int i = temp.size(); i < 5; i++)
+            {
+              temp = temp + " ";
+            }
+            header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+            flag++;                              // 拆分的字符串数量++
+            temp_from = temp_from.substr(pos + 1, temp_from.size());
+            pos = temp_from.find(pattern);
+          }
+          header->set_from_length(flag);
+          while (flag != 8)
+          {
+            string temp = "     ";               // 用五个空格填充一下
+            header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+            flag++;                              // 拆分的字符串数量++
+          }
+
+          // 这一行之前是gaoxuan添加的
         }
-        header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
-        flag++;                              // 拆分的字符串数量++
-        temp_from = temp_from.substr(pos + 1, temp_from.size());
-        pos = temp_from.find(pattern);
-      }
-      header->set_from_length(flag);
-      while (flag != 8)
-      {
-        string temp = "     ";               // 用五个空格填充一下
-        header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
-        flag++;                              // 拆分的字符串数量++
-      }
+        else
+        {
 
-      // 这一行之前是gaoxuan添加的
-    }
-    else
-    {
-
-      int flag = 0; // 用来标识此时split_string 里面有多少子串
-      while (flag != 8)
-      {
-        string temp = "     ";               // 用五个空格填充一下
-        header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
-        flag++;                              // 拆分的字符串数量++
-      }
-      header->set_from_length(flag);
-    }
-*/
+          int flag = 0; // 用来标识此时split_string 里面有多少子串
+          while (flag != 8)
+          {
+            string temp = "     ";               // 用五个空格填充一下
+            header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+            flag++;                              // 拆分的字符串数量++
+          }
+          header->set_from_length(flag);
+        }
+    */
 
     MessageBuffer *m = NULL;
     header->set_data_ptr(reinterpret_cast<uint64>(&m));
@@ -2624,35 +2624,32 @@ void MetadataStore::getLOOKUP(string path)
     delete serialized;
     MetadataAction::LookupOutput out;
     out.ParseFromString(b.output());
-    if(front1.find("b") == std::string::npos)
-    {//这是树部分
-            for (int i = 1; i < out.entry().dir_contents_size(); i++)
-            {
-              string full_path = front1 + "/" + out.entry().dir_contents(i); // 拼接获取全路径
+    if (front1.find("b") == std::string::npos)
+    { // 这是树部分
+      for (int i = 1; i < out.entry().dir_contents_size(); i++)
+      {
+        string full_path = front1 + "/" + out.entry().dir_contents(i); // 拼接获取全路径
 
-                root1 = full_path;
-                root = "/" + out.entry().dir_contents(0) + out.entry().dir_contents(i);
-                queue1.push(root);
-                queue2.push(root1);
-
-            }      
+        root1 = full_path;
+        root = "/" + out.entry().dir_contents(0) + out.entry().dir_contents(i);
+        queue1.push(root);
+        queue2.push(root1);
+      }
     }
     else
     {
-            for (int i = 1; i < out.entry().dir_contents_size(); i++)
-            {
-              string full_path = front1 + "/" + out.entry().dir_contents(i); // 拼接获取全路径
+      for (int i = 1; i < out.entry().dir_contents_size(); i++)
+      {
+        string full_path = front1 + "/" + out.entry().dir_contents(i); // 拼接获取全路径
 
-                root1 = full_path;
-                root = front + "/" + out.entry().dir_contents(i);
-                queue1.push(root);
-                queue2.push(root1);
-
-            }       
+        root1 = full_path;
+        root = front + "/" + out.entry().dir_contents(i);
+        queue1.push(root);
+        queue2.push(root1);
+      }
     }
-
   }
-  LOG(ERROR)<<"finished LOOKUP";
+  LOG(ERROR) << "finished LOOKUP";
 }
 void MetadataStore::GetRWSets(Action *action)
 { // gaoxuan --this function is called by RameFile() for RenameExperiment
@@ -3591,7 +3588,7 @@ void MetadataStore::GetRWSets(Action *action)
         // 目的位置的分层点元数据项就在to_split_entry这个里面
 
         string from_uid = from_split_entry.dir_contents(0);
-        string to_uid = to_split_entry.dir_contents(0);//注意注意，这两个id很大可能相同嗷，别大意，到时候测试也是要基于这一点再思考
+        string to_uid = to_split_entry.dir_contents(0); // 注意注意，这两个id很大可能相同嗷，别大意，到时候测试也是要基于这一点再思考
         // 下面要获得父目录
         string from_parent = ParentDir(from_path);
         string to_parent = ParentDir(to_path);
@@ -4600,12 +4597,12 @@ void MetadataStore::Rename_Internal(
       out->add_errors(MetadataAction::FileDoesNotExist);
       return;
     }
-    //注意在这里，如果父目录完全一样，parent_from_entry和parent_to_entry是一样的
-    // 现在原位置和目的位置的父目录的元数据项都拿到了
-    // 判断目的路径的父目录下是不是重复
+    // 注意在这里，如果父目录完全一样，parent_from_entry和parent_to_entry是一样的
+    //  现在原位置和目的位置的父目录的元数据项都拿到了
+    //  判断目的路径的父目录下是不是重复
     string to_filename = FileName(in.to_path());
     for (int i = 1; i < parent_to_entry.dir_contents_size(); i++)
-    {//这一步不会有问题，
+    { // 这一步不会有问题，
       if (parent_to_entry.dir_contents(i) == to_filename)
       {
         LOG(ERROR) << "file already exists, fail.";
@@ -4614,49 +4611,48 @@ void MetadataStore::Rename_Internal(
         return;
       }
     }
-if(from_parent != to_parent)
-{
-    // 目的父目录添加到最后的元数据项
-    //所以问题出现在这一步了，写回没写回去，原因呢
-    parent_to_entry.add_dir_contents(to_filename);
-    context->PutEntry(to_parent, parent_to_entry);
-    string from_filename = FileName(in.from_path());
-    // 源父目录删除
-    for (int i = 1; i < parent_from_entry.dir_contents_size(); i++)
-    {//这一步正常进行了，反而是上面一步没正常进行，猜测是这一步给上一步覆盖了，那么就区分开
-      if (parent_from_entry.dir_contents(i) == from_filename)
-      {
-        // Remove reference to target file entry from dir contents.
-        parent_from_entry.mutable_dir_contents()
-            ->SwapElements(i, parent_from_entry.dir_contents_size() - 1);
-        parent_from_entry.mutable_dir_contents()->RemoveLast();
-        // Write updated parent entry.
-        context->PutEntry(from_parent, parent_from_entry);
-        break;
+    if (from_parent != to_parent)
+    {
+      // 目的父目录添加到最后的元数据项
+      // 所以问题出现在这一步了，写回没写回去，原因呢
+      parent_to_entry.add_dir_contents(to_filename);
+      context->PutEntry(to_parent, parent_to_entry);
+      string from_filename = FileName(in.from_path());
+      // 源父目录删除
+      for (int i = 1; i < parent_from_entry.dir_contents_size(); i++)
+      { // 这一步正常进行了，反而是上面一步没正常进行，猜测是这一步给上一步覆盖了，那么就区分开
+        if (parent_from_entry.dir_contents(i) == from_filename)
+        {
+          // Remove reference to target file entry from dir contents.
+          parent_from_entry.mutable_dir_contents()
+              ->SwapElements(i, parent_from_entry.dir_contents_size() - 1);
+          parent_from_entry.mutable_dir_contents()->RemoveLast();
+          // Write updated parent entry.
+          context->PutEntry(from_parent, parent_from_entry);
+          break;
+        }
       }
-    }  
-}
-else
-{
+    }
+    else
+    {
 
-    parent_from_entry.add_dir_contents(to_filename);
-    string from_filename = FileName(in.from_path());
-    // 源父目录删除
-    for (int i = 1; i < parent_from_entry.dir_contents_size(); i++)
-    {//这一步正常进行了，反而是上面一步没正常进行，猜测是这一步给上一步覆盖了，那么就区分开
-      if (parent_from_entry.dir_contents(i) == from_filename)
-      {
-        // Remove reference to target file entry from dir contents.
-        parent_from_entry.mutable_dir_contents()
-            ->SwapElements(i, parent_from_entry.dir_contents_size() - 1);
-        parent_from_entry.mutable_dir_contents()->RemoveLast();
-        // Write updated parent entry.
-        context->PutEntry(from_parent, parent_from_entry);
-        break;
+      parent_from_entry.add_dir_contents(to_filename);
+      string from_filename = FileName(in.from_path());
+      // 源父目录删除
+      for (int i = 1; i < parent_from_entry.dir_contents_size(); i++)
+      { // 这一步正常进行了，反而是上面一步没正常进行，猜测是这一步给上一步覆盖了，那么就区分开
+        if (parent_from_entry.dir_contents(i) == from_filename)
+        {
+          // Remove reference to target file entry from dir contents.
+          parent_from_entry.mutable_dir_contents()
+              ->SwapElements(i, parent_from_entry.dir_contents_size() - 1);
+          parent_from_entry.mutable_dir_contents()->RemoveLast();
+          // Write updated parent entry.
+          context->PutEntry(from_parent, parent_from_entry);
+          break;
+        }
       }
-    }    
-}
-
+    }
 
     // 将原位置的拷贝过来，创建新的目的目录的元数据项
     string origin_path = "/" + Parent_from_entry.dir_contents(0) + FileName(from_path);
@@ -4934,18 +4930,17 @@ else
     // gaoxuan --the part above is used to check if we can rename
     // gaoxuan --in the following part we should change it to a loop
     //  Update to_parent (add new dir content)
-    //这块可能有错误
-    int flag = 0;//用来标记父目录是不是会一样
-if(to_parent != from_parent)
-{
-    parent_to_entry.add_dir_contents(to_filename);
-    context->PutEntry(to_parent, parent_to_entry);  
-}    
-else
-{
-  flag = true;
-}
-
+    // 这块可能有错误
+    int flag = 0; // 用来标记父目录是不是会一样
+    if (to_parent != from_parent)
+    {
+      parent_to_entry.add_dir_contents(to_filename);
+      context->PutEntry(to_parent, parent_to_entry);
+    }
+    else
+    {
+      flag = true;
+    }
 
     string origin_path = "/" + from_uid + from_path.substr(p);
     string desti_path = "/" + to_uid + to_path.substr(p1);
@@ -4986,7 +4981,7 @@ else
         MetadataEntry parent_from_entry1;
         context->GetEntry(parent_from_path1, &parent_from_entry1);
         // 下面实现将原位置的父目录内对应项删除
-        if(flag == true && parent_from_path1 == from_parent)
+        if (flag == true && parent_from_path1 == from_parent)
         {
           //
           parent_from_entry1.add_dir_contents(to_filename);
@@ -5042,9 +5037,9 @@ else
       MetadataEntry parent_from_entry1;
       context->GetEntry(parent_from_path1, &parent_from_entry1);
 
-      if(flag == true)
+      if (flag == true)
       {
-        //原目录和目的目录都是一个父亲
+        // 原目录和目的目录都是一个父亲
         parent_from_entry1.add_dir_contents(to_filename);
       }
       for (int i = 1; i < parent_from_entry1.dir_contents_size(); i++)
