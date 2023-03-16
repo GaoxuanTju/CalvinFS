@@ -44,6 +44,7 @@ public:
   void Init_for_depth(BTNode *dir_tree);
   void Init_for_30(BTNode *dir_tree);
   void Init_for_10(BTNode *dir_tree);
+  void Init_tree_20(BTNode *dir_tree);
   void InitSmall();
 
   string getAPPname()
