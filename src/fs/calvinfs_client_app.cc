@@ -73,8 +73,8 @@ MessageBuffer *CalvinFSClientApp::GetMetadataEntry(const Slice &path)
     // 拆分的算法，遇到一个/就把之前的字符串放进去
     // 将拆分后的元素添加去的方法：header->add_split_string(拆分的字符串)
     // 下面是路径拆分
-/*
-//为了输出超过八层的树，暂时先把拆分屏蔽掉
+
+    // 为了输出超过八层的树，暂时先把拆分屏蔽掉
     if (front != "")
     {
       int flag = 0;       // 用来标识此时split_string 里面有多少子串
@@ -118,7 +118,6 @@ MessageBuffer *CalvinFSClientApp::GetMetadataEntry(const Slice &path)
       }
       header->set_from_length(flag);
     }
-*/
 
     // 这一行之前是gaoxuan添加的
 
@@ -333,9 +332,8 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
   in.SerializeToString(a->mutable_input());
   metadata_->setAPPname(name());
   metadata_->GetRWSets(a);
-  
-  log_->Append(a);
 
+  log_->Append(a);
 
   MessageBuffer *m = NULL;
   while (!channel->Pop(&m))
@@ -345,18 +343,17 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
   }
   Action result;
   result.ParseFromArray((*m)[0].data(), (*m)[0].size());
-  delete m;  
+  delete m;
   MetadataAction::Tree_LookupOutput out;
   out.ParseFromString(result.output());
 
-
   if (out.success() && out.entry().type() == DIR)
   {
-    LOG(ERROR)<<"metadata entry of "<<path.data()<<" is :";
+    LOG(ERROR) << "metadata entry of " << path.data() << " is :";
     string *result = new string();
     for (int i = 0; i < out.entry().dir_contents_size(); i++)
     {
-      LOG(ERROR)<<out.entry().dir_contents(i);
+      LOG(ERROR) << out.entry().dir_contents(i);
       result->append(out.entry().dir_contents(i));
       result->append("\n");
     }
@@ -454,7 +451,7 @@ MessageBuffer *CalvinFSClientApp::RenameFile(const Slice &from_path, const Slice
   }
 }
 
-BTNode *CalvinFSClientApp::find_path(BTNode* dir_tree, string path, BTNode* &pre)
+BTNode *CalvinFSClientApp::find_path(BTNode *dir_tree, string path, BTNode *&pre)
 {
   BTNode *temp = dir_tree->child;
   pre = dir_tree;
@@ -462,7 +459,7 @@ BTNode *CalvinFSClientApp::find_path(BTNode* dir_tree, string path, BTNode* &pre
   char pattern = '/';
   string split_string = path;
   split_string = split_string + pattern; // 最后加个/便于处理
-  split_string = split_string.substr(1, split_string.size()); 
+  split_string = split_string.substr(1, split_string.size());
   while (temp != NULL && split_string != "")
   {
     int pos = split_string.find(pattern);
@@ -522,7 +519,7 @@ BTNode *CalvinFSClientApp::find_path(BTNode* dir_tree, string path, BTNode* &pre
     return temp;
   }
 }
-void CalvinFSClientApp::rename_dir_tree(BTNode* &dir_tree, string from_path, string to_path)
+void CalvinFSClientApp::rename_dir_tree(BTNode *&dir_tree, string from_path, string to_path)
 {
   // 这个函数用于根据from_path和to_path操作一下dir_tree这个目录树
   //  1、找：找到from，to路径的位置
@@ -533,16 +530,16 @@ void CalvinFSClientApp::rename_dir_tree(BTNode* &dir_tree, string from_path, str
   string parent_to_path = to_path.substr(0, pos);
 
   int pos_ = from_path.rfind('/');
-  string parent_from_path = from_path.substr(0,pos_);
+  string parent_from_path = from_path.substr(0, pos_);
 
   int index = to_path.rfind('/');
   string filename = to_path.substr(index + 1);
 
- //这里如果是父目录相同的话，只改名字不改指针，名字不同才需要改指针
+  // 这里如果是父目录相同的话，只改名字不改指针，名字不同才需要改指针
   BTNode *from = find_path(dir_tree, from_path, from_pre);
-  //父目录相同
-  //LOG(ERROR)<<from_path<<" to "<<to_path;
-  if(parent_from_path == parent_to_path) 
+  // 父目录相同
+  // LOG(ERROR)<<from_path<<" to "<<to_path;
+  if (parent_from_path == parent_to_path)
   {
     from->path = filename;
     return;
@@ -550,11 +547,11 @@ void CalvinFSClientApp::rename_dir_tree(BTNode* &dir_tree, string from_path, str
 
   BTNode *to = find_path(dir_tree, parent_to_path, to_pre);
 
-  if(from != NULL && to != NULL)
+  if (from != NULL && to != NULL)
   {
-    //todo：这现在有bug，文件名字不能和父亲的兄弟相同
+    // todo：这现在有bug，文件名字不能和父亲的兄弟相同
 
-    //检查会不会重名
+    // 检查会不会重名
     BTNode *check = to->child;
     while (check != NULL)
     {
@@ -563,27 +560,26 @@ void CalvinFSClientApp::rename_dir_tree(BTNode* &dir_tree, string from_path, str
         return; // 有同名文件
       }
       check = check->sibling;
-    }    
-    //如果是左孩子
-    if(from_pre->child != NULL)
+    }
+    // 如果是左孩子
+    if (from_pre->child != NULL)
     {
-      if(from_pre->child->path == from->path)
+      if (from_pre->child->path == from->path)
       {
         from_pre->child = from->sibling;
-      }      
+      }
     }
 
-    //如果是兄弟
-    if(from_pre->sibling != NULL)
+    // 如果是兄弟
+    if (from_pre->sibling != NULL)
     {
-      if(from_pre->sibling->path ==from->path)
+      if (from_pre->sibling->path == from->path)
       {
         from_pre->sibling = from->sibling;
-      }      
+      }
     }
 
-
-    //下边改变父亲的指向
+    // 下边改变父亲的指向
     from->path = filename;
     from->sibling = to->child;
     to->child = from;
@@ -592,10 +588,8 @@ void CalvinFSClientApp::rename_dir_tree(BTNode* &dir_tree, string from_path, str
   {
     return;
   }
-
-  
 }
-void CalvinFSClientApp::copy_dir_tree(BTNode* &dir_tree, string from_path, string to_path)
+void CalvinFSClientApp::copy_dir_tree(BTNode *&dir_tree, string from_path, string to_path)
 {
   /*
   copy的本质，是把一个地方的目录树，粘贴到另一个位置，是完整的粘贴，不能光修改指针
@@ -611,10 +605,10 @@ void CalvinFSClientApp::copy_dir_tree(BTNode* &dir_tree, string from_path, strin
   BTNode *to_pre = NULL;
   BTNode *from = find_path(dir_tree, from_path, from_pre);
   int pos = from_path.rfind('/');
- // string parent_to_path = to_path.substr(0, pos);
- //copy的目的路径就是一个目录，不用找他的父亲了
+  // string parent_to_path = to_path.substr(0, pos);
+  // copy的目的路径就是一个目录，不用找他的父亲了
   BTNode *to = find_path(dir_tree, to_path, to_pre);
-  LOG(ERROR)<<from_path<<" copy to "<<to_path;
+  LOG(ERROR) << from_path << " copy to " << to_path;
   if (from != NULL && to != NULL)
   {
     // 2、查：查看目的位置的孩子是否存在同名文件
@@ -646,7 +640,7 @@ void CalvinFSClientApp::copy_dir_tree(BTNode* &dir_tree, string from_path, strin
     return;
   }
 }
-void CalvinFSClientApp::create_dir_tree(BTNode* &dir_tree, string path)
+void CalvinFSClientApp::create_dir_tree(BTNode *&dir_tree, string path)
 {
   /*
   1、找：找到路径的父目录
@@ -656,10 +650,10 @@ void CalvinFSClientApp::create_dir_tree(BTNode* &dir_tree, string path)
   // 1、找
   int pos = path.rfind('/');
   string parent_from_path = path.substr(0, pos);
-  string filename = path.substr(pos+1);
+  string filename = path.substr(pos + 1);
   BTNode *parent_pre = NULL;
   BTNode *parent = find_path(dir_tree, parent_from_path, parent_pre);
-  LOG(ERROR)<<"create "<<path;
+  LOG(ERROR) << "create " << path;
   if (parent != NULL)
   {
 
@@ -669,7 +663,7 @@ void CalvinFSClientApp::create_dir_tree(BTNode* &dir_tree, string path)
     {
       if (check->path == filename)
       {
-        return;//有同名文件
+        return; // 有同名文件
       }
       check = check->sibling;
     }
@@ -682,7 +676,7 @@ void CalvinFSClientApp::create_dir_tree(BTNode* &dir_tree, string path)
     parent->child = create_node;
   }
 }
-void CalvinFSClientApp::delete_dir_tree(BTNode* &dir_tree, string path)
+void CalvinFSClientApp::delete_dir_tree(BTNode *&dir_tree, string path)
 {
   /*
   1、找：找到要删除的路径和指向它的指针
@@ -692,20 +686,20 @@ void CalvinFSClientApp::delete_dir_tree(BTNode* &dir_tree, string path)
   BTNode *from = find_path(dir_tree, path, from_pre);
   int pos = path.rfind('/');
   string filename = path.substr(pos + 1);
-  LOG(ERROR)<<"delete "<<path;
-  if(from != NULL)
+  LOG(ERROR) << "delete " << path;
+  if (from != NULL)
   {
     // 改下指向
-    if(from_pre->child != NULL)
+    if (from_pre->child != NULL)
     {
       if (from_pre->child->path == filename)
       {
         from_pre->child = from->sibling;
-      }    
+      }
     }
-    if(from_pre->sibling != NULL)
+    if (from_pre->sibling != NULL)
     {
-      if(from_pre->sibling->path == filename)
+      if (from_pre->sibling->path == filename)
       {
         from_pre->sibling = from->sibling;
       }

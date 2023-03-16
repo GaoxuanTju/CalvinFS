@@ -2540,6 +2540,7 @@ bool MetadataStore::IsLocal(const string &path)
 
 void MetadataStore::getLOOKUP(string path)
 { // 输出整棵树
+//如果要使用这个函数，需要将GetMetadataentry这个函数里面拆分屏蔽掉，因为大于八层
   string root = "";
   string root1 = "";
   std::queue<string> queue1;
@@ -3917,13 +3918,13 @@ void MetadataStore::GetRWSets(Action *action)
         }
         // PParent_to_entry中存放目的位置的爷爷的元数据项，Parent_to_entry存放父亲的元数据项
 
-       // PParent_to_entry中存放目的位置的爷爷的元数据项，Parent_to_entry存放父亲的元数据项
-         // 获得原位置的父目录
+        // PParent_to_entry中存放目的位置的爷爷的元数据项，Parent_to_entry存放父亲的元数据项
+        // 获得原位置的父目录
         string from_uid = from_split_entry.dir_contents(0);
         string from_parent = ParentDir(from_path);
         int pos_from_parent = from_parent.find('b');
         from_parent = "/" + from_uid + from_parent.substr(pos_from_parent);
-     
+
         // 获得目的位置的父目录
         string to_parent = "/" + PParent_to_entry.dir_contents(0) + FileName(parent_to_path);
         if (from_parent == to_parent) // 父目录相同
@@ -3964,7 +3965,7 @@ void MetadataStore::GetRWSets(Action *action)
           // 给from这个子树节点添加读写集
           action->add_readset(front);
           action->add_writeset(front);
-          //这块没写，To_path怎么更改的
+          // 这块没写，To_path怎么更改的
           action->add_writeset(writeset);
           // 下面是获取这个路径的元数据项的过程
           uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
@@ -5749,7 +5750,7 @@ void MetadataStore::Rename_Internal(
           }
         }
       }
-  
+
       //   Update to_parent (add new dir content)
       if (from_parent != to_parent)
       {
