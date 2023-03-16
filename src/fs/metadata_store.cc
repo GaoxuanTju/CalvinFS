@@ -3706,7 +3706,7 @@ void MetadataStore::GetRWSets(Action *action)
         */
 
         // 原位置是hash，先搜到分层点，再
-        //  1.1搜到原位置的分层点
+        // 1.1搜到原位置的分层点
         int p = from_path.find("b");
         string tree_name = from_path.substr(0, p - 1);
         string hash_name = from_path.substr(p);
@@ -3809,14 +3809,9 @@ void MetadataStore::GetRWSets(Action *action)
           }
         }
         // 原位置的分层点元数据项就在from_split_entry这个里面
-        // 获得原位置的父目录
-        string from_uid = from_split_entry.dir_contents(0);
-        string from_parent = ParentDir(from_path);
-        int pos_from_parent = from_parent.find('b');
-        from_parent = "/" + from_uid + from_parent.substr(pos_from_parent);
 
         // 搜索目的位置的父目录
-        //  1.1 找到目的位置的父目录以及父父目录
+        // 1.1 找到目的位置的父目录以及父父目录
         MetadataEntry Parent_to_entry;
         MetadataEntry PParent_to_entry;
         string parent_to_path = ParentDir(in.to_path());
@@ -3921,6 +3916,14 @@ void MetadataStore::GetRWSets(Action *action)
           }
         }
         // PParent_to_entry中存放目的位置的爷爷的元数据项，Parent_to_entry存放父亲的元数据项
+
+       // PParent_to_entry中存放目的位置的爷爷的元数据项，Parent_to_entry存放父亲的元数据项
+         // 获得原位置的父目录
+        string from_uid = from_split_entry.dir_contents(0);
+        string from_parent = ParentDir(from_path);
+        int pos_from_parent = from_parent.find('b');
+        from_parent = "/" + from_uid + from_parent.substr(pos_from_parent);
+     
         // 获得目的位置的父目录
         string to_parent = "/" + PParent_to_entry.dir_contents(0) + FileName(parent_to_path);
         if (from_parent == to_parent) // 父目录相同
@@ -3955,14 +3958,14 @@ void MetadataStore::GetRWSets(Action *action)
         {
           string front = queue1.front();
           queue1.pop();
-          string writewet = queue2.front();
+          string writeset = queue2.front();
           queue2.pop();
           // 一系列操作
           // 给from这个子树节点添加读写集
           action->add_readset(front);
           action->add_writeset(front);
-
-          action->add_writeset(To_path);
+          //这块没写，To_path怎么更改的
+          action->add_writeset(writeset);
           // 下面是获取这个路径的元数据项的过程
           uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
           Header *header = new Header();
