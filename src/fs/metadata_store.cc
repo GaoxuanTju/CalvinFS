@@ -7646,7 +7646,7 @@ void MetadataStore::Tree_Lookup_Internal(
       header->set_flag(2);//标识
       header->set_from(machine_->machine_id());
       header->set_to(mds_machine);
-      header->set_type(Header::DATA);
+      header->set_type(Header::TEST);
       header->set_app("client");
       header->set_rpc("LOOKUP");
       header->add_misc_string(front.c_str(), strlen(front.c_str()));

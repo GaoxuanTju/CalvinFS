@@ -973,8 +973,8 @@ public:
     LOG(ERROR) << "Renamed "
                << "1 files. Elapsed time:"
                << (GetTime() - start) << " seconds";
-    // Spin(10);
-    // metadata_->getLOOKUP("");
+   // Spin(10);
+   // metadata_->getLOOKUP("");
     // Spin(1);
     // print_dir_tree(dir_tree);
   }
@@ -1045,16 +1045,23 @@ public:
     // string from_path = "/a_0" + IntToString(machine()->machine_id());
     // string from_path = "/a_0" + IntToString(machine()->machine_id())+"/a_1" + IntToString(a1);
     string from_path5 = "/a_0" + IntToString(machine()->machine_id()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2) + "/a_3" + IntToString(a3) + "/a_4" + IntToString(a4);
-    string from_path10 = "/a_0" + IntToString(machine()->machine_id()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2) + "/a_3" + IntToString(a3) + "/a_4" + IntToString(a4) + "/a_5" + IntToString(a5) + "/a_6" + IntToString(a6) + "/a_7" + IntToString(a7) + "/a_8" + IntToString(a8) + "/a_9" + IntToString(a9);
-    string from_path15 = "/a_0" + IntToString(machine()->machine_id()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2) + "/a_3" + IntToString(a3) + "/a_4" + IntToString(a4) + "/a_5" + IntToString(a5) + "/a_6" + IntToString(a6) + "/a_7" + IntToString(a7) + "/a_8" + IntToString(a8) + "/a_9" + IntToString(a9) + "/a_10" + IntToString(a10) + "/a_11" + IntToString(a11) + "/a_12" + IntToString(a12) + "/a_13" + IntToString(a13) + "/a_14" + IntToString(a14);
-    string from_path20 = "/a_0" + IntToString(machine()->machine_id()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2) + "/a_3" + IntToString(a3) + "/a_4" + IntToString(a4) + "/a_5" + IntToString(a5) + "/a_6" + IntToString(a6) + "/a_7" + IntToString(a7) + "/a_8" + IntToString(a8) + "/a_9" + IntToString(a9) + "/a_10" + IntToString(a10) + "/a_11" + IntToString(a11) + "/a_12" + IntToString(a12) + "/a_13" + IntToString(a13) + "/a_14" + IntToString(a14) + "/a_15" + IntToString(a15) + "/a_16" + IntToString(a16) + "/a_17" + IntToString(a17) + "/a_18" + IntToString(a18) + "/a_19" + IntToString(0);
+    string from_path10 = "/a_0" + IntToString(machine()->machine_id()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2) + "/a_3" + IntToString(a3) + "/a_4" + IntToString(a4)
+    + "/a_5" + IntToString(a5) + "/a_6" + IntToString(a6) + "/a_7" + IntToString(a7) + "/a_8" + IntToString(a8) +"/a_9" + IntToString(a9);
+    string from_path15 = "/a_0" + IntToString(machine()->machine_id()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2) + "/a_3" + IntToString(a3) + "/a_4" + IntToString(a4)
+    + "/a_5" + IntToString(a5) + "/a_6" + IntToString(a6) + "/a_7" + IntToString(a7) + "/a_8" + IntToString(a8) +"/a_9" + IntToString(a9)
+    + "/a_10" + IntToString(a10) + "/a_11" + IntToString(a11) + "/a_12" + IntToString(a12) + "/a_13" + IntToString(a13) +"/a_14" + IntToString(a14);
+    string from_path20 = "/a_0" + IntToString(machine()->machine_id()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2) + "/a_3" + IntToString(a3) + "/a_4" + IntToString(a4)
+    + "/a_5" + IntToString(a5) + "/a_6" + IntToString(a6) + "/a_7" + IntToString(a7) + "/a_8" + IntToString(a8) +"/a_9" + IntToString(a9)
+    + "/a_10" + IntToString(a10) + "/a_11" + IntToString(a11) + "/a_12" + IntToString(a12) + "/a_13" + IntToString(a13) +"/a_14" + IntToString(a14)
+    + "/a_15" + IntToString(a15) + "/a_16" + IntToString(a16) + "/a_17" + IntToString(a17) + "/a_18" + IntToString(a18) +"/a_19" + IntToString(0);    
 
     from_path20 = "";
     LOG(ERROR) << machine()->machine_id() << " path: " << from_path20 << " in " << config_->LookupMetadataShard(config_->HashFileName(from_path20), config_->LookupReplica(machine()->machine_id()));
-    for (int i = 0; i < 1; i++)
-    {
-      BackgroundLS(from_path20);
-    }
+   for(int i = 0; i < 1 ; i++)
+   {
+        BackgroundLS(from_path20);
+   }
+
 
     /*
         LOG(ERROR) << machine()->machine_id() << " path: " << from_path7 << " in " << config_->LookupMetadataShard(config_->HashFileName(from_path7), config_->LookupReplica(machine()->machine_id()));
@@ -1439,38 +1446,40 @@ public:
 
     // gaoxuan --在这里发出消息之前，把from_path.data()和to_path.data()拆分一下
 
-    /*
-    //拆分路径
-        int flag = 0;       // 用来标识此时split_string 里面有多少子串
-        char pattern = '/'; // 根据/进行字符串拆分
 
-        string temp_from = path.data();
-        temp_from = temp_from.substr(1, temp_from.size()); // 这一行是为了去除最前面的/
-        temp_from = temp_from + pattern;                   // 在最后面添加一个/便于处理
-        int pos = temp_from.find(pattern);                 // 找到第一个/的位置
-        while (pos != std::string::npos)                   // 循环不断找/，找到一个拆分一次
-        {
-          string temp1 = temp_from.substr(0, pos); // temp里面就是拆分出来的第一个子串
-          string temp = temp1;
-          for (int i = temp.size(); i < 5; i++)
-          {
-            temp = temp + " ";
-          }
-          header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
-          flag++;                              // 拆分的字符串数量++
-          temp_from = temp_from.substr(pos + 1, temp_from.size());
-          pos = temp_from.find(pattern);
-        }
-        header->set_from_length(flag);
-        while (flag != 8)
-        {
-          string temp = "     ";               // 用五个空格填充一下
-          header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
-          flag++;                              // 拆分的字符串数量++
-        }
+/*
+//拆分路径
+    int flag = 0;       // 用来标识此时split_string 里面有多少子串
+    char pattern = '/'; // 根据/进行字符串拆分
 
-        // 这一行之前是gaoxuan添加的
-    */
+    string temp_from = path.data();
+    temp_from = temp_from.substr(1, temp_from.size()); // 这一行是为了去除最前面的/
+    temp_from = temp_from + pattern;                   // 在最后面添加一个/便于处理
+    int pos = temp_from.find(pattern);                 // 找到第一个/的位置
+    while (pos != std::string::npos)                   // 循环不断找/，找到一个拆分一次
+    {
+      string temp1 = temp_from.substr(0, pos); // temp里面就是拆分出来的第一个子串
+      string temp = temp1;
+      for (int i = temp.size(); i < 5; i++)
+      {
+        temp = temp + " ";
+      }
+      header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+      flag++;                              // 拆分的字符串数量++
+      temp_from = temp_from.substr(pos + 1, temp_from.size());
+      pos = temp_from.find(pattern);
+    }
+    header->set_from_length(flag);
+    while (flag != 8)
+    {
+      string temp = "     ";               // 用五个空格填充一下
+      header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+      flag++;                              // 拆分的字符串数量++
+    }
+
+    // 这一行之前是gaoxuan添加的
+*/
+
 
     if (reporting_ && rand() % 2 == 0)
     {
