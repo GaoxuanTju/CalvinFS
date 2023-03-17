@@ -7638,16 +7638,19 @@ void MetadataStore::Tree_Lookup_Internal(
   // Look up existing entry.
   MetadataEntry entry;
 
-      string path = in.path();
-      uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(path)), config_->LookupReplica(machine_->machine_id()));
+  string front = in.path();
+
+
+      uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
       Header *header = new Header();
       header->set_flag(2);//标识
       header->set_from(machine_->machine_id());
       header->set_to(mds_machine);
-      header->set_type(Header::TEST);
+      header->set_type(Header::RPC);
       header->set_app("client");
       header->set_rpc("LOOKUP");
-      header->add_misc_string(path.c_str(), strlen(path.c_str()));
+      header->add_misc_string(front.c_str(), strlen(front.c_str()));
+
 
 
       MessageBuffer *m = NULL;
@@ -7660,10 +7663,10 @@ void MetadataStore::Tree_Lookup_Internal(
       }
 
       MessageBuffer *serialized = m;
-      Header b;
+      Action b;
       b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
       delete serialized;
-      LOG(ERROR)<<b.flag()<<" ; "<<b.misc_string(0);
+
 
 }
 void MetadataStore::Resize_Internal(
