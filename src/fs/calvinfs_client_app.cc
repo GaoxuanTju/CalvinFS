@@ -61,6 +61,7 @@ MessageBuffer *CalvinFSClientApp::GetMetadataEntry(const Slice &path)
   else
   {
     Header *header = new Header();
+    header->set_flag(1);//标识
     header->set_from(machine()->machine_id());
     header->set_to(mds_machine);
     header->set_type(Header::RPC);

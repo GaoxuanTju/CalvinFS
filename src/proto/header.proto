@@ -7,10 +7,11 @@ import "scalar.proto";
 
 message Header {
   // Sender's machine id.
-  required uint64 from = 1;
+  optional uint64 flag = 1;
+  required uint64 from = 2;
 
   // Destination machine id.
-  required uint64 to = 2;
+  required uint64 to = 3;
 
   // Type of message.
   enum Type {
@@ -20,11 +21,11 @@ message Header {
     DATA     = 4;  // Pure data, no function invocation (e.g. RPC result)
     SYSTEM   = 5;  // (NOT FOR USE BY APPS)
   }
-  required Type type = 3;
+  required Type type = 4;
 
   // Required for both RPC requests and CALLBACK invocations:
-  optional string app = 11;
-  optional string rpc = 12;
+  optional string app = 5;
+  optional string rpc = 6;
 
   // RPCs and callbacks may specify priority at which the requested procedure
   // should run.

@@ -4325,6 +4325,7 @@ void MetadataStore::getLOOKUP(string path)
     LOG(ERROR) << front1;
     uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
     Header *header = new Header();
+    header->set_flag(1);//标识
     header->set_from(machine_->machine_id());
     header->set_to(mds_machine);
     header->set_type(Header::RPC);
@@ -4481,6 +4482,7 @@ void MetadataStore::GetRWSets(Action *action)
           string front1 = root1;
           uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
           Header *header = new Header();
+          header->set_flag(1);//标识
           header->set_from(machine_->machine_id());
           header->set_to(mds_machine);
           header->set_type(Header::RPC);
@@ -4587,6 +4589,7 @@ void MetadataStore::GetRWSets(Action *action)
           string front1 = root1;
           uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
           Header *header = new Header();
+          header->set_flag(1);//标识
           header->set_from(machine_->machine_id());
           header->set_to(mds_machine);
           header->set_type(Header::RPC);
@@ -4717,6 +4720,7 @@ void MetadataStore::GetRWSets(Action *action)
           // 下面是获取这个路径的元数据项的过程
           uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
           Header *header = new Header();
+          header->set_flag(1);//标识
           header->set_from(machine_->machine_id());
           header->set_to(mds_machine);
           header->set_type(Header::RPC);
@@ -4817,6 +4821,7 @@ void MetadataStore::GetRWSets(Action *action)
           string front1 = root1;
           uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
           Header *header = new Header();
+          header->set_flag(1);//标识
           header->set_from(machine_->machine_id());
           header->set_to(mds_machine);
           header->set_type(Header::RPC);
@@ -4924,6 +4929,7 @@ void MetadataStore::GetRWSets(Action *action)
           string front1 = root1;
           uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
           Header *header = new Header();
+          header->set_flag(1);//标识
           header->set_from(machine_->machine_id());
           header->set_to(mds_machine);
           header->set_type(Header::RPC);
@@ -5065,6 +5071,7 @@ void MetadataStore::GetRWSets(Action *action)
           // 下面是获取这个路径的元数据项的过程
           uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
           Header *header = new Header();
+          header->set_flag(1);//标识
           header->set_from(machine_->machine_id());
           header->set_to(mds_machine);
           header->set_type(Header::RPC);
@@ -5166,6 +5173,7 @@ void MetadataStore::GetRWSets(Action *action)
           string front1 = root1;
           uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
           Header *header = new Header();
+          header->set_flag(1);//标识
           header->set_from(machine_->machine_id());
           header->set_to(mds_machine);
           header->set_type(Header::RPC);
@@ -5269,6 +5277,7 @@ void MetadataStore::GetRWSets(Action *action)
           string front1 = root1;
           uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
           Header *header = new Header();
+          header->set_flag(1);//标识
           header->set_from(machine_->machine_id());
           header->set_to(mds_machine);
           header->set_type(Header::RPC);
@@ -5403,6 +5412,7 @@ void MetadataStore::GetRWSets(Action *action)
           // 下面是获取这个路径的元数据项的过程
           uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
           Header *header = new Header();
+          header->set_flag(1);//标识
           header->set_from(machine_->machine_id());
           header->set_to(mds_machine);
           header->set_type(Header::RPC);
@@ -5491,6 +5501,7 @@ void MetadataStore::GetRWSets(Action *action)
           string front1 = root1;
           uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
           Header *header = new Header();
+          header->set_flag(1);//标识
           header->set_from(machine_->machine_id());
           header->set_to(mds_machine);
           header->set_type(Header::RPC);
@@ -5594,6 +5605,7 @@ void MetadataStore::GetRWSets(Action *action)
           string front1 = root1;
           uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
           Header *header = new Header();
+          header->set_flag(1);//标识
           header->set_from(machine_->machine_id());
           header->set_to(mds_machine);
           header->set_type(Header::RPC);
@@ -5739,6 +5751,7 @@ void MetadataStore::GetRWSets(Action *action)
           // 下面是获取这个路径的元数据项的过程
           uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
           Header *header = new Header();
+          header->set_flag(1);//标识
           header->set_from(machine_->machine_id());
           header->set_to(mds_machine);
           header->set_type(Header::RPC);
@@ -6153,6 +6166,7 @@ void MetadataStore::Rename_Internal(
       string front1 = root1;
       uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
       Header *header = new Header();
+      header->set_flag(1);//标识
       header->set_from(machine_->machine_id());
       header->set_to(mds_machine);
       header->set_type(Header::RPC);
@@ -6259,6 +6273,7 @@ void MetadataStore::Rename_Internal(
       string front1 = root1;
       uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
       Header *header = new Header();
+      header->set_flag(1);//标识
       header->set_from(machine_->machine_id());
       header->set_to(mds_machine);
       header->set_type(Header::RPC);
@@ -6465,6 +6480,7 @@ void MetadataStore::Rename_Internal(
       string front1 = root1;
       uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
       Header *header = new Header();
+      header->set_flag(1);//标识
       header->set_from(machine_->machine_id());
       header->set_to(mds_machine);
       header->set_type(Header::RPC);
@@ -6568,6 +6584,7 @@ void MetadataStore::Rename_Internal(
       string front1 = root1;
       uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
       Header *header = new Header();
+      header->set_flag(1);//标识
       header->set_from(machine_->machine_id());
       header->set_to(mds_machine);
       header->set_type(Header::RPC);
@@ -6850,6 +6867,7 @@ void MetadataStore::Rename_Internal(
       string front1 = root1;
       uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
       Header *header = new Header();
+      header->set_flag(1);//标识
       header->set_from(machine_->machine_id());
       header->set_to(mds_machine);
       header->set_type(Header::RPC);
@@ -6957,6 +6975,7 @@ void MetadataStore::Rename_Internal(
       string front1 = root1;
       uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
       Header *header = new Header();
+      header->set_flag(1);//标识
       header->set_from(machine_->machine_id());
       header->set_to(mds_machine);
       header->set_type(Header::RPC);
@@ -7235,6 +7254,7 @@ void MetadataStore::Rename_Internal(
       string front1 = root1;
       uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
       Header *header = new Header();
+      header->set_flag(1);//标识
       header->set_from(machine_->machine_id());
       header->set_to(mds_machine);
       header->set_type(Header::RPC);
@@ -7338,6 +7358,7 @@ void MetadataStore::Rename_Internal(
       string front1 = root1;
       uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
       Header *header = new Header();
+      header->set_flag(1);//标识
       header->set_from(machine_->machine_id());
       header->set_to(mds_machine);
       header->set_type(Header::RPC);
@@ -7637,6 +7658,7 @@ void MetadataStore::Tree_Lookup_Internal(
       string front1 = root1;
       uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
       Header *header = new Header();
+      header->set_flag(1);//标识
       header->set_from(machine_->machine_id());
       header->set_to(mds_machine);
       header->set_type(Header::RPC);
@@ -7736,6 +7758,7 @@ void MetadataStore::Tree_Lookup_Internal(
     // 这个路径直接去lookup一下
     uint64 to_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(hash_name)), config_->LookupReplica(machine_->machine_id()));
     Header *header = new Header();
+    header->set_flag(1);//标识
     header->set_from(machine_->machine_id());
     header->set_to(to_machine);
     header->set_type(Header::RPC);
@@ -7807,6 +7830,7 @@ void MetadataStore::Tree_Lookup_Internal(
       string front1 = root1;
       uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
       Header *header = new Header();
+      header->set_flag(1);//标识
       header->set_from(machine_->machine_id());
       header->set_to(mds_machine);
       header->set_type(Header::RPC);
