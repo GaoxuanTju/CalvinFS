@@ -366,6 +366,7 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
   }
 
   */
+ return new MessageBuffer();
 
 }
 
