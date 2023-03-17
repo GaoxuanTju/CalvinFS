@@ -7664,7 +7664,7 @@ void MetadataStore::Tree_Lookup_Internal(
 
       MessageBuffer *serialized = m;
       Header b;
-      b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
+     // b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
       delete serialized;
 
 
