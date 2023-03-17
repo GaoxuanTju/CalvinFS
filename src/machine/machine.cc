@@ -34,7 +34,7 @@ class ConnectionLoopMessageHandler : public MessageHandler {
       // TODO(agt): Support inline RPCs?
       //case Header::RPC:
       //
-      case Header::RPC:
+      case Header::TEST:
         if (header->has_data_ptr()) {
           *reinterpret_cast<MessageBuffer**>(header->data_ptr()) = message;
         } else if (header->has_data_channel()) {

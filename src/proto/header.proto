@@ -20,6 +20,7 @@ message Header {
     ACK      = 3;  // Acknowledgement of completed RPC request.
     DATA     = 4;  // Pure data, no function invocation (e.g. RPC result)
     SYSTEM   = 5;  // (NOT FOR USE BY APPS)
+    TEST     = 6;
   }
   required Type type = 4;
 
