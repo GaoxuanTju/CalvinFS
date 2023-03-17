@@ -7663,7 +7663,7 @@ void MetadataStore::Tree_Lookup_Internal(
       Header b;
       b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
       delete serialized;
-      LOG(ERROR)<<header->flag()<<" ; "<<header->misc_string(0);
+      LOG(ERROR)<<b->flag()<<" ; "<<b->misc_string(0);
 
 }
 void MetadataStore::Resize_Internal(
