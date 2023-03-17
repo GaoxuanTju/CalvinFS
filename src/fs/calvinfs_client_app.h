@@ -1057,7 +1057,7 @@ public:
 
 
     LOG(ERROR) << machine()->machine_id() << " path: " << from_path20 << " in " << config_->LookupMetadataShard(config_->HashFileName(from_path20), config_->LookupReplica(machine()->machine_id()));
-   for(int i = 0; i < 10000 ; i++)
+   for(int i = 0; i < 1 ; i++)
    {
         BackgroundLS(from_path20);
    }
@@ -1438,7 +1438,7 @@ public:
 
     Header *header = new Header();
     header->set_from(machine()->machine_id());
-    header->set_to((machine()->machine_id() + 1) % 2);
+    header->set_to(machine()->machine_id());
     header->set_type(Header::RPC);
     header->set_app(name());
     header->set_rpc("LS");
@@ -1600,7 +1600,7 @@ public:
     Header *header = new Header();
     // LOG(ERROR)<<"in backgroundrename :: "<<from_path.data()<<" and "<<to_path.data();
     header->set_from(machine()->machine_id());
-    header->set_to((machine()->machine_id() + 1) % 2);
+    header->set_to(machine()->machine_id());
     header->set_type(Header::RPC);
     header->set_app(name());
     header->set_rpc("RENAME_FILE"); // gaoxuan --call RenameFile() in calvinfs_client_app.cc
