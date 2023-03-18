@@ -162,7 +162,7 @@ void ConnectionZMQ::SendMessage(uint64 recipient, MessageBuffer* message) {
   }
   delete message;
 }
-
+/*
 void ConnectionZMQ::Init() {
   // Bind port for incoming socket.
   char endpoint[256];
@@ -195,6 +195,43 @@ void ConnectionZMQ::Init() {
                it->second.host().c_str(), it->second.port());
       sockets_out_[it->second.id()] =
           new zmq::socket_t(*GetZMQContext(), ZMQ_PUSH);
+      sockets_out_[it->second.id()]->connect(endpoint);
+    }
+  }
+}
+*/
+void ConnectionZMQ::Init() {
+  // Bind port for incoming socket.
+  char endpoint[256];
+  snprintf(endpoint, sizeof(endpoint), "udp://*:%d", port_);
+
+
+  //gaoxuan --这里想看一下端口是什么样的
+  LOG(ERROR)<<"port is "<<port_;
+
+
+  socket_in_ = new zmq::socket_t(*GetZMQContext(), ZMQ_DISH);
+  socket_in_->bind(endpoint);
+
+  // Initialize mutexes.
+  for (map<uint64, MachineInfo>::const_iterator it =
+          config_.machines().begin();
+       it != config_.machines().end(); ++it) {
+      mutexes_[it->second.id()] = new Mutex();
+  }
+
+  // Wait a bit for other nodes to bind sockets before connecting to them.
+  Spin(2);
+
+  // Connect to remote outgoing sockets.
+  for (map<uint64, MachineInfo>::const_iterator it =
+          config_.machines().begin();
+       it != config_.machines().end(); ++it) {
+    if (it->second.id() != id_) {  // Only connect to remote nodes.
+      snprintf(endpoint, sizeof(endpoint), "udp://%s:%d",
+               it->second.host().c_str(), it->second.port());
+      sockets_out_[it->second.id()] =
+          new zmq::socket_t(*GetZMQContext(), ZMQ_RADIO);
       sockets_out_[it->second.id()]->connect(endpoint);
     }
   }
