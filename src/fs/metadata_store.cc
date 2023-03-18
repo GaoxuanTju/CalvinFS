@@ -7726,21 +7726,15 @@ void MetadataStore::Tree_Lookup_Internal(
 
       MessageBuffer *serialized = m;
       Action b;
-      b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
+      HeaderParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
       delete serialized;
-      MetadataAction::LookupOutput out;
-      out.ParseFromString(b.output());
-      if (i == 9) // 单独用全路径来判断是否搜索完成,可以肯定是这里没执行，才退不出去
-      {
-        entry = out.entry();
-  
-      }
+
 
     }
     // LOG(ERROR)<<"跳出了循环";
     //  TODO(agt): Check permissions.
     //  Return entry.
-    out->mutable_entry()->CopyFrom(entry);
+   // out->mutable_entry()->CopyFrom(entry);
   
 
 

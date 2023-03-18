@@ -342,9 +342,7 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
     usleep(100);
   }
  /*
- 
- */ 
-  Action result;
+   Action result;
   result.ParseFromArray((*m)[0].data(), (*m)[0].size());
   delete m;
   MetadataAction::Tree_LookupOutput out;
@@ -366,6 +364,8 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
   {
     return new MessageBuffer(new string("metadata lookup error\n"));
   }
+ */ 
+
 
 
 
