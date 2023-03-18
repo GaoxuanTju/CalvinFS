@@ -7729,7 +7729,7 @@ void MetadataStore::Tree_Lookup_Internal(
       delete serialized;
       MetadataAction::LookupOutput out;
       out.ParseFromString(b.output());
-      if (front1 == in.path()) // 单独用全路径来判断是否搜索完成,可以肯定是这里没执行，才退不出去
+      if (front == in.path()) // 单独用全路径来判断是否搜索完成,可以肯定是这里没执行，才退不出去
       {
         entry = out.entry();
   
