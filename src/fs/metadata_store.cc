@@ -7647,7 +7647,7 @@ for (int i = 0; i < 100; i++)
       header->set_flag(2);//标识
       header->set_from(machine_->machine_id());
       header->set_to(mds_machine);
-      header->set_type(Header::DATA);
+      header->set_type(Header::RPC);
       header->set_app("client");
       header->set_rpc("LOOKUP");
       header->add_misc_string(front.c_str(), strlen(front.c_str()));
