@@ -7638,7 +7638,7 @@ void MetadataStore::Tree_Lookup_Internal(
   // Look up existing entry.
   MetadataEntry entry;
 
-  string path = in.path();
+  string path = "/0a_01";
 
   LOG(ERROR)<<machine_->machine_id()<<" 's TREE_LOOKUP";
     // 不分层，只是树
