@@ -141,6 +141,8 @@ public:
     {
       machine()->SendReplyMessage(header, LS(header->misc_string(0)));
 
+
+
       // EXTERNAL read file
     }
     else if (header->rpc() == "READ_FILE")
