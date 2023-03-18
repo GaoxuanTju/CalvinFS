@@ -7646,7 +7646,7 @@ void MetadataStore::Tree_Lookup_Internal(
 
 
     // LOG(ERROR)<<"还没进入循环";
-    for(int i=0;i<100;i++)
+    for(int i=0;i<10;i++)
     {
       string front = path;
 
@@ -7730,7 +7730,7 @@ void MetadataStore::Tree_Lookup_Internal(
       delete serialized;
       MetadataAction::LookupOutput out;
       out.ParseFromString(b.output());
-      if (front == in.path()) // 单独用全路径来判断是否搜索完成,可以肯定是这里没执行，才退不出去
+      if (i == 9) // 单独用全路径来判断是否搜索完成,可以肯定是这里没执行，才退不出去
       {
         entry = out.entry();
   
