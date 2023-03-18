@@ -70,26 +70,7 @@ public:
       header->clear_data_channel();
       machine_->SendReplyMessage(header, new MessageBuffer());
       break;
-    case Header::TEST:
-      if (header->has_data_ptr())
-      {
-        *reinterpret_cast<MessageBuffer **>(header->data_ptr()) = message;
-      }
-      else if (header->has_data_channel())
-      {
-        machine_->DataChannel(header->data_channel())->Push(message);
-      }
-      else
-      {
-        LOG(FATAL) << "DATA message header lacks data: "
-                   << header->DebugString();
-      }
-
-      // Send (non-data) response if requested (either ack or callback).
-      header->clear_data_ptr();
-      header->clear_data_channel();
-      machine_->SendReplyMessage(header, new MessageBuffer());
-      break;
+      
     case Header::SYSTEM:
       // LOCAL AddApp() calls.
       if (header->rpc() == "addapp")
