@@ -1441,6 +1441,7 @@ public:
     Header *header = new Header();
     header->set_from(machine()->machine_id());
     header->set_to(machine()->machine_id());
+    LOG(ERROR)<<"LS from "<<machine()->machine_id()<<" to "<<machine()->machine_id();
     header->set_type(Header::RPC);
     header->set_app(name());
     header->set_rpc("LS");

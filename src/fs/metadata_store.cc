@@ -7640,7 +7640,7 @@ void MetadataStore::Tree_Lookup_Internal(
 
   string path = in.path();
 
-
+  LOG(ERROR)<<machine_->machine_id()<<" 's TREE_LOOKUP";
     // 不分层，只是树
     //  gaoxuan --use BFS to add new metadata entry
 
