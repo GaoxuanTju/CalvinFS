@@ -7651,6 +7651,7 @@ void MetadataStore::Tree_Lookup_Internal(
       string front = path;
 
       uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
+      LOG(ERROR)<<machine_->machine_id()<<" to "<<mds_machine;
       Header *header = new Header();
       header->set_flag(2);//标识
       header->set_from(machine_->machine_id());
