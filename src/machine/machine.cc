@@ -49,6 +49,7 @@ public:
       break;
 
     // Data packets can be delivered directly.
+    case Header::TEST:
     case Header::DATA:
       if (header->has_data_ptr())
       {
