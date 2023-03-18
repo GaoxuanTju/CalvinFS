@@ -7634,8 +7634,9 @@ void MetadataStore::Tree_Lookup_Internal(
     const MetadataAction::Tree_LookupInput &in,
     MetadataAction::Tree_LookupOutput *out)
 {
-
-  // Look up existing entry.
+for (int i = 0; i < 100; i++)
+{
+  /* code */  // Look up existing entry.
   MetadataEntry entry;
 
   string front = in.path();
@@ -7664,8 +7665,11 @@ void MetadataStore::Tree_Lookup_Internal(
 
       MessageBuffer *serialized = m;
       Header b;
-      b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
+     // b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
       delete serialized;
+}
+
+
 
 
 }
