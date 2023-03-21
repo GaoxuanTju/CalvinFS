@@ -337,7 +337,7 @@ void *ConnectionZMQ::ListenerLoop_UDP(void *arg)
     // Get the next message. (Non-blocking.)
     // LOG(ERROR)<<"before dontwait";
     
-    if (connection->socket_in_UDP->recv(msg_part))
+    if (connection->socket_in_UDP->recv(msg_part, ZMQ_DONTWAIT))
     {
       // if (connection->socket_in_->recv(msg_part, ZMQ_DONTWAIT)) {
       // See if that was the final message part for this message.
