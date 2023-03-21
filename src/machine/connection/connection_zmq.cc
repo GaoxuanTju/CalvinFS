@@ -248,7 +248,6 @@ void ConnectionZMQ::SendMessage(uint64 recipient, MessageBuffer *message)
   }
   delete message;
 }
-<<<<<<< HEAD
 
 void ConnectionZMQ::Init_UDP()
 {
@@ -288,10 +287,7 @@ void ConnectionZMQ::Init_UDP()
     }
   }
 }
-
-=======
 /*
->>>>>>> 7d9d7743aa6acc92bb737f76ffecf52d42e1f826
 void ConnectionZMQ::Init() {
   // Bind port for incoming socket.
   char endpoint[256];
