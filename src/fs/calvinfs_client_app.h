@@ -1065,11 +1065,12 @@ public:
     + "/a_5" + IntToString(a5) + "/a_6" + IntToString(a6) + "/a_7" + IntToString(0);
     from_path20 = from_path5;
     LOG(ERROR) << machine()->machine_id() << " path: " << from_path20 << " in " << config_->LookupMetadataShard(config_->HashFileName(from_path20), config_->LookupReplica(machine()->machine_id()));
-    for(int i = 0; i < 10 ; i++)
+    for(int i = 0; i < 10000 ; i++)
     {
-          double begin = GetTime();
+ //         double begin = GetTime();
           BackgroundLS(from_path20);
-          double end = GetTime();
+ //         double end = GetTime();
+/*
 
           LOG(ERROR)<<end - begin;
           
@@ -1085,7 +1086,7 @@ public:
             LOG(ERROR)<<"file dont open";
           }
           outputfile.close();
-
+*/
     }
 
 
