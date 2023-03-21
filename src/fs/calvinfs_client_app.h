@@ -17,7 +17,11 @@
 #include "machine/app/app.h"
 #include "machine/machine.h"
 #include <stack>
-
+//add for file op
+#include <iostream>
+#include <fstream>
+#include <stdlib.h>
+//
 using std::make_pair;
 
 class CalvinFSClientApp : public App
@@ -1061,9 +1065,19 @@ public:
     + "/a_5" + IntToString(a5) + "/a_6" + IntToString(a6) + "/a_7" + IntToString(0);
     from_path20 = from_path5;
     LOG(ERROR) << machine()->machine_id() << " path: " << from_path20 << " in " << config_->LookupMetadataShard(config_->HashFileName(from_path20), config_->LookupReplica(machine()->machine_id()));
-    for(int i = 0; i < 10000 ; i++)
+    for(int i = 0; i < 10 ; i++)
     {
+          double begin = GetTime();
           BackgroundLS(from_path20);
+          double end = GetTime();
+          //print to a txt
+          std::ofstream dataFile;
+          dataFile.open("dataFile.txt", std::ofstream::app);
+          std::fstream file("dataFile.txt", std::ios::out);
+        
+          dataFile << end - begin ;     // 写入数据
+          dataFile.close();         
+
     }
 
 
