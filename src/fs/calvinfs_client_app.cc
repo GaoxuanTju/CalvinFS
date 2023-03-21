@@ -307,14 +307,13 @@ MessageBuffer *CalvinFSClientApp::ReadFile(const Slice &path)
   }
 }
 
+/*
 MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
 {
- 
   uint64 distinct_id = machine()->GetGUID();
   string channel_name = "action-result-" + UInt64ToString(distinct_id);
   auto channel = machine()->DataChannel(channel_name);
   CHECK(!channel->Pop(NULL));
-
   Action *a = new Action();
   a->set_client_machine(machine()->machine_id());
   a->set_client_channel(channel_name);
@@ -323,25 +322,19 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
   in.set_path(path.data(), path.size());
   in.SerializeToString(a->mutable_input());
   metadata_->setAPPname(name());
-
   metadata_->GetRWSets(a);
-
   log_->Append(a);
-  
   MessageBuffer *m = NULL;
   while (!channel->Pop(&m))
   {
     // Wait for action to complete and be sent back.
     usleep(100);
   }
- 
   Action result;
   result.ParseFromArray((*m)[0].data(), (*m)[0].size());
   delete m;
-  /**/
   MetadataAction::Tree_LookupOutput out;
   out.ParseFromString(result.output());
-
   if (out.success() && out.entry().type() == DIR)
   {
     //LOG(ERROR)<<"metadataentry is "<<out.entry().dir_contents(0);
@@ -358,11 +351,151 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
   {
     return new MessageBuffer(new string("metadata lookup error\n"));
   }
- 
+}*/
+int Dir_dep(const string &path)
+{
+  int depth = 0;
+  char pattern = '/';
+  string temp = path;
+  int pos = temp.find(pattern);
+  while (pos != std::string::npos)
+  {
+    depth++;
+    temp = temp.substr(pos + 1);
+    pos = temp.find(pattern);
+  }
 
+  return depth;
+}
 
+MessageBuffer* CalvinFSClientApp::LS(const Slice& pat) {
+    MetadataEntry entry;
+    string path = pat.data();
+    string root = "";
+    string root1 = "";
+    while (1)
+    {
+      string front = root;
+      string front1 = root1;
+      uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine()->machine_id()));
+      if(mds_machine == machine()->machine_id())
+      {
+        mds_machine = (mds_machine+1)%2;
+      }      
+      Header *header = new Header();
+      header->set_flag(2); // 标识      
+      header->set_from(machine()->machine_id());
+      header->set_to(mds_machine);
+      header->set_type(Header::RPC);
+      header->set_app("client");
+      header->set_rpc("LOOKUP");
+      header->add_misc_string(front.c_str(), strlen(front.c_str()));
 
+      if (path != "")
+      {
+        int flag = 0;       // 用来标识此时split_string 里面有多少子串
+        char pattern = '/'; // 根据/进行字符串拆分
+        string temp_from = path.c_str();
+        temp_from = temp_from.substr(1, temp_from.size()); // 这一行是为了去除最前面的/
+        temp_from = temp_from + pattern;                   // 在最后面添加一个/便于处理
+        int pos = temp_from.find(pattern);                 // 找到第一个/的位置
+        while (pos != std::string::npos)                   // 循环不断找/，找到一个拆分一次
+        {
+          string temp1 = temp_from.substr(0, pos); // temp里面就是拆分出来的第一个子串
+          string temp = temp1;
+          for (int i = temp.size(); i < 4; i++)
+          {
+            temp = temp + " ";
+          }
+          header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+          flag++;                              // 拆分的字符串数量++
+          temp_from = temp_from.substr(pos + 1, temp_from.size());
+          pos = temp_from.find(pattern);
+        }
+        header->set_from_length(flag);
+        while (flag != 8)
+        {
+          string temp = "    ";               // 用四个空格填充一下
+          header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+          flag++;                              // 拆分的字符串数量++
+        }
+      }
+      else
+      {
+        int flag = 0; // 用来标识此时split_string 里面有多少子串
+        while (flag != 8)
+        {
+          string temp = "    ";               // 用四个空格填充一下
+          header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+          flag++;                              // 拆分的字符串数量++
+        }
+        header->set_from_length(flag);
+      }
+      int depth = Dir_dep(path);
+      header->set_depth(depth);
+      int uid = 9999;
+      header->set_uid(uid);
+      string empty_str = "0000000000000000";
+      for (int i = 0; i < 8; i++)
+      {
+        header->add_metadatentry(empty_str);
+      }      
+      MessageBuffer *m = NULL;
+      header->set_data_ptr(reinterpret_cast<uint64>(&m));
+      machine()->SendMessage(header, new MessageBuffer());
+      while (m == NULL)
+      {
+        usleep(10);
+        Noop<MessageBuffer *>(m);
+      }
 
+      MessageBuffer *serialized = m;
+      Action b;
+      b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
+      delete serialized;
+
+      if(b.input() == "switch processed")
+      {
+       
+        entry.set_type(DIR);
+        entry.add_dir_contents("gaoxuan");
+     
+        break;
+      }
+      MetadataAction::LookupOutput out;
+      out.ParseFromString(b.output());
+      if (front1 == path)//单独用全路径来判断是否搜索完成,可以肯定是这里没执行，才退不出去
+      {
+        entry = out.entry();
+        break;
+      }
+      else
+      { // gaoxuan --还没有找到
+        for (int i = 0; i < out.entry().dir_contents_size(); i++)
+        {
+          string full_path = front1 + "/" + out.entry().dir_contents(i);//拼接获取全路径
+          if (path.find(full_path) == 0)
+          { // Todo:这里需要用相对路径
+          //进入这个分支就代表此时，恰好搜到了，此时i代表的就是所需的相对路径，我们只需要用0位置的id拼一下就好
+            root1 = full_path;
+            root = "/" + out.entry().dir_contents(0) + out.entry().dir_contents(i);
+            break;
+          }
+        }
+      }
+    }
+
+  if (entry.type() == DIR) {
+    string* result = new string();
+    for (int i = 0; i < entry.dir_contents_size(); i++) {
+      result->append(entry.dir_contents(i));
+      result->append("\n");
+    }
+    return new MessageBuffer(result);
+
+  } else {
+    return new MessageBuffer(new string("metadata lookup error\n"));
+  }
 }
 
 MessageBuffer *CalvinFSClientApp::CopyFile(const Slice &from_path, const Slice &to_path)
