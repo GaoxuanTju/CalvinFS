@@ -1070,14 +1070,22 @@ public:
           double begin = GetTime();
           BackgroundLS(from_path20);
           double end = GetTime();
-          //print to a txt
-          std::ofstream dataFile;
-          dataFile.open("dataFile.txt", std::ofstream::app);
-          std::fstream file("dataFile.txt", std::ios::out);
-        
-          dataFile << end - begin ;     // 写入数据
-          dataFile.close();         
 
+          LOG(ERROR)<<end - begin;
+          /*
+          
+          std::ofstream outputfile;
+          outputfile.open("dataFile.txt");
+          if(outputfile.is_open())
+          {
+            outputfile << end - begin <<std::endl;
+          }
+          else
+          {
+            LOG(ERROR)<<"file dont open";
+          }
+          outputfile.close();
+*/
     }
 
 
