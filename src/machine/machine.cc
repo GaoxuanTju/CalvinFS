@@ -28,7 +28,11 @@ public:
 
   virtual void HandleMessage(Header *header, MessageBuffer *message)
   {
+    //LOG(ERROR)<<"rpc is "<<header->rpc();
+
     CHECK(header->has_type());
+
+      
     // TODO(agt): Better header validity checking.
 
     switch (header->type())
@@ -37,6 +41,19 @@ public:
     //
     // TODO(agt): Support inline RPCs?
     case Header::RPC:
+    
+    
+      if(header->has_flag() && header->flag() == 3)
+      {
+        //3 represents this packet is modified by switch
+        Action b;
+        b.set_action_type(4);
+        b.set_input("switch processed");
+        MessageBuffer *m = new MessageBuffer(b);
+        *reinterpret_cast<MessageBuffer **>(header->data_ptr()) = m;
+        break;
+      }
+      
     case Header::CALLBACK:
       tp_->HandleMessage(header, message);
       break;
@@ -70,7 +87,7 @@ public:
       header->clear_data_channel();
       machine_->SendReplyMessage(header, new MessageBuffer());
       break;
-      
+
     case Header::SYSTEM:
       // LOCAL AddApp() calls.
       if (header->rpc() == "addapp")
@@ -177,8 +194,32 @@ Machine::~Machine()
 void Machine::SendMessage(Header *header, MessageBuffer *message)
 {
   // TODO(agt): Check header validity.
-  message->Append(*header);
-  connection_->SendMessage(header->to(), message);
+  if (header->rpc() == "LOOKUP")
+  {
+    Msg *msg = new Msg();
+    msg->mutable_header()->CopyFrom(*header);
+    msg->set_type(0);
+    if (message->size() == 1)
+    {
+      msg->set_type(1);
+      Action result;
+      result.ParseFromArray((*message)[0].data(), (*message)[0].size());
+      msg->mutable_action()->CopyFrom(result);
+    }
+    MessageBuffer *m = new MessageBuffer(*msg);
+    // TODO: change to connection_UDP
+    connection_->SendMessage_UDP(header->to(), m);
+  }
+  else
+  {
+
+
+    message->Append(*header);
+    connection_->SendMessage(header->to(), message);
+  }
+
+  // Create a msg.proto
+
   delete header;
 }
 

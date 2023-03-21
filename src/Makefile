@@ -20,7 +20,7 @@ GTEST   := $(EXTDIR)/gtest
 GLOG    := $(EXTDIR)/glog
 GFLAGS  := $(EXTDIR)/gflags
 LEVELDB := $(EXTDIR)/leveldb
-ZEROMQ  := $(EXTDIR)/zeromq
+ZEROMQ  := $(EXTDIR)/zeromq-4.3.2/build_res
 
 # Executable for protocol buffers
 PROTOCEXE := $(PROTOB)/src/.libs/protoc

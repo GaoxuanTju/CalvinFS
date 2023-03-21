@@ -4,7 +4,9 @@
 syntax = "proto2";
 import "scalar.proto";
 
-
+import "action.proto";
+import "start_app.proto";
+import "cluster_config.proto";
 message Header {
   // Sender's machine id.
   optional uint64 flag = 1;
@@ -38,9 +40,17 @@ message Header {
 
   
   optional uint64 from_length = 14;//源路径拆分后的子串数量
-  repeated string split_string_from = 15;//存放被拆分后的源路径
+  repeated string split_string_from = 15;//存放被拆分后的全路径
   optional uint64 to_length = 16;//目的路径拆分后的子串数量
   repeated string split_string_to = 17;//存放被拆分后的目的路径
+
+//the depth of full path
+  optional uint64 depth = 18;
+//uid of file; fixed 4 bytes
+  optional fixed32 uid = 19;
+//eight metadatentry, every one is 16 bytes
+  repeated string metadatentry = 20;
+
   // Optional for RPC requests (should NOT appear for CALLBACK invocations):
   //
   // RPC requests (but NOT callbacks) may request a response in one of
@@ -69,3 +79,18 @@ message Header {
   optional int32 external_port = 52;
 }
 
+message Msg 
+{
+    //Every Msg all has a Header 
+    required Header header = 1;
+    //use this one to confirm which one has been add:
+    // 0-nothing/1-Action;2-ActionBaTch
+    required uint64 type = 2 ;
+
+    optional Action action = 3;
+
+    optional ActionBatch action_batch = 4;
+    
+    optional StartAppProto startappproto = 5;
+
+}

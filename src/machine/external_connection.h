@@ -11,7 +11,7 @@
 #include "common/utils.h"
 #include "machine/cluster_config.h"
 #include "machine/connection/connection.h"
-#include "machine/connection/zmq_cpp.h"
+#include <zmq.hpp>
 #include "machine/message_buffer.h"
 #include "common/atomic.h"
 #include "common/types.h"

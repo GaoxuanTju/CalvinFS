@@ -133,7 +133,7 @@ public:
     {
       machine()->SendReplyMessage(
           header,
-          GetMetadataEntry(header->misc_string(0)));
+          GetMetadataEntry(header, header->misc_string(0)));
 
       // EXTERNAL LS
     }
@@ -1056,13 +1056,15 @@ public:
     + "/a_5" + IntToString(a5) + "/a_6" + IntToString(a6) + "/a_7" + IntToString(a7) + "/a_8" + IntToString(a8) +"/a_9" + IntToString(a9)
     + "/a_10" + IntToString(a10) + "/a_11" + IntToString(a11) + "/a_12" + IntToString(a12) + "/a_13" + IntToString(a13) +"/a_14" + IntToString(a14)
     + "/a_15" + IntToString(a15) + "/a_16" + IntToString(a16) + "/a_17" + IntToString(a17) + "/a_18" + IntToString(a18) +"/a_19" + IntToString(0);    
-
-    from_path20 = "/0a_00";
+    string from_path3 = "/a_0" + IntToString(machine()->machine_id()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2);
+    string from_path8 = "/a_0" + IntToString(machine()->machine_id()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2) + "/a_3" + IntToString(a3) + "/a_4" + IntToString(a4)
+    + "/a_5" + IntToString(a5) + "/a_6" + IntToString(a6) + "/a_7" + IntToString(0);
+    from_path20 = from_path5;
     LOG(ERROR) << machine()->machine_id() << " path: " << from_path20 << " in " << config_->LookupMetadataShard(config_->HashFileName(from_path20), config_->LookupReplica(machine()->machine_id()));
-   for(int i = 0; i < 1 ; i++)
-   {
-        BackgroundLS(from_path20);
-   }
+    for(int i = 0; i < 10000 ; i++)
+    {
+          BackgroundLS(from_path20);
+    }
 
 
     /*
@@ -1174,7 +1176,7 @@ public:
   // Caller takes ownership of returned MessageBuffers.
   // Returns serialized MetadataEntry protobuf.
   MessageBuffer *GetMetadataEntry(const Slice &path);
-
+  MessageBuffer *GetMetadataEntry(Header * header, const Slice &path); 
   // Returns client-side printable output.
   MessageBuffer *CreateFile(const Slice &path, FileType type = DATA);
   MessageBuffer *AppendStringToFile(const Slice &data, const Slice &path);
@@ -1437,11 +1439,10 @@ public:
 
   void BackgroundLS(const Slice &path)
   {
-
     Header *header = new Header();
     header->set_from(machine()->machine_id());
     header->set_to(machine()->machine_id());
-    LOG(ERROR)<<"LS from "<<machine()->machine_id()<<" to "<<machine()->machine_id();
+   // LOG(ERROR)<<"LS from "<<machine()->machine_id()<<" to "<<machine()->machine_id();
     header->set_type(Header::RPC);
     header->set_app(name());
     header->set_rpc("LS");

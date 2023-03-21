@@ -26,7 +26,6 @@
 #define __ZMQ_HPP_INCLUDED__
 
 #include <zmq.h>
-
 #include <algorithm>
 #include <cassert>
 #include <cstring>
@@ -133,6 +132,11 @@ namespace zmq
             return *this;
         }
 #endif
+
+        inline int set_group (const char *group)
+        {
+            return zmq_msg_set_group(&(this->msg), group);
+        }
 
         inline ~message_t ()
         {
@@ -353,6 +357,11 @@ namespace zmq
             if (zmq_errno () == EAGAIN)
                 return false;
             exit(1);
+        }
+
+        inline int join(const char *group)
+        {
+            return zmq_join (this, group);
         }
 
     private:

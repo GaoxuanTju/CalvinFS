@@ -96,7 +96,10 @@ int main(int argc, char** argv) {
     LOG(ERROR) << "[" << FLAGS_machine_id << "] created Metalog (Paxos2)";
   }
 
+
   m.GlobalBarrier();
+
+
   Spin(1);
 
  

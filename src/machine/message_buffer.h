@@ -28,7 +28,7 @@
 #include <string>
 #include <vector>
 
-#include "machine/connection/zmq_cpp.h"
+#include <zmq.hpp>
 #include "common/types.h"
 
 using std::vector;

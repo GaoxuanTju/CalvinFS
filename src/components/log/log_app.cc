@@ -32,9 +32,11 @@ bool LogApp::HandleRemoteReaderMessage(Header* header, MessageBuffer* message) {
     machine()->SendReplyMessage(header, message);
 
   } else if (header->rpc() == "GET") {
+
     Log::Reader* r =
         remote_readers_[make_pair(header->from(), header->data_channel())];
     if (r->Next()) {
+
       message->Append(r->Entry());
       message->Append(new string(UInt64ToString(r->Version())));
     }

@@ -142,14 +142,13 @@ class BlockLogApp : public App {
           Header* header = new Header();
           header->set_from(machine()->machine_id());
           header->set_to(
-              config_->LookupBlucket(config_->HashBlockID(block_id), i));
+          config_->LookupBlucket(config_->HashBlockID(block_id), i));
           header->set_type(Header::RPC);
           header->set_app(name());
           header->set_rpc("BATCH");
           header->add_misc_int(block_id);
           machine()->SendMessage(header, new MessageBuffer(Slice(*block)));
         }
-
         // Scheduler block for eventual deallocation.
         to_delete_.Push(block);
       }
@@ -176,13 +175,16 @@ class BlockLogApp : public App {
 
   // Takes ownership of '*entry'.
   virtual void Append(Action* entry) {
+
     queue_.Push(entry);
   }
 
   virtual void Append(const Slice& entry, uint64 count = 1) {
     CHECK(count == 1);
     Action* a = new Action();
+  
     a->ParseFromArray(entry.data(), entry.size());
+
     queue_.Push(a);
   }
 

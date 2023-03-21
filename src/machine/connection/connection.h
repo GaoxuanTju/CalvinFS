@@ -37,6 +37,7 @@ class Connection {
   // Sends '*message' to the machine with unique id 'recipient'. Takes
   // ownership of '*message' and deletes it when sending is complete.
   virtual void SendMessage(uint64 recipient, MessageBuffer* message) = 0;
+  virtual void SendMessage_UDP(uint64 recipient, MessageBuffer* message) = 0;
   virtual void SendMessageExternal(Header* header, MessageBuffer* message) = 0;
 
  protected:

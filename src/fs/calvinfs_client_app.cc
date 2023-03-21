@@ -35,6 +35,7 @@ void delete_tree(BTNode *&root)
   delete_tree(root->sibling);
   delete root;
 }
+
 MessageBuffer *CalvinFSClientApp::GetMetadataEntry(const Slice &path)
 {
   // Find out what machine to run this on.
@@ -70,56 +71,47 @@ MessageBuffer *CalvinFSClientApp::GetMetadataEntry(const Slice &path)
     header->add_misc_string(path.data(), path.size());
     // gaoxuan --在这里发出消息之前，把from_path.data()和to_path.data()拆分一下
 
-/*
-    // 为了输出超过八层的树，暂时先把拆分屏蔽掉
-    if (path.data() != "")
+
+
+
+
+    MessageBuffer *m = NULL;
+    header->set_data_ptr(reinterpret_cast<uint64>(&m));
+    machine()->SendMessage(header, new MessageBuffer());
+    while (m == NULL)
     {
-      int flag = 0;       // 用来标识此时split_string 里面有多少子串
-      char pattern = '/'; // 根据/进行字符串拆分
-      string temp_from = path.data();
-      temp_from = temp_from.substr(1, temp_from.size()); // 这一行是为了去除最前面的/
-      temp_from = temp_from + pattern;                   // 在最后面添加一个/便于处理
-      int pos = temp_from.find(pattern);                 // 找到第一个/的位置
-      while (pos != std::string::npos)                   // 循环不断找/，找到一个拆分一次
-      {
-        string temp1 = temp_from.substr(0, pos); // temp里面就是拆分出来的第一个子串
-        string temp = temp1;
-        for (int i = temp.size(); i < 5; i++)
-        {
-          temp = temp + " ";
-        }
-        header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
-        flag++;                              // 拆分的字符串数量++
-        temp_from = temp_from.substr(pos + 1, temp_from.size());
-        pos = temp_from.find(pattern);
-      }
-      header->set_from_length(flag);
-      while (flag != 8)
-      {
-        string temp = "     ";               // 用五个空格填充一下
-        header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
-        flag++;                              // 拆分的字符串数量++
-      }
-
-      // 这一行之前是gaoxuan添加的
+      usleep(10);
+      Noop<MessageBuffer *>(m);
     }
-    else
-    {
+    return m;
+  }
+}
 
-      int flag = 0; // 用来标识此时split_string 里面有多少子串
-      while (flag != 8)
-      {
-        string temp = "     ";               // 用五个空格填充一下
-        header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
-        flag++;                              // 拆分的字符串数量++
-      }
-      header->set_from_length(flag);
-    }
+MessageBuffer *CalvinFSClientApp::GetMetadataEntry(Header* header, const Slice &path)
+{
+  // Find out what machine to run this on.
+  uint64 mds_machine =
+      config_->LookupMetadataShard(config_->HashFileName(path), replica_);
 
-    // 这一行之前是gaoxuan添加的
-*/
+  // Run if local.
+  if (mds_machine == machine()->machine_id())
+  {
+    Action a;
 
+    a.set_action_type(MetadataAction::LOOKUP);
+    MetadataAction::LookupInput in;
+    in.set_path(path.data(), path.size());
 
+    a.set_version(1000000000); // gaoxuan --this line is very important for LOOKUP
+    in.SerializeToString(a.mutable_input());
+    metadata_->GetRWSets(&a);
+    metadata_->Run(&a);
+    return new MessageBuffer(a);
+
+    // If not local, get result from the right machine (within this replica).
+  }
+  else
+  {
 
     MessageBuffer *m = NULL;
     header->set_data_ptr(reinterpret_cast<uint64>(&m));
@@ -317,7 +309,7 @@ MessageBuffer *CalvinFSClientApp::ReadFile(const Slice &path)
 
 MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
 {
-
+ 
   uint64 distinct_id = machine()->GetGUID();
   string channel_name = "action-result-" + UInt64ToString(distinct_id);
   auto channel = machine()->DataChannel(channel_name);
@@ -331,30 +323,32 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
   in.set_path(path.data(), path.size());
   in.SerializeToString(a->mutable_input());
   metadata_->setAPPname(name());
+
   metadata_->GetRWSets(a);
 
   log_->Append(a);
-
+  
   MessageBuffer *m = NULL;
   while (!channel->Pop(&m))
   {
     // Wait for action to complete and be sent back.
     usleep(100);
   }
- /*
-   Action result;
+ 
+  Action result;
   result.ParseFromArray((*m)[0].data(), (*m)[0].size());
   delete m;
+  /**/
   MetadataAction::Tree_LookupOutput out;
   out.ParseFromString(result.output());
 
   if (out.success() && out.entry().type() == DIR)
   {
-    LOG(ERROR) << "metadata entry of " << path.data() << " is :";
+    //LOG(ERROR)<<"metadataentry is "<<out.entry().dir_contents(0);
     string *result = new string();
     for (int i = 0; i < out.entry().dir_contents_size(); i++)
     {
-      LOG(ERROR) << out.entry().dir_contents(i);
+
       result->append(out.entry().dir_contents(i));
       result->append("\n");
     }
@@ -364,7 +358,7 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
   {
     return new MessageBuffer(new string("metadata lookup error\n"));
   }
- */ 
+ 
 
 
 
