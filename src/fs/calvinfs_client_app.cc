@@ -378,10 +378,12 @@ MessageBuffer* CalvinFSClientApp::LS(const Slice& pat) {
       string front = root;
       string front1 = root1;
       uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine()->machine_id()));
+      /*
+     
       if(mds_machine == machine()->machine_id())
       {
         mds_machine = (mds_machine+1)%2;
-      }      
+      }     */  
       Header *header = new Header();
       header->set_flag(2); // 标识      
       header->set_from(machine()->machine_id());
