@@ -1075,7 +1075,7 @@ public:
           
           
           std::ofstream outputfile;
-          outputfile.open("dataFile.txt", std::ios::out);
+          outputfile.open("dataFile.txt");
           if(outputfile.is_open())
           {
             outputfile << end - begin <<std::endl;
