@@ -1072,10 +1072,10 @@ public:
           double end = GetTime();
 
           LOG(ERROR)<<end - begin;
-          /*
+          
           
           std::ofstream outputfile;
-          outputfile.open("dataFile.txt");
+          outputfile.open("dataFile.txt", std::ios::out);
           if(outputfile.is_open())
           {
             outputfile << end - begin <<std::endl;
@@ -1085,7 +1085,7 @@ public:
             LOG(ERROR)<<"file dont open";
           }
           outputfile.close();
-*/
+
     }
 
 
