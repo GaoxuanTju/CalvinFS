@@ -1075,7 +1075,7 @@ public:
           
           
           std::ofstream outputfile;
-          outputfile.open("dataFile.txt");
+          outputfile.open("/home/CalvinFS/src/fs/dataFile.txt", std::ios_base::app);
           if(outputfile.is_open())
           {
             outputfile << end - begin <<std::endl;
