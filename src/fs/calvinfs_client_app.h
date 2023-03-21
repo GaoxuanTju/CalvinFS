@@ -1074,7 +1074,7 @@ public:
 
           LOG(ERROR)<<end - begin;
           
-          
+      
           std::ofstream outputfile;
           outputfile.open("/home/CalvinFS/src/fs/dataFile.txt", std::ios_base::app);
           if(outputfile.is_open())
