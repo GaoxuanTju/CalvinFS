@@ -12,6 +12,7 @@
 #include "common/mutex.h"
 #include "components/store/store.h"
 #include "fs/metadata.pb.h"
+#include <map>
 
 // gaoxuan --下面的二叉链表用于存储目录树
 typedef struct BTNode
@@ -45,6 +46,7 @@ public:
   void Init_for_30(BTNode *dir_tree);
   void Init_for_10(BTNode *dir_tree);
   void Init_tree_20(BTNode *dir_tree);
+  void Init_from_txt(string filename);
   void InitSmall();
 
   string getAPPname()
@@ -65,7 +67,7 @@ public:
   {
     return machine_;
   }
-
+std::map<string, int>path_type;
 private:
   void CreateFile_Internal(
       ExecutionContext *context,
@@ -119,7 +121,7 @@ private:
 
   // Map of file paths to serialized MetadataEntries.
   VersionedKVStore *store_;
-
+  
   // Pointer to local machine (for distributed action execution contexts).
   Machine *machine_;
 

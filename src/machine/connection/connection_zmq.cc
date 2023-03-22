@@ -30,7 +30,7 @@ zmq::context_t *GetZMQContext()
   Lock l(&context_lock_);
   if (context_ == NULL)
   {
-    context_ = new zmq::context_t(1);
+    context_ = new zmq::context_t(30);
   }
   connection_count_++;
   return context_;

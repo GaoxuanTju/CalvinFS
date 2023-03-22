@@ -1020,8 +1020,9 @@ public:
   void LsExperiment()
   { // gaoxuan --删除文件的实验
     Spin(1);
-    dir_tree = new BTNode;
-    metadata_->Init_tree_20(dir_tree);
+   // dir_tree = new BTNode;
+   // metadata_->Init_tree_20(dir_tree);
+    metadata_->Init_from_txt("/home/CalvinFS/src/fs/Init.txt");
     Spin(1);
     machine()->GlobalBarrier();
     Spin(1);
@@ -1063,18 +1064,14 @@ public:
     string from_path3 = "/a_0" + IntToString(machine()->machine_id()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2);
     string from_path8 = "/a_0" + IntToString(machine()->machine_id()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2) + "/a_3" + IntToString(a3) + "/a_4" + IntToString(a4)
     + "/a_5" + IntToString(a5) + "/a_6" + IntToString(a6) + "/a_7" + IntToString(0);
-    from_path20 = from_path5;
+    from_path20 = "/a1";
     LOG(ERROR) << machine()->machine_id() << " path: " << from_path20 << " in " << config_->LookupMetadataShard(config_->HashFileName(from_path20), config_->LookupReplica(machine()->machine_id()));
-    for(int i = 0; i < 10000 ; i++)
+    for(int i = 0; i < 1 ; i++)
     {
  //         double begin = GetTime();
           BackgroundLS(from_path20);
  //         double end = GetTime();
 /*
-
-          LOG(ERROR)<<end - begin;
-          
-      
           std::ofstream outputfile;
           outputfile.open("/home/CalvinFS/src/fs/dataFile.txt", std::ios_base::app);
           if(outputfile.is_open())
@@ -1088,23 +1085,6 @@ public:
           outputfile.close();
 */
     }
-
-
-    /*
-        LOG(ERROR) << machine()->machine_id() << " path: " << from_path7 << " in " << config_->LookupMetadataShard(config_->HashFileName(from_path7), config_->LookupReplica(machine()->machine_id()));
-        BackgroundLS(from_path7);
-        LOG(ERROR) << machine()->machine_id() << " path: " << from_path8 << " in " << config_->LookupMetadataShard(config_->HashFileName(from_path8), config_->LookupReplica(machine()->machine_id()));
-        BackgroundLS(from_path8);
-
-    */
-
-    /*
-       for(int i = 0; i < 10000 ; i++)
-       {
-            BackgroundLS(from_path);
-
-       }
-    */
 
     // Wait for all operations to finish.
     while (capacity_.load() < kMaxCapacity)

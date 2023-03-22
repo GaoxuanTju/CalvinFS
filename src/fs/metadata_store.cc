@@ -22,6 +22,8 @@
 #include "proto/action.pb.h"
 #include <stack> //gaoxuan --the stack for DFS
 #include <queue> //gaoxuan --the queue for BFS
+#include <iostream>
+#include <fstream>
 using std::map;
 using std::set;
 using std::string;
@@ -4242,6 +4244,57 @@ void MetadataStore::Init_for_10(BTNode *dir_tree)
              << GetTime() - start << " seconds";
 }
 
+void MetadataStore::Init_from_txt(string filename)
+{
+  std::ifstream input_file(filename);
+  string line;
+  if (input_file.is_open())
+  {
+    //line中第一个字段是路径，第二个字段是类型，第三部分是元数据项
+    while (getline(input_file, line))
+    {
+      string temp = line;
+      temp = temp + " ";
+      int pos = temp.find(" ");
+      string key = temp.substr(0, pos);
+      temp = temp.substr(pos + 1);
+
+      pos = temp.find(" ");
+      string str_type = temp.substr(0, pos);
+      int  type;
+      if(str_type == "0")
+      {
+        type = 0;
+      }
+      else
+      {
+        type = 1;
+      }
+      temp = temp.substr(pos + 1);  
+      path_type.insert({key, type});
+      if (IsLocal(key))
+      {
+        MetadataEntry entry;
+        entry.mutable_permissions();
+        entry.set_type(DIR);
+        while ((pos = temp.find(" ")) != std::string::npos)
+        {
+          string str = temp.substr(0, pos);
+          entry.add_dir_contents(str);
+          temp = temp.substr(pos + 1);
+        }
+        string serialized_entry;
+        entry.SerializeToString(&serialized_entry);
+        store_->Put(key, serialized_entry, 0);
+      }
+    }
+  }
+  else
+  {
+    LOG(ERROR) << "can't open file!";
+  }
+  input_file.close();
+}
 void MetadataStore::InitSmall()
 {
   int asize = machine_->config().size();
@@ -7648,24 +7701,24 @@ void MetadataStore::Tree_Lookup_Internal(
     MetadataAction::Tree_LookupOutput *out)
 {
 
- //原本的遍历代码
+  // 原本的遍历代码
 
   MetadataEntry entry;
   string path = in.path();
 
-  if (path.find("b") != std::string::npos)//我这里是从b开始才是分层的地方了
+  if (path.find("b") != std::string::npos) // 我这里是从b开始才是分层的地方了
   {
-    //要分层
-    //  gaoxuan --use BFS to add new metadata entry
+    // 要分层
+    //   gaoxuan --use BFS to add new metadata entry
 
-    //先把路径拆分开，根据这个b
+    // 先把路径拆分开，根据这个b
     int p = path.find("b");
-    string tree_name = path.substr(0, p -1);
+    string tree_name = path.substr(0, p - 1);
     string hash_name = path.substr(p);
     //
     string root = "";
     string root1 = "";
-    //LOG(ERROR)<<"还没进入循环";
+    // LOG(ERROR)<<"还没进入循环";
     while (1)
     {
       string front = root;
@@ -7742,7 +7795,7 @@ void MetadataStore::Tree_Lookup_Internal(
       delete serialized;
       MetadataAction::LookupOutput out;
       out.ParseFromString(b.output());
-      if (front1 == tree_name)//判断树部分是否搜索完成
+      if (front1 == tree_name) // 判断树部分是否搜索完成
       {
         entry = out.entry();
         break;
@@ -7752,11 +7805,11 @@ void MetadataStore::Tree_Lookup_Internal(
         for (int i = 0; i < out.entry().dir_contents_size(); i++)
         {
 
-          string full_path = front1 + "/" + out.entry().dir_contents(i);//拼接获取全路径
+          string full_path = front1 + "/" + out.entry().dir_contents(i); // 拼接获取全路径
 
           if (in.path().find(full_path) == 0)
           { // Todo:这里需要用相对路径
-          //进入这个分支就代表此时，恰好搜到了，此时i代表的就是所需的相对路径，我们只需要用0位置的id拼一下就好
+            // 进入这个分支就代表此时，恰好搜到了，此时i代表的就是所需的相对路径，我们只需要用0位置的id拼一下就好
             root1 = full_path;
             root = "/" + out.entry().dir_contents(0) + out.entry().dir_contents(i);
             break;
@@ -7764,11 +7817,11 @@ void MetadataStore::Tree_Lookup_Internal(
         }
       }
     }
-    //LOG(ERROR)<<"跳出了循环";
+    // LOG(ERROR)<<"跳出了循环";
 
-    //现在entry中存放的是分层点的元数据项
-    hash_name = "/" +  entry.dir_contents(0) + hash_name;//获取需要hash的相对路径
-    //这个路径直接去lookup一下
+    // 现在entry中存放的是分层点的元数据项
+    hash_name = "/" + entry.dir_contents(0) + hash_name; // 获取需要hash的相对路径
+    // 这个路径直接去lookup一下
     uint64 to_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(hash_name)), config_->LookupReplica(machine_->machine_id()));
     Header *header = new Header();
     header->set_from(machine_->machine_id());
@@ -7817,11 +7870,11 @@ void MetadataStore::Tree_Lookup_Internal(
       Noop<MessageBuffer *>(m);
     }
     MessageBuffer *serialized = m;
-      Action b;
-      b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
-      delete serialized;
-      MetadataAction::LookupOutput o;
-      o.ParseFromString(b.output());    
+    Action b;
+    b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
+    delete serialized;
+    MetadataAction::LookupOutput o;
+    o.ParseFromString(b.output());
     // TODO(agt): Check permissions.
     MetadataEntry entry1 = o.entry();
     // Return entry.
@@ -7831,18 +7884,18 @@ void MetadataStore::Tree_Lookup_Internal(
   {
     string root = "";
     string root1 = "";
-    //LOG(ERROR)<<"还没进入循环";
+    // LOG(ERROR)<<"还没进入循环";
     while (1)
     {
       string front = root;
       string front1 = root1;
       uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
-      if(mds_machine == machine_->machine_id())
+      if (mds_machine == machine_->machine_id())
       {
-        mds_machine = (mds_machine+1)%2;
-      }      
+        mds_machine = (mds_machine + 1) % 2;
+      }
       Header *header = new Header();
-      header->set_flag(2); // 标识      
+      header->set_flag(2); // 标识
       header->set_from(machine_->machine_id());
       header->set_to(mds_machine);
       header->set_type(Header::RPC);
@@ -7874,7 +7927,7 @@ void MetadataStore::Tree_Lookup_Internal(
         header->set_from_length(flag);
         while (flag != 8)
         {
-          string temp = "    ";               // 用四个空格填充一下
+          string temp = "    ";                // 用四个空格填充一下
           header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
           flag++;                              // 拆分的字符串数量++
         }
@@ -7886,7 +7939,7 @@ void MetadataStore::Tree_Lookup_Internal(
         int flag = 0; // 用来标识此时split_string 里面有多少子串
         while (flag != 8)
         {
-          string temp = "    ";               // 用四个空格填充一下
+          string temp = "    ";                // 用四个空格填充一下
           header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
           flag++;                              // 拆分的字符串数量++
         }
@@ -7900,7 +7953,7 @@ void MetadataStore::Tree_Lookup_Internal(
       for (int i = 0; i < 8; i++)
       {
         header->add_metadatentry(empty_str);
-      }      
+      }
       MessageBuffer *m = NULL;
       header->set_data_ptr(reinterpret_cast<uint64>(&m));
       machine_->SendMessage(header, new MessageBuffer());
@@ -7915,17 +7968,17 @@ void MetadataStore::Tree_Lookup_Internal(
       b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
       delete serialized;
 
-      if(b.input() == "switch processed")
+      if (b.input() == "switch processed")
       {
-       
+
         entry.set_type(DIR);
         entry.add_dir_contents("gaoxuan");
-     
+
         break;
       }
       MetadataAction::LookupOutput out;
       out.ParseFromString(b.output());
-      if (front1 == in.path())//单独用全路径来判断是否搜索完成,可以肯定是这里没执行，才退不出去
+      if (front1 == in.path()) // 单独用全路径来判断是否搜索完成,可以肯定是这里没执行，才退不出去
       {
         entry = out.entry();
         break;
@@ -7934,10 +7987,10 @@ void MetadataStore::Tree_Lookup_Internal(
       { // gaoxuan --还没有找到
         for (int i = 0; i < out.entry().dir_contents_size(); i++)
         {
-          string full_path = front1 + "/" + out.entry().dir_contents(i);//拼接获取全路径
+          string full_path = front1 + "/" + out.entry().dir_contents(i); // 拼接获取全路径
           if (in.path().find(full_path) == 0)
           { // Todo:这里需要用相对路径
-          //进入这个分支就代表此时，恰好搜到了，此时i代表的就是所需的相对路径，我们只需要用0位置的id拼一下就好
+            // 进入这个分支就代表此时，恰好搜到了，此时i代表的就是所需的相对路径，我们只需要用0位置的id拼一下就好
             root1 = full_path;
             root = "/" + out.entry().dir_contents(0) + out.entry().dir_contents(i);
             break;
@@ -7948,110 +8001,108 @@ void MetadataStore::Tree_Lookup_Internal(
     out->mutable_entry()->CopyFrom(entry);
   }
 
-
-/*
-  MetadataEntry entry;
-  string path = in.path();
-  string full_path = in.path();
-  string front = path;
-  uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
-  if(mds_machine == machine_->machine_id())
-  {
-    mds_machine = (mds_machine+1)%2;
-  }
-  //LOG(ERROR) << path <<"LS: "<<machine_->machine_id() << " to " << mds_machine;
-  Header *header = new Header();
-  header->set_flag(2); // 标识
-  header->set_from(machine_->machine_id());
-  header->set_to(mds_machine);
-  header->set_type(Header::RPC);
-  header->set_app("client");
-  header->set_rpc("LOOKUP");
-  header->add_misc_string(front.c_str(), strlen(front.c_str()));
-  // firstly, we need split full path
-  if (full_path != "")
-  {
-    int flag = 0;       // 用来标识此时split_string 里面有多少子串
-    char pattern = '/'; // 根据/进行字符串拆分
-    string temp_from = full_path;
-    temp_from = temp_from.substr(1, temp_from.size()); // 这一行是为了去除最前面的/
-    temp_from = temp_from + pattern;                   // 在最后面添加一个/便于处理
-    int pos = temp_from.find(pattern);                 // 找到第一个/的位置
-    while (pos != std::string::npos)                   // 循环不断找/，找到一个拆分一次
+  /*
+    MetadataEntry entry;
+    string path = in.path();
+    string full_path = in.path();
+    string front = path;
+    uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
+    if(mds_machine == machine_->machine_id())
     {
-      string temp1 = temp_from.substr(0, pos); // temp里面就是拆分出来的第一个子串
-      string temp = temp1;
-      for (int i = temp.size(); i < 4; i++)
+      mds_machine = (mds_machine+1)%2;
+    }
+    //LOG(ERROR) << path <<"LS: "<<machine_->machine_id() << " to " << mds_machine;
+    Header *header = new Header();
+    header->set_flag(2); // 标识
+    header->set_from(machine_->machine_id());
+    header->set_to(mds_machine);
+    header->set_type(Header::RPC);
+    header->set_app("client");
+    header->set_rpc("LOOKUP");
+    header->add_misc_string(front.c_str(), strlen(front.c_str()));
+    // firstly, we need split full path
+    if (full_path != "")
+    {
+      int flag = 0;       // 用来标识此时split_string 里面有多少子串
+      char pattern = '/'; // 根据/进行字符串拆分
+      string temp_from = full_path;
+      temp_from = temp_from.substr(1, temp_from.size()); // 这一行是为了去除最前面的/
+      temp_from = temp_from + pattern;                   // 在最后面添加一个/便于处理
+      int pos = temp_from.find(pattern);                 // 找到第一个/的位置
+      while (pos != std::string::npos)                   // 循环不断找/，找到一个拆分一次
       {
-        temp = temp + " ";
+        string temp1 = temp_from.substr(0, pos); // temp里面就是拆分出来的第一个子串
+        string temp = temp1;
+        for (int i = temp.size(); i < 4; i++)
+        {
+          temp = temp + " ";
+        }
+        header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+        flag++;                              // 拆分的字符串数量++
+        temp_from = temp_from.substr(pos + 1, temp_from.size());
+        pos = temp_from.find(pattern);
       }
-      header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
-      flag++;                              // 拆分的字符串数量++
-      temp_from = temp_from.substr(pos + 1, temp_from.size());
-      pos = temp_from.find(pattern);
+      header->set_from_length(flag);
+      while (flag != 8)
+      {
+        string temp = "    ";                // 用四个空格填充一下
+        header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+        flag++;                              // 拆分的字符串数量++
+      }
     }
-    header->set_from_length(flag);
-    while (flag != 8)
+    else
     {
-      string temp = "    ";                // 用四个空格填充一下
-      header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
-      flag++;                              // 拆分的字符串数量++
+      int flag = 0; // 用来标识此时split_string 里面有多少子串
+      while (flag != 8)
+      {
+        string temp = "    ";               // 用四个空格填充一下
+        header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+        flag++;                              // 拆分的字符串数量++
+      }
+      header->set_from_length(flag);
     }
-  }
-  else
-  {
-    int flag = 0; // 用来标识此时split_string 里面有多少子串
-    while (flag != 8)
+    // secondly, we need to add depth of full_path;
+    // need a little function :Dir_depth();
+    int depth = Dir_depth(full_path);
+    header->set_depth(depth);
+    // uid which need to be added in switch
+    int uid = 9999;
+    header->set_uid(uid);
+    // metadataentry part , using " " to fill up
+    string empty_str = "0000000000000000";
+    for (int i = 0; i < 8; i++)
     {
-      string temp = "    ";               // 用四个空格填充一下
-      header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
-      flag++;                              // 拆分的字符串数量++
+      header->add_metadatentry(empty_str);
     }
-    header->set_from_length(flag);
-  }
-  // secondly, we need to add depth of full_path;
-  // need a little function :Dir_depth();
-  int depth = Dir_depth(full_path);
-  header->set_depth(depth);
-  // uid which need to be added in switch
-  int uid = 9999;
-  header->set_uid(uid);
-  // metadataentry part , using " " to fill up
-  string empty_str = "0000000000000000";
-  for (int i = 0; i < 8; i++)
-  {
-    header->add_metadatentry(empty_str);
-  }
-  MessageBuffer *m = NULL;
-  header->set_data_ptr(reinterpret_cast<uint64>(&m));
-  machine_->SendMessage(header, new MessageBuffer());
-  while (m == NULL)
-  {
-    usleep(10);
-    Noop<MessageBuffer *>(m);
-  }
-  MessageBuffer *serialized = m;
-  Action b;
-  b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
-  delete serialized;
+    MessageBuffer *m = NULL;
+    header->set_data_ptr(reinterpret_cast<uint64>(&m));
+    machine_->SendMessage(header, new MessageBuffer());
+    while (m == NULL)
+    {
+      usleep(10);
+      Noop<MessageBuffer *>(m);
+    }
+    MessageBuffer *serialized = m;
+    Action b;
+    b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
+    delete serialized;
 
-  if(b.input() == "switch processed")
-  {
-   
-    entry.set_type(DIR);
-    entry.add_dir_contents("gaoxuan");
-    //LOG(ERROR) << "switch modified! opreation finished!";
-  }
-  else
-  {
-    MetadataAction::LookupOutput out;
-    out.ParseFromString(b.output());
-    entry = out.entry();
-  }
-  out->mutable_entry()->CopyFrom(entry);
- 
-*/
+    if(b.input() == "switch processed")
+    {
 
+      entry.set_type(DIR);
+      entry.add_dir_contents("gaoxuan");
+      //LOG(ERROR) << "switch modified! opreation finished!";
+    }
+    else
+    {
+      MetadataAction::LookupOutput out;
+      out.ParseFromString(b.output());
+      entry = out.entry();
+    }
+    out->mutable_entry()->CopyFrom(entry);
+
+  */
 }
 void MetadataStore::Resize_Internal(
     ExecutionContext *context,
