@@ -363,22 +363,24 @@ int Dir_dep(const string &path)
 
   return depth;
 }
-MessageBuffer *CalvinFSClientApp::LS(const Slice &pat)
+MessageBuffer *CalvinFSClientApp::LS(const Slice &p)
 {
   MetadataEntry entry;
-  string path = pat.data();
-  string root = "";
-  string root1 = "";
-  // LOG(ERROR)<<"还没进入循环";
+  string path = p.data();
+  // TODO vector PATH_SPLIT[]
+
+  string root  = "" ;
+  string root1 = "" ;
+  bool is_hash = false;
+  string hash_full;
+  string hash_path;
+  
+  // for (int num=0 num < size)
   while (1)
   {
     string front = root;
-    string front1 = root1;
+    string front1= root1;
     uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine()->machine_id()));
-    // if (mds_machine == machine_->machine_id())
-    // {
-    //   mds_machine = (mds_machine + 1) % 2;
-    // }
     Header *header = new Header();
     header->set_flag(2); // 标识
     header->set_from(machine()->machine_id());
@@ -387,7 +389,74 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &pat)
     header->set_app("client");
     header->set_rpc("LOOKUP");
     header->add_misc_string(front.c_str(), strlen(front.c_str()));
+//拆分先删掉不看
+    MessageBuffer *m = NULL;
+    header->set_data_ptr(reinterpret_cast<uint64>(&m));
+    machine()->SendMessage(header, new MessageBuffer());
+    while (m == NULL)
+    {
+      usleep(10);
+      Noop<MessageBuffer *>(m);
+    }
+    MessageBuffer *serialized = m;
+    Action b;
+    b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
+    delete serialized;
+    /*
+    if (b.input() == "switch processed")
+    {
+      entry.set_type(DIR);
+      entry.add_dir_contents("gaoxuan");
+      break;
+    }*/
+    MetadataAction::LookupOutput out;
+    out.ParseFromString(b.output());
+    if (front1 == path) 
+    {
+      entry = out.entry();
+      break;
+    }
+    else
+    { // gaoxuan --还没有找到
+      for (int i = 1; i < out.entry().dir_contents_size(); i++)
+      {
+        // if (dir_con[i] == path_split[num])
+        
 
+        string full_path = front1 + "/"  + out.entry().dir_contents(i); // 拼接获取全路径
+       // LOG(ERROR)<<full_path;
+        root1 = full_path;
+        LOG(ERROR)<<full_path <<" and "<<path.find(full_path);
+        if (path.find(full_path) == 0)
+        {
+
+          root = "/" + out.entry().dir_contents(0) +"/" + out.entry().dir_contents(i);
+          LOG(ERROR)<<root;
+          break;
+        }
+      }
+      if(metadata_->path_type[root] == 1)
+      {
+        LOG(ERROR)<<"root";
+        is_hash = true;
+        hash_path = root;
+        hash_full = hash_path + path.substr(root1.size());
+        break;
+      }
+    }
+  }
+  if(is_hash == true)
+  {
+    LOG(ERROR)<<"is_hash";
+    uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(hash_full)), config_->LookupReplica(machine()->machine_id()));
+    Header *header = new Header();
+    header->set_flag(2); // 标识
+    header->set_from(machine()->machine_id());
+    header->set_to(mds_machine);
+    header->set_type(Header::RPC);
+    header->set_app("client");
+    header->set_rpc("LOOKUP");
+    header->add_misc_string(hash_full.c_str(), strlen(hash_full.c_str()));
     if (path != "")
     {
       int flag = 0;       // 用来标识此时split_string 里面有多少子串
@@ -451,35 +520,22 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &pat)
     Action b;
     b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
     delete serialized;
-
     if (b.input() == "switch processed")
     {
       entry.set_type(DIR);
       entry.add_dir_contents("gaoxuan");
-      break;
-    }
-    MetadataAction::LookupOutput out;
-    out.ParseFromString(b.output());
-    if (front1 == pat.data()) // 单独用全路径来判断是否搜索完成,可以肯定是这里没执行，才退不出去
-    {
-      entry = out.entry();
-      break;
+
     }
     else
-    { // gaoxuan --还没有找到
-      for (int i = 0; i < out.entry().dir_contents_size(); i++)
-      {
-        string full_path = front1 + "/" + out.entry().dir_contents(i); // 拼接获取全路径
-        if (path.find(full_path) == 0)
-        { // Todo:这里需要用相对路径
-          // 进入这个分支就代表此时，恰好搜到了，此时i代表的就是所需的相对路径，我们只需要用0位置的id拼一下就好
-          root1 = full_path;
-          root = "/" + out.entry().dir_contents(0) + "/" + out.entry().dir_contents(i);
-          break;
-        }
-      }
+    {
+     MetadataAction::LookupOutput out;
+    out.ParseFromString(b.output());
+    entry = out.entry();     
     }
+
   }
+
+
 
   if (entry.type() == DIR)
   {

@@ -4272,6 +4272,7 @@ void MetadataStore::Init_from_txt(string filename)
       }
       temp = temp.substr(pos + 1);  
       path_type.insert({key, type});
+      LOG(ERROR)<<key;
       if (IsLocal(key))
       {
         MetadataEntry entry;
@@ -4489,7 +4490,8 @@ void MetadataStore::getLOOKUP(string path)
   }
   LOG(ERROR) << "finished LOOKUP";
 }
-void MetadataStore::GetRWSets(Action *action)
+void MetadataStore::
+GetRWSets(Action *action)
 { // gaoxuan --this function is called by RameFile() for RenameExperiment
   action->clear_readset();
   action->clear_writeset();
