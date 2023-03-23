@@ -21,6 +21,7 @@
 #include <iostream>
 #include <fstream>
 #include <stdlib.h>
+#include <vector>
 //
 using std::make_pair;
 
