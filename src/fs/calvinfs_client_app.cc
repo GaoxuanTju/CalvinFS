@@ -544,6 +544,7 @@ MessageBuffer *CalvinFSClientApp::CopyFile(const Slice &from_path, const Slice &
 
 MessageBuffer *CalvinFSClientApp::RenameFile(const Slice &from_path, const Slice &to_path)
 {
+
   uint64 distinct_id = machine()->GetGUID();
   string channel_name = "action-result-" + UInt64ToString(distinct_id);
   auto channel = machine()->DataChannel(channel_name);
@@ -562,6 +563,7 @@ MessageBuffer *CalvinFSClientApp::RenameFile(const Slice &from_path, const Slice
   metadata_->GetRWSets(a);
 
   log_->Append(a);
+  
 
   MessageBuffer *m = NULL;
   while (!channel->Pop(&m))
@@ -569,12 +571,13 @@ MessageBuffer *CalvinFSClientApp::RenameFile(const Slice &from_path, const Slice
     // Wait for action to complete and be sent back.
     usleep(100);
   }
-
+  LOG(ERROR)<<m->size();
   Action result;
   result.ParseFromArray((*m)[0].data(), (*m)[0].size());
   delete m;
   MetadataAction::RenameOutput out;
   out.ParseFromString(result.output());
+
 
   if (out.success())
   {
@@ -584,6 +587,7 @@ MessageBuffer *CalvinFSClientApp::RenameFile(const Slice &from_path, const Slice
   {
     return new MessageBuffer(new string("error creating file/dir\n"));
   }
+
 }
 
 BTNode *CalvinFSClientApp::find_path(BTNode *dir_tree, string path, BTNode *&pre)
