@@ -67,7 +67,8 @@ public:
   {
     return machine_;
   }
-std::map<string, int>path_type;
+  std::map<string, int> path_type;
+
 private:
   void CreateFile_Internal(
       ExecutionContext *context,
@@ -87,7 +88,7 @@ private:
   void Rename_Internal(
       ExecutionContext *context,
       const MetadataAction::RenameInput &in,
-      MetadataAction::RenameOutput *out);
+      MetadataAction::RenameOutput *out, string from_hash, string to_hash, string from_parent, string to_parent);
 
   void Lookup_Internal(
       ExecutionContext *context,
@@ -121,7 +122,7 @@ private:
 
   // Map of file paths to serialized MetadataEntries.
   VersionedKVStore *store_;
-  
+
   // Pointer to local machine (for distributed action execution contexts).
   Machine *machine_;
 

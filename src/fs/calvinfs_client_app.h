@@ -891,23 +891,13 @@ public:
     Spin(1);
     machine()->GlobalBarrier();
     Spin(1);
-    int a1 = rand() % 2;
-    int a2 = rand() % 2;
-    int a3 = rand() % 2;
-    int a4 = rand() % 2;
-    int a5 = rand() % 2;
-    int a6 = rand() % 2;
-    int a7 = rand() % 2;
-    int a8 = rand() % 2;
-    int a9 = rand() % 2;
+    std::vector<int> file_suffix;
+    
 
     double start = GetTime();
     string from_path;
     string to_path;
-    while (a4 == a9)
-    {
-      a9 = rand() % 2;
-    }
+
     /*
     //使用五层测试树到树
     from_path = "/a_0" + IntToString(machine()->machine_id()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2) + "/a_3" + IntToString(a3) + "/a_4" + IntToString(a4);
@@ -934,13 +924,15 @@ public:
         BackgroundRenameFile(from_path, to_path);
     */
     // 八层rename到五层，测试hash到树
+    /*
+    
     to_path = "/a_0" + IntToString(rand() % machine()->config().size()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2) + "/a_3" + IntToString(a3) + "/a_4" + IntToString(a4) + "/A" + IntToString(machine()->GetGUID());
     from_path = "/a_0" + IntToString(machine()->machine_id()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2) + "/a_3" + IntToString(a3) + "/a_4" + IntToString(a4) + "/a_5" + IntToString(a5) + "/b" + IntToString(a6) + "/c" + IntToString(a7);
     uint64 from_id = config_->LookupMetadataShard(config_->HashFileName(from_path), config_->LookupReplica(machine()->machine_id()));
     uint64 to_id = config_->LookupMetadataShard(config_->HashFileName(to_path), config_->LookupReplica(machine()->machine_id()));
     LOG(ERROR) << from_path << " in machine[" << from_id << "]  renamed to   " << to_path << " in machine[" << to_id << "]";
     BackgroundRenameFile(from_path, to_path);
-
+*/
     /*
         for (int j = 0; j < 2; j++)
         {
@@ -1065,7 +1057,7 @@ public:
     string from_path3 = "/a_0" + IntToString(machine()->machine_id()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2);
     string from_path8 = "/a_0" + IntToString(machine()->machine_id()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2) + "/a_3" + IntToString(a3) + "/a_4" + IntToString(a4)
     + "/a_5" + IntToString(a5) + "/a_6" + IntToString(a6) + "/a_7" + IntToString(0);
-    string path = "/a0";
+    string path = "/a0/b0/c1";
     LOG(ERROR) << machine()->machine_id() << " path: " << path << " in " << config_->LookupMetadataShard(config_->HashFileName(path), config_->LookupReplica(machine()->machine_id()));
     for(int i = 0; i < 1 ; i++)
     {

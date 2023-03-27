@@ -372,6 +372,9 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &p)
   PATH_SPLIT.push_back(""); // add root dir to split_string
   char pattern = '/';
   path = path + pattern; // add / so that we can deal with it more conveniently
+  path = path.substr(1);
+  bool hash_flag = false;
+  string hash_path;
   int pos;
   while ((pos = path.find(pattern)) != std::string::npos)
   {
@@ -381,7 +384,8 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &p)
   }
   // ok, now all the split_string has been put to PATH_SPLIT, then use it to loop
   string uid;
-  for (int i = 0; i < PATH_SPLIT.size(); i++)
+  int i;
+  for (i = 0; i < PATH_SPLIT.size(); i++)
   {
     // get split string and send lookup to get metadataentry
     string front;
@@ -392,6 +396,15 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &p)
     else
     {
       front = "/" + uid + "/" + PATH_SPLIT[i];
+    }
+
+    //if the path is hash type, we need to jump to deal with hash lookup
+    if(metadata_->path_type[front] == 1)//1 represents hash
+    {
+      i++;
+      hash_flag = true;
+      hash_path = front;
+      break;
     }
 
     uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine()->machine_id()));
@@ -434,6 +447,42 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &p)
       entry = out.entry();
     }
   }
+
+  if(hash_flag == true)
+  {
+    //hash,we need to get hash path;
+    for(; i < PATH_SPLIT.size(); i++)
+    {
+      hash_path = hash_path + "/" + PATH_SPLIT[i];
+    }
+    uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(hash_path)), config_->LookupReplica(machine()->machine_id()));
+    Header *header = new Header();
+    header->set_flag(2); // 标识
+    header->set_from(machine()->machine_id());
+    header->set_to(mds_machine);
+    header->set_type(Header::RPC);
+    header->set_app("client");
+    header->set_rpc("LOOKUP");
+    header->add_misc_string(hash_path.c_str(), strlen(hash_path.c_str()));
+    // TODO：this part needs to add some parts to lookup request
+
+    MessageBuffer *m = NULL;
+    header->set_data_ptr(reinterpret_cast<uint64>(&m));
+    machine()->SendMessage(header, new MessageBuffer());
+    while (m == NULL)
+    {
+      usleep(10);
+      Noop<MessageBuffer *>(m);
+    }
+    MessageBuffer *serialized = m;
+    Action b;
+    b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
+    delete serialized;   
+    MetadataAction::LookupOutput out;
+    out.ParseFromString(b.output());
+    entry = out.entry();
+  }
+
   if (entry.type() == DIR)
   {
     string *result = new string();
