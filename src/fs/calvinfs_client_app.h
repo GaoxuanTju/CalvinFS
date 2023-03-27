@@ -951,12 +951,14 @@ public:
         }
     */
     from_path = "/a" + IntToString(0) + "/b" + IntToString(0);
-    to_path = "/a" + IntToString(0) + "/b" + IntToString(1) + "/d" + IntToString(machine()->GetGUID());
+    to_path = "/a" + IntToString(1) + "/b" + IntToString(0) + "/d" + IntToString(machine()->GetGUID());
     uint64 from_id = config_->LookupMetadataShard(config_->HashFileName(from_path), config_->LookupReplica(machine()->machine_id()));
     uint64 to_id = config_->LookupMetadataShard(config_->HashFileName(to_path), config_->LookupReplica(machine()->machine_id()));
     LOG(ERROR) << from_path << " in machine[" << from_id << "]  renamed to   " << to_path << " in machine[" << to_id << "]";
     BackgroundRenameFile(from_path,
                          to_path);
+
+
     // Wait for all operations to finish.
     while (capacity_.load() < kMaxCapacity)
     {
@@ -969,6 +971,8 @@ public:
     LOG(ERROR) << "Renamed "
                << "1 files. Elapsed time:"
                << (GetTime() - start) << " seconds";
+              Spin(1); 
+               metadata_->getLOOKUP("");
   }
   void DeleteExperiment()
   { // gaoxuan --删除文件的实验
@@ -1043,7 +1047,7 @@ public:
     string from_path20 = "/a_0" + IntToString(machine()->machine_id()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2) + "/a_3" + IntToString(a3) + "/a_4" + IntToString(a4) + "/a_5" + IntToString(a5) + "/a_6" + IntToString(a6) + "/a_7" + IntToString(a7) + "/a_8" + IntToString(a8) + "/a_9" + IntToString(a9) + "/a_10" + IntToString(a10) + "/a_11" + IntToString(a11) + "/a_12" + IntToString(a12) + "/a_13" + IntToString(a13) + "/a_14" + IntToString(a14) + "/a_15" + IntToString(a15) + "/a_16" + IntToString(a16) + "/a_17" + IntToString(a17) + "/a_18" + IntToString(a18) + "/a_19" + IntToString(0);
     string from_path3 = "/a_0" + IntToString(machine()->machine_id()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2);
     string from_path8 = "/a_0" + IntToString(machine()->machine_id()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2) + "/a_3" + IntToString(a3) + "/a_4" + IntToString(a4) + "/a_5" + IntToString(a5) + "/a_6" + IntToString(a6) + "/a_7" + IntToString(0);
-    string path = "/a0/b0/c1";
+    string path = "/a0/b0/c0";
     LOG(ERROR) << machine()->machine_id() << " path: " << path << " in " << config_->LookupMetadataShard(config_->HashFileName(path), config_->LookupReplica(machine()->machine_id()));
     for (int i = 0; i < 1; i++)
     {
@@ -1567,7 +1571,7 @@ public:
 
   void BackgroundRenameFile(const Slice &from_path, const Slice &to_path)
   {
-    LOG(ERROR)<<"background rename is starting";
+
     Header *header = new Header();
     // LOG(ERROR)<<"in backgroundrename :: "<<from_path.data()<<" and "<<to_path.data();
     header->set_from(machine()->machine_id());

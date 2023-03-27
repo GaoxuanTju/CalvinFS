@@ -571,7 +571,7 @@ MessageBuffer *CalvinFSClientApp::RenameFile(const Slice &from_path, const Slice
     // Wait for action to complete and be sent back.
     usleep(100);
   }
-  LOG(ERROR)<<m->size();
+  
   Action result;
   result.ParseFromArray((*m)[0].data(), (*m)[0].size());
   delete m;
