@@ -134,14 +134,71 @@ public:
   virtual void HandleMessage(Header *header, MessageBuffer *message)
   {
     // INTERNAL metadata lookup
+/*    
     if (header->rpc() == "LOOKUP")
     {
+      //在这判断一下是不是最终的位置，如果是了，
       machine()->SendReplyMessage(
           header,
           GetMetadataEntry(header, header->misc_string(0)));
+    }*/
+    if (header->rpc() == "LOOKUP")
+    {
+      int depth;//用来记录当前遍历到那个深度了
+      //先获取元数据项
+      string path;
+      MessageBuffer *serialized = GetMetadataEntry(header, path = header->misc_string(0));
+      if(path == "")
+      {
+        depth = 0;
+      }
+      else
+      {
+        depth = header->depth() + 1;
+      }
+      if(depth == header->from_length() || Dir_dep(path) >2)//是最后一段,将最后结果发回
+      {
+        machine()->SendReplyMessage(header, serialized);
+        delete serialized;
+      }      
+      else
+      {
+        Action b;
+        b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
+        delete serialized;
+        MetadataAction::LookupOutput out;
+        out.ParseFromString(b.output());   
+        MetadataEntry entry = out.entry();
+        //现在entry中存放的是这一步拿到的元数据项   
+        string LS_path ;
+        string uid = entry.dir_contents(0);
+        if(metadata_->path_type[path] == 0)
+        {
+          //树类型
 
-      // EXTERNAL LS
-    }
+          string filename = header->split_string_from(depth);
+          LS_path = "/" + uid + "/" + filename;
+        } 
+        else
+        {
+          LS_path = path;
+          for(int i = depth; i < header->from_length(); i++)
+          {
+            LS_path = LS_path + "/" + header->split_string_from(i);
+          }
+        }
+        //下面要对LS——path发lookup请求
+        uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(LS_path)), config_->LookupReplica(machine()->machine_id()));   
+        //这之前是发送lookup请求
+        //还是之前的header，只需要改路径，from, to就行
+        header->set_from(machine()->machine_id());
+        header-set_to(mds_machine);
+        header->clear_misc_string();
+        header->add_misc_string(LS_path.c_str(), strlen(LS_path.c_str()));
+        machine()->SendMessage(header, new MessageBuffer());
+      }
+
+    }    
     else if (header->rpc() == "LS")
     {
       machine()->SendReplyMessage(header, LS(header->misc_string(0)));
@@ -955,36 +1012,6 @@ public:
     machine()->GlobalBarrier();
     Spin(1);
 
-    int a1 = rand() % 2;
-    int a2 = rand() % 2;
-    int a3 = rand() % 2;
-    int a4 = rand() % 2;
-    int a5 = rand() % 2;
-    int a6 = rand() % 2;
-    int a7 = rand() % 2;
-    int a8 = rand() % 2;
-    int a9 = rand() % 2;
-    int a10 = rand() % 2;
-    int a11 = rand() % 2;
-    int a12 = rand() % 2;
-    int a13 = rand() % 2;
-    int a14 = rand() % 2;
-    int a15 = rand() % 2;
-    int a16 = rand() % 2;
-    int a17 = rand() % 2;
-    int a18 = rand() % 2;
-    int a19 = rand() % 2;
-    int a20 = rand() % 2;
-
-    double start = GetTime();
-    // string from_path = "/a_0" + IntToString(machine()->machine_id());
-    // string from_path = "/a_0" + IntToString(machine()->machine_id())+"/a_1" + IntToString(a1);
-    string from_path5 = "/a_0" + IntToString(machine()->machine_id()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2) + "/a_3" + IntToString(a3) + "/a_4" + IntToString(a4);
-    string from_path10 = "/a_0" + IntToString(machine()->machine_id()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2) + "/a_3" + IntToString(a3) + "/a_4" + IntToString(a4) + "/a_5" + IntToString(a5) + "/a_6" + IntToString(a6) + "/a_7" + IntToString(a7) + "/a_8" + IntToString(a8) + "/a_9" + IntToString(a9);
-    string from_path15 = "/a_0" + IntToString(machine()->machine_id()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2) + "/a_3" + IntToString(a3) + "/a_4" + IntToString(a4) + "/a_5" + IntToString(a5) + "/a_6" + IntToString(a6) + "/a_7" + IntToString(a7) + "/a_8" + IntToString(a8) + "/a_9" + IntToString(a9) + "/a_10" + IntToString(a10) + "/a_11" + IntToString(a11) + "/a_12" + IntToString(a12) + "/a_13" + IntToString(a13) + "/a_14" + IntToString(a14);
-    string from_path20 = "/a_0" + IntToString(machine()->machine_id()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2) + "/a_3" + IntToString(a3) + "/a_4" + IntToString(a4) + "/a_5" + IntToString(a5) + "/a_6" + IntToString(a6) + "/a_7" + IntToString(a7) + "/a_8" + IntToString(a8) + "/a_9" + IntToString(a9) + "/a_10" + IntToString(a10) + "/a_11" + IntToString(a11) + "/a_12" + IntToString(a12) + "/a_13" + IntToString(a13) + "/a_14" + IntToString(a14) + "/a_15" + IntToString(a15) + "/a_16" + IntToString(a16) + "/a_17" + IntToString(a17) + "/a_18" + IntToString(a18) + "/a_19" + IntToString(0);
-    string from_path3 = "/a_0" + IntToString(machine()->machine_id()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2);
-    string from_path8 = "/a_0" + IntToString(machine()->machine_id()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2) + "/a_3" + IntToString(a3) + "/a_4" + IntToString(a4) + "/a_5" + IntToString(a5) + "/a_6" + IntToString(a6) + "/a_7" + IntToString(0);
     string path = "/a0/b0/c0";
     LOG(ERROR) << machine()->machine_id() << " path: " << path << " in " << config_->LookupMetadataShard(config_->HashFileName(path), config_->LookupReplica(machine()->machine_id()));
     for (int i = 0; i < 1; i++)
@@ -1092,6 +1119,7 @@ public:
   MessageBuffer *CreateFile(const Slice &path, FileType type = DATA);
   MessageBuffer *AppendStringToFile(const Slice &data, const Slice &path);
   MessageBuffer *ReadFile(const Slice &path);
+  int Dir_dep(const string &path);//获取深度
   MessageBuffer *LS(const Slice &path);
   MessageBuffer *CopyFile(const Slice &from_path, const Slice &to_path);
   MessageBuffer *RenameFile(const Slice &from_path, const Slice &to_path);
@@ -1324,42 +1352,6 @@ public:
     header->set_app(name());
     header->set_rpc("LS");
     header->add_misc_string(path.data(), path.size());
-
-    // gaoxuan --在这里发出消息之前，把from_path.data()和to_path.data()拆分一下
-
-    /*
-    //拆分路径
-        int flag = 0;       // 用来标识此时split_string 里面有多少子串
-        char pattern = '/'; // 根据/进行字符串拆分
-
-        string temp_from = path.data();
-        temp_from = temp_from.substr(1, temp_from.size()); // 这一行是为了去除最前面的/
-        temp_from = temp_from + pattern;                   // 在最后面添加一个/便于处理
-        int pos = temp_from.find(pattern);                 // 找到第一个/的位置
-        while (pos != std::string::npos)                   // 循环不断找/，找到一个拆分一次
-        {
-          string temp1 = temp_from.substr(0, pos); // temp里面就是拆分出来的第一个子串
-          string temp = temp1;
-          for (int i = temp.size(); i < 5; i++)
-          {
-            temp = temp + " ";
-          }
-          header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
-          flag++;                              // 拆分的字符串数量++
-          temp_from = temp_from.substr(pos + 1, temp_from.size());
-          pos = temp_from.find(pattern);
-        }
-        header->set_from_length(flag);
-        while (flag != 8)
-        {
-          string temp = "     ";               // 用五个空格填充一下
-          header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
-          flag++;                              // 拆分的字符串数量++
-        }
-
-        // 这一行之前是gaoxuan添加的
-    */
-
     if (reporting_ && rand() % 2 == 0)
     {
       header->set_callback_app(name());

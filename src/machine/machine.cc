@@ -41,8 +41,6 @@ public:
     //
     // TODO(agt): Support inline RPCs?
     case Header::RPC:
-    
-    
       if(header->has_flag() && header->flag() == 3)
       {
         //3 represents this packet is modified by switch
