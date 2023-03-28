@@ -519,7 +519,7 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
   {
     int flag = 0;       
     char pattern = '/'; 
-    string temp_from = path.data().c_str();
+    string temp_from = path.data();
     temp_from = temp_from.substr(1, temp_from.size()); // 这一行是为了去除最前面的/
     temp_from = temp_from + pattern;                   // 在最后面添加一个/便于处理
     int pos = temp_from.find(pattern);                 // 找到第一个/的位置

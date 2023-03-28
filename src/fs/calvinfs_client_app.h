@@ -192,7 +192,7 @@ public:
         //这之前是发送lookup请求
         //还是之前的header，只需要改路径，from, to就行
         header->set_from(machine()->machine_id());
-        header-set_to(mds_machine);
+        header->set_to(mds_machine);
         header->clear_misc_string();
         header->add_misc_string(LS_path.c_str(), strlen(LS_path.c_str()));
         machine()->SendMessage(header, new MessageBuffer());
@@ -1011,7 +1011,7 @@ public:
     Spin(1);
     machine()->GlobalBarrier();
     Spin(1);
-
+    double start = GetTime();
     string path = "/a0/b0/c0";
     LOG(ERROR) << machine()->machine_id() << " path: " << path << " in " << config_->LookupMetadataShard(config_->HashFileName(path), config_->LookupReplica(machine()->machine_id()));
     for (int i = 0; i < 1; i++)
