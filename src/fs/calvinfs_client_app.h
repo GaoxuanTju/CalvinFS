@@ -148,6 +148,7 @@ public:
       // 先获取元数据项
       string path;
       MessageBuffer *serialized = GetMetadataEntry(header, path = header->misc_string(0));
+      LOG(ERROR)<<path;
       if (path == "")
       {
         depth = 0;
@@ -158,6 +159,7 @@ public:
       }
       if (depth == header->from_length() || Dir_dep(path) > 2) // 是最后一段,将最后结果发回
       {
+        LOG(ERROR)<<path<<" finished";
         machine()->SendReplyMessage(header, serialized);
         delete serialized;
       }
@@ -205,10 +207,12 @@ public:
             LS_path = LS_path + "/" + new_str;
           }
         }
+        LOG(ERROR)<<path<<"send again";
         // 下面要对LS——path发lookup请求
         uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(LS_path)), config_->LookupReplica(machine()->machine_id()));
         // 这之前是发送lookup请求
         // 还是之前的header，只需要改路径，from, to就行
+        
         header->set_from(machine()->machine_id());
         header->set_to(mds_machine);
         header->clear_misc_string();
