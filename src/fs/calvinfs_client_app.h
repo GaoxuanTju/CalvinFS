@@ -171,7 +171,7 @@ public:
         }   
         //这上面是正常的，证明我们的确是能够正常把元数据项拿到了，只是发回去的过程出了点问题
         machine()->SendReplyMessage(header, serialized);
-        delete serialized;
+
       }
       else
       {
@@ -222,30 +222,12 @@ public:
         uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(LS_path)), config_->LookupReplica(machine()->machine_id()));
         // 这之前是发送lookup请求
         // 还是之前的header，只需要改路径，from, to就行
-        Header *h = new Header();
-        h->set_from(machine()->machine_id());
-        h->set_to(mds_machine);
-        h->set_flag(2);
-        h->set_type(Header::RPC);
-        h->set_app("client");
-        h->set_rpc("LOOKUP");  
-        h->add_misc_string(LS_path.c_str(), strlen(LS_path.c_str()));
-        //下面把拆分的拷贝过来
-        int length = header->from_length();
-        h->set_from_length(length);
-        for(int i = 0; i < 8; i++)
-        {
-          h->add_split_string_from(header->split_string_from(i));
-        }
-        h->set_depth(header->depth());
-        h->set_uid(9999);
-        string empty_str = "0000000000000000";
-        for (int i = 0; i < 8; i++)
-        {
-          h->add_metadatentry(empty_str);
-        }    
-        h->set_data_ptr(header->data_ptr());    
-        machine()->SendMessage(h, new MessageBuffer());
+        
+        header->set_from(machine()->machine_id());
+        header->set_to(mds_machine);
+        header->clear_misc_string();
+        header->add_misc_string(LS_path.c_str(), strlen(LS_path.c_str()));
+        machine()->SendMessage(header, new MessageBuffer());
       }
     }
     else if (header->rpc() == "LS")
