@@ -207,7 +207,7 @@ public:
             LS_path = LS_path + "/" + new_str;
           }
         }
-        LOG(ERROR)<<path<<"send again";
+        LOG(ERROR)<<LS_path<<"send again";
         // 下面要对LS——path发lookup请求
         uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(LS_path)), config_->LookupReplica(machine()->machine_id()));
         // 这之前是发送lookup请求
