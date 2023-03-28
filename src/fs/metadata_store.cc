@@ -222,7 +222,7 @@ public:
     {
 
       string path = action->writeset(i);
-
+      
       string hash_name;
 
       hash_name = path;
@@ -4255,6 +4255,7 @@ void MetadataStore::Init_from_txt(string filename)
     // line中第一个字段是路径，第二个字段是类型，第三部分是元数据项
     while (getline(input_file, line))
     {
+      line.erase(remove(line.begin(), line.end(), '\r'), line.end());
       string temp = line;
       temp = temp + " ";
       int pos = temp.find(" ");
@@ -4949,7 +4950,7 @@ void MetadataStore::
           action->add_readset(front);
           action->add_writeset(front);
           action->add_writeset(target_front);
-          LOG(ERROR) << "writeset: " << target_front;
+//          LOG(ERROR) << "writeset: " << target_front;
           path_type[target_front] = 1; // 目的位置是hash，下面全是hash
           // get its child
           uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
@@ -5557,7 +5558,7 @@ void MetadataStore::Rename_Internal(
     const MetadataAction::RenameInput &in,
     MetadataAction::RenameOutput *out, string from_hash, string to_hash, string from_parent, string to_parent)
 {
-  // LOG(ERROR)<<"rename internal";
+   LOG(ERROR)<<"rename internal in machine [" <<machine_->machine_id();
   MetadataEntry from_parent_entry;
   if (!context->GetEntry(from_parent, &from_parent_entry))
   {
@@ -5681,19 +5682,22 @@ void MetadataStore::Rename_Internal(
         {
           MetadataEntry to;   // gaoxuan --the entry which will be added
           MetadataEntry from; // gaoxuan --the entry which will be used to copy to to_entry
-          context->GetEntry(front, &from);
+          if(!context->GetEntry(front, &from))
+          {
+            LOG(ERROR)<<"dont getentry";
+          }
           to.CopyFrom(from);
 
           context->PutEntry(hash_front, to);
           // Erase the from_entry
-          LOG(ERROR) << hash_front << " and " << to.dir_contents(0);
+        //  LOG(ERROR) << hash_front << " and " << to.dir_contents(0);
           if (to.type() == DIR)
           {
             string uid = to.dir_contents(0);
             uid.erase(remove(uid.begin(), uid.end(), '\r'), uid.end());
             for (int i = 1; i < to.dir_contents_size(); i++)
             {
-              string filename = out.entry().dir_contents(i);
+              string filename = to.dir_contents(i);
               //  push queue
               size_t pos = filename.find_first_of("\r"); // 查找第一个回车符的位置
               while (pos != string::npos)

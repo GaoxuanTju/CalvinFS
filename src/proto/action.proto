@@ -32,6 +32,11 @@ message Action {
   // Specifies any results returned once the Action was executed.
   optional bytes output = 15;
 
+  optional string from_hash = 16;
+  optional string to_hash = 17;
+  optional string from_parent = 18;
+  optional string to_parent = 19;
+
   // Keys of records READ by the action.
   repeated bytes readset = 21;
 
