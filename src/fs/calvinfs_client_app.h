@@ -225,20 +225,20 @@ public:
       machine()->SendReplyMessage(header, RenameFile(
                                               s1 = header->misc_string(0),
                                               s2 = header->misc_string(1)));
-    /*
-      // 用于发送汇总请求的地方
-      Header *temp = new Header();
-      temp->set_from(header->from());
-      temp->set_to(0);
-      temp->set_type(Header::RPC);
-      temp->set_app(name());
-      temp->set_rpc("SUMMARY_RENAME");
+      /*
+        // 用于发送汇总请求的地方
+        Header *temp = new Header();
+        temp->set_from(header->from());
+        temp->set_to(0);
+        temp->set_type(Header::RPC);
+        temp->set_app(name());
+        temp->set_rpc("SUMMARY_RENAME");
 
-      temp->add_misc_string(s1);
-      temp->add_misc_string(s2);
+        temp->add_misc_string(s1);
+        temp->add_misc_string(s2);
 
-      machine()->SendMessage(temp, new MessageBuffer());
-*/
+        machine()->SendMessage(temp, new MessageBuffer());
+  */
       // Callback for recording latency stats
     }
     else if (header->rpc() == "CB")
@@ -890,74 +890,13 @@ public:
     string from_path;
     string to_path;
 
-    /*
-    //使用五层测试树到树
-    from_path = "/a_0" + IntToString(machine()->machine_id()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2) + "/a_3" + IntToString(a3) + "/a_4" + IntToString(a4);
-    to_path = "/a_0" + IntToString(rand() % machine()->config().size()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2) + "/a_3" + IntToString(a5) + "/A" + IntToString(machine()->GetGUID());
-    */
-
-    /*
-    //使用八层测试hash到hash
-
-        from_path = "/a_0" + IntToString(machine()->machine_id()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2) + "/a_3" + IntToString(a3)
-        + "/a_4" + IntToString(a4) + "/a_5" + IntToString(a5) + "/b" + IntToString(a6) + "/c" + IntToString(a7);
-        to_path = "/a_0" + IntToString(rand() % machine()->config().size()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2) + "/a_3" + IntToString(a3)
-        + "/a_4" + IntToString(a4) + "/a_5" + IntToString(a9) + "/b" + IntToString(a6) + "/A" + IntToString(machine()->GetGUID());    // 上面是到相同父目录下
-     */
-    /*
-        // 五层rename到八层，测试树到hash
-        from_path = "/a_0" + IntToString(machine()->machine_id()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2) + "/a_3" + IntToString(a3) + "/a_4" + IntToString(a4);
-        to_path = "/a_0" + IntToString(rand() % machine()->config().size()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2) + "/a_3" + IntToString(a3) + "/a_4" + IntToString(a9) + "/a_5" + IntToString(a5) + "/b" + IntToString(a6) + "/A" + IntToString(machine()->GetGUID());
-
-        uint64 from_id = config_->LookupMetadataShard(config_->HashFileName(from_path), config_->LookupReplica(machine()->machine_id()));
-        uint64 to_id = config_->LookupMetadataShard(config_->HashFileName(to_path), config_->LookupReplica(machine()->machine_id()));
-        LOG(ERROR) << from_path << " in machine[" << from_id << "]  renamed to   " << to_path << " in machine[" << to_id << "]";
-        BackgroundRenameFile(from_path, to_path);
-    */
-    // 八层rename到五层，测试hash到树
-    /*
-
-    to_path = "/a_0" + IntToString(rand() % machine()->config().size()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2) + "/a_3" + IntToString(a3) + "/a_4" + IntToString(a4) + "/A" + IntToString(machine()->GetGUID());
-    from_path = "/a_0" + IntToString(machine()->machine_id()) + "/a_1" + IntToString(a1) + "/a_2" + IntToString(a2) + "/a_3" + IntToString(a3) + "/a_4" + IntToString(a4) + "/a_5" + IntToString(a5) + "/b" + IntToString(a6) + "/c" + IntToString(a7);
-    uint64 from_id = config_->LookupMetadataShard(config_->HashFileName(from_path), config_->LookupReplica(machine()->machine_id()));
-    uint64 to_id = config_->LookupMetadataShard(config_->HashFileName(to_path), config_->LookupReplica(machine()->machine_id()));
-    LOG(ERROR) << from_path << " in machine[" << from_id << "]  renamed to   " << to_path << " in machine[" << to_id << "]";
-    BackgroundRenameFile(from_path, to_path);
-*/
-    /*
-        for (int j = 0; j < 2; j++)
-        {
-          int a1 = rand() % 5;
-          int a2 = rand() % 5;
-          while (a2 == a1)
-          {
-            a2 = rand() % 5;
-          }
-
-          string from_path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(a1) + "/c" + IntToString(j);
-          string to_path = "/a" + IntToString(rand() % machine()->config().size()) + "/b" + IntToString(a2) + "/d" + IntToString(machine()->GetGUID());
-          uint64 from_id = config_->LookupMetadataShard(config_->HashFileName(from_path), config_->LookupReplica(machine()->machine_id()));
-          uint64 to_id = config_->LookupMetadataShard(config_->HashFileName(to_path), config_->LookupReplica(machine()->machine_id()));
-          LOG(ERROR) << from_path << " in machine[" << from_id << "]  renamed to   " << to_path << " in machine[" << to_id << "]";
-          BackgroundRenameFile(from_path,
-                               to_path);
-
-          if (j % 50 == 0)
-          {
-
-            LOG(ERROR) << "[" << machine()->machine_id() << "] "
-                       << "Test progress : " << j / 50 << "/" << 5;
-          }
-        }
-    */
-    from_path = "/a" + IntToString(0) + "/b" + IntToString(0);
+    from_path = "/a" + IntToString(0) ;
     to_path = "/a" + IntToString(1) + "/b" + IntToString(0) + "/d" + IntToString(machine()->GetGUID());
     uint64 from_id = config_->LookupMetadataShard(config_->HashFileName(from_path), config_->LookupReplica(machine()->machine_id()));
     uint64 to_id = config_->LookupMetadataShard(config_->HashFileName(to_path), config_->LookupReplica(machine()->machine_id()));
     LOG(ERROR) << from_path << " in machine[" << from_id << "]  renamed to   " << to_path << " in machine[" << to_id << "]";
     BackgroundRenameFile(from_path,
                          to_path);
-
 
     // Wait for all operations to finish.
     while (capacity_.load() < kMaxCapacity)
@@ -971,8 +910,8 @@ public:
     LOG(ERROR) << "Renamed "
                << "1 files. Elapsed time:"
                << (GetTime() - start) << " seconds";
-              Spin(1); 
-               metadata_->getLOOKUP("");
+    Spin(1);
+    metadata_->getLOOKUP("");
   }
   void DeleteExperiment()
   { // gaoxuan --删除文件的实验
@@ -1163,47 +1102,13 @@ public:
   {
     Header *header = new Header();
     header->set_from(machine()->machine_id());
-    header->set_to((machine()->machine_id() + 1) % 2);
+    header->set_to(machine()->machine_id());
     header->set_type(Header::RPC);
     header->set_app(name());
     header->set_rpc("CREATE_FILE");
     header->add_misc_bool(type == DIR); // DIR = true, DATA = false
     header->add_misc_string(path.data(), path.size());
     // gaoxuan --在这里发出消息之前，把from_path.data()和to_path.data()拆分一下
-
-    // 第一步：将from_path.data()拆分放进split_string里面，拆完后，不够八个格子的，使用五个空格填充上
-    // 拆分的算法，遇到一个/就把之前的字符串放进去
-    // 将拆分后的元素添加去的方法：header->add_split_string(拆分的字符串)
-    int flag = 0;       // 用来标识此时split_string 里面有多少子串
-    char pattern = '/'; // 根据/进行字符串拆分
-
-    string temp_from = path.data();
-    temp_from = temp_from.substr(1, temp_from.size()); // 这一行是为了去除最前面的/
-    temp_from = temp_from + pattern;                   // 在最后面添加一个/便于处理
-    int pos = temp_from.find(pattern);                 // 找到第一个/的位置
-    while (pos != std::string::npos)                   // 循环不断找/，找到一个拆分一次
-    {
-      string temp1 = temp_from.substr(0, pos); // temp里面就是拆分出来的第一个子串
-      string temp = temp1;
-      for (int i = temp.size(); i < 5; i++)
-      {
-        temp = temp + " ";
-      }
-      header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
-      flag++;                              // 拆分的字符串数量++
-      temp_from = temp_from.substr(pos + 1, temp_from.size());
-      pos = temp_from.find(pattern);
-    }
-    // 现在flag中存放的就是子串的数量
-    header->set_from_length(flag); // 设置拆分后的实际子串占据的格子数量
-    while (flag != 8)
-    {
-      string temp = "     ";               // 用五个空格填充一下
-      header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
-      flag++;                              // 拆分的字符串数量++
-    }
-
-    // 这一行之前是gaoxuan添加的
 
     if (reporting_ && rand() % 2 == 0)
     {
@@ -1582,68 +1487,6 @@ public:
     header->add_misc_string(from_path.data(), from_path.size());
     header->add_misc_string(to_path.data(), to_path.size());
 
-    // gaoxuan --在这里发出消息之前，把from_path.data()和to_path.data()拆分一下
-
-    // 第一步：将from_path.data()拆分放进split_string里面，拆完后，不够八个格子的，使用空格填充上
-    // 拆分的算法，遇到一个/就把之前的字符串放进去
-    // 将拆分后的元素添加去的方法：header->add_split_string(拆分的字符串)
-    int flag = 0;       // 用来标识此时split_string 里面有多少子串
-    char pattern = '/'; // 根据/进行字符串拆分
-
-    string temp_from = from_path.data();
-    temp_from = temp_from.substr(1, temp_from.size()); // 这一行是为了去除最前面的/
-    temp_from = temp_from + pattern;                   // 在最后面添加一个/便于处理
-    int pos = temp_from.find(pattern);                 // 找到第一个/的位置
-    while (pos != std::string::npos)                   // 循环不断找/，找到一个拆分一次
-    {
-      string temp1 = temp_from.substr(0, pos); // temp里面就是拆分出来的第一个子串
-      string temp = temp1;                     // 这个用来将子串填充至四个字节
-      for (int i = temp.size(); i < 5; i++)
-      {
-        temp = temp + " ";
-      }
-
-      header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
-      flag++;                              // 拆分的字符串数量++
-      temp_from = temp_from.substr(pos + 1, temp_from.size());
-      pos = temp_from.find(pattern);
-    }
-    header->set_from_length(flag);
-    while (flag != 8)
-    {
-      string temp = "     ";               // 用空格填充一下
-      header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
-      flag++;                              // 拆分的字符串数量++
-    }
-    int flag1 = 0;
-    // 第二步：将to_path.data()拆分放进split_string里面，拆完后，不够八个格子的，使用空格填充上
-    string temp_to = to_path.data();
-    temp_to = temp_to.substr(1, temp_to.size()); // 这一行是为了去除最前面的/
-    temp_to = temp_to + pattern;                 // 在最后面添加一个/便于处理
-    int pos1 = temp_to.find(pattern);            // 找到第一个/的位置
-    while (pos1 != std::string::npos)            // 循环不断找/，找到一个拆分一次
-    {
-      string temp1 = temp_to.substr(0, pos1); // temp里面就是拆分出来的第一个子串
-      string temp = temp1;
-      for (int i = temp.size(); i < 5; i++)
-      {
-        temp = temp + " ";
-      }
-
-      header->add_split_string_to(temp); // 将拆出来的子串加到header里面去
-      flag1++;                           // 拆分的字符串数量++
-      temp_to = temp_to.substr(pos1 + 1, temp_to.size());
-      pos1 = temp_to.find(pattern);
-    }
-    header->set_to_length(flag1);
-    while (flag1 != 8)
-    {
-      string temp = "     ";             // 用五个空格填充一下
-      header->add_split_string_to(temp); // 将拆出来的子串加到header里面去
-      flag1++;                           // 拆分的字符串数量++
-    }
-
-    // 这一行之前是gaoxuan添加的
 
     if (reporting_ && rand() % 2 == 0)
     { // gaoxuan --this branch will never be executed in RenameExperiment(),reporting_ is false

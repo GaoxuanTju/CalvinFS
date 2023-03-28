@@ -4273,7 +4273,7 @@ void MetadataStore::Init_from_txt(string filename)
         type = 1;
       }
       temp = temp.substr(pos + 1);
-      path_type.insert({key, type});
+      path_type[key] = type;
 
       if (IsLocal(key))
       {
@@ -4378,8 +4378,7 @@ bool MetadataStore::IsLocal(const string &path)
 }
 
 void MetadataStore::getLOOKUP(string path)
-{ // 输出整棵树
-  // 如果要使用这个函数，需要将GetMetadataentry这个函数里面拆分屏蔽掉，因为大于八层
+{ 
   string from_hash = "";
   std::queue<string> level_queue;
   level_queue.push(from_hash);
@@ -4428,7 +4427,7 @@ void MetadataStore::getLOOKUP(string path)
 
       MetadataAction::LookupOutput out;
       out.ParseFromString(b.output());
-      if (out.entry().type() == DIR && out.entry().dir_contents_size() > 1)
+      if (out.entry().type() == DIR)
       {
         string str = out.entry().dir_contents(0);
         str.erase(remove(str.begin(), str.end(), '\r'), str.end());
@@ -4451,12 +4450,10 @@ void MetadataStore::getLOOKUP(string path)
     }
     else
     {
-
       std::queue<string> hash_queue;
       hash_queue.push(front);
       while (!hash_queue.empty())
       {
-        // 直接将所有孩子都用hash的方式加入读写集
         string front1 = hash_queue.front();
         hash_queue.pop();
         LOG(ERROR) << front1;
@@ -4952,6 +4949,7 @@ void MetadataStore::
           action->add_readset(front);
           action->add_writeset(front);
           action->add_writeset(target_front);
+          LOG(ERROR) << "writeset: " << target_front;
           path_type[target_front] = 1; // 目的位置是hash，下面全是hash
           // get its child
           uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
@@ -4986,7 +4984,7 @@ void MetadataStore::
           }*/
           MetadataAction::LookupOutput out;
           out.ParseFromString(b.output());
-          if (out.entry().type() == DIR && out.entry().dir_contents_size() > 1)
+          if (out.entry().type() == DIR)
           {
             string str = out.entry().dir_contents(0);
             str.erase(remove(str.begin(), str.end(), '\r'), str.end());
@@ -4994,7 +4992,6 @@ void MetadataStore::
             for (int j = 1; j < out.entry().dir_contents_size(); j++)
             {
               string filename = out.entry().dir_contents(j);
-              // filename.replace("\r","")
               //  push queue
               size_t pos = filename.find_first_of("\r"); // 查找第一个回车符的位置
               while (pos != string::npos)
@@ -5609,43 +5606,27 @@ void MetadataStore::Rename_Internal(
     {
       to_parent_entry.add_dir_contents(to_filename);
       context->PutEntry(to_parent, to_parent_entry);
-      string from_filename = FileName(in.from_path());
-      for (int i = 1; i < from_parent_entry.dir_contents_size(); i++)
-      {
-        string str = from_parent_entry.dir_contents(i);
-        str.erase(remove(str.begin(), str.end(), '\r'), str.end());
-        if (str == from_filename)
-        {
-          // Remove reference to target file entry from dir contents.
-          from_parent_entry.mutable_dir_contents()
-              ->SwapElements(i, from_parent_entry.dir_contents_size() - 1);
-          from_parent_entry.mutable_dir_contents()->RemoveLast();
-          // Write updated parent entry.
-          context->PutEntry(from_parent, from_parent_entry);
-          break;
-        }
-      }
     }
     else
     {
 
       from_parent_entry.add_dir_contents(to_filename);
-      string from_filename = FileName(in.from_path());
+    }
+    string from_filename = FileName(in.from_path());
 
-      for (int i = 1; i < from_parent_entry.dir_contents_size(); i++)
+    for (int i = 1; i < from_parent_entry.dir_contents_size(); i++)
+    {
+      string str = from_parent_entry.dir_contents(i);
+      str.erase(remove(str.begin(), str.end(), '\r'), str.end());
+      if (str == from_filename)
       {
-        string str = from_parent_entry.dir_contents(i);
-        str.erase(remove(str.begin(), str.end(), '\r'), str.end());
-        if (str == from_filename)
-        {
-          // Remove reference to target file entry from dir contents.
-          from_parent_entry.mutable_dir_contents()
-              ->SwapElements(i, from_parent_entry.dir_contents_size() - 1);
-          from_parent_entry.mutable_dir_contents()->RemoveLast();
-          // Write updated parent entry.
-          context->PutEntry(from_parent, from_parent_entry);
-          break;
-        }
+        // Remove reference to target file entry from dir contents.
+        from_parent_entry.mutable_dir_contents()
+            ->SwapElements(i, from_parent_entry.dir_contents_size() - 1);
+        from_parent_entry.mutable_dir_contents()->RemoveLast();
+        // Write updated parent entry.
+        context->PutEntry(from_parent, from_parent_entry);
+        break;
       }
     }
     MetadataEntry to_entry; // gaoxuan --the entry which will be added
@@ -5702,24 +5683,32 @@ void MetadataStore::Rename_Internal(
           MetadataEntry from; // gaoxuan --the entry which will be used to copy to to_entry
           context->GetEntry(front, &from);
           to.CopyFrom(from);
-          //  LOG(ERROR)<<hash_front<<" and "<<to_entry1.dir_contents(0);
+
           context->PutEntry(hash_front, to);
           // Erase the from_entry
-          context->DeleteEntry(front);
+          LOG(ERROR) << hash_front << " and " << to.dir_contents(0);
           if (to.type() == DIR)
           {
             string uid = to.dir_contents(0);
             uid.erase(remove(uid.begin(), uid.end(), '\r'), uid.end());
             for (int i = 1; i < to.dir_contents_size(); i++)
             {
-              string str = to.dir_contents(i);
-              str.erase(remove(str.begin(), str.end(), '\r'), str.end());
-              string child_path = "/" + uid + "/" + str;
-              string full_path = hash_front + "/" + str;
-              queue1.push(child_path);
-              queue2.push(full_path);
+              string filename = out.entry().dir_contents(i);
+              //  push queue
+              size_t pos = filename.find_first_of("\r"); // 查找第一个回车符的位置
+              while (pos != string::npos)
+              {                                     // 如果找到了
+                filename.erase(pos, 1);             // 则删除该位置的字符
+                pos = filename.find_first_of("\r"); // 继续查找下一个回车符的位置 不知道为什么会引入这个，但确实这个会引起问题
+              }
+              string child = "/" + uid + "/" + filename;
+              string hash_child = hash_front + "/" + filename;
+              queue1.push(child);
+              queue2.push(hash_child);
             }
+            context->DeleteEntry(front);
           }
+          
         }
         else
         {
@@ -5745,43 +5734,9 @@ void MetadataStore::Rename_Internal(
             // Erase the from_entry
             context->DeleteEntry(front1);
 
-            // get its child
-            uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front1)), config_->LookupReplica(machine_->machine_id()));
-            Header *header = new Header();
-            header->set_flag(2); // 标识
-            header->set_from(machine_->machine_id());
-            header->set_to(mds_machine);
-            header->set_type(Header::RPC);
-            header->set_app("client");
-            header->set_rpc("LOOKUP");
-            header->add_misc_string(front1.c_str(), strlen(front1.c_str()));
-            // TODO：this part needs to add some parts to lookup request
-
-            MessageBuffer *m = NULL;
-            header->set_data_ptr(reinterpret_cast<uint64>(&m));
-            machine_->SendMessage(header, new MessageBuffer());
-            while (m == NULL)
+            for (int j = 1; j < to.dir_contents_size(); j++)
             {
-              usleep(10);
-              Noop<MessageBuffer *>(m);
-            }
-            MessageBuffer *serialized = m;
-            Action b;
-            b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
-            delete serialized;
-            /*
-            if (b.input() == "switch processed")
-            {
-              entry.set_type(DIR);
-              entry.add_dir_contents("gaoxuan");
-              break;
-            }*/
-            MetadataAction::LookupOutput out;
-            out.ParseFromString(b.output());
-
-            for (int j = 1; j < out.entry().dir_contents_size(); j++)
-            {
-              string filename = out.entry().dir_contents(j);
+              string filename = to.dir_contents(j);
               // filename.replace("\r","")
               //  push queue
               size_t pos = filename.find_first_of("\r"); // 查找第一个回车符的位置
@@ -6055,10 +6010,6 @@ void MetadataStore::Lookup_Internal(
 {
   // Look up existing entry.
   MetadataEntry entry;
-  if (in.path() == "/2/b0/d2001/c0")
-  {
-    LOG(ERROR) << "确实是这个路径";
-  }
   if (!context->GetEntry(in.path(), &entry))
   {
     // File doesn't exist!
