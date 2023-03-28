@@ -503,6 +503,7 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &p)
 */
 MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
 {
+  LOG(ERROR)<<"in LS";
   MetadataEntry entry;
   string front = ""; // 最初的位置只发一个根目录的请求
   uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine()->machine_id()));
@@ -515,8 +516,10 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
   header->set_rpc("LOOKUP");
   header->add_misc_string(front.c_str(), strlen(front.c_str()));
   // TODO：this part needs to add some parts to lookup request
-  if (path.data() != "")
+  string s = path.data();
+  if (s != "")
   {
+    LOG(ERROR)<<"is not root!";
     int flag = 0;       
     char pattern = '/'; 
     string temp_from = path.data();
@@ -545,7 +548,8 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
     }
   }
   else
-  {
+  { 
+    LOG(ERROR)<<"is root";
     int flag = 0; // 用来标识此时split_string 里面有多少子串
     while (flag != 8)
     {
@@ -564,6 +568,7 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
     header->add_metadatentry(empty_str);
   }
   // before this part is split
+  LOG(ERROR)<<"after split";
   MessageBuffer *m = NULL;
   header->set_data_ptr(reinterpret_cast<uint64>(&m));
   machine()->SendMessage(header, new MessageBuffer());

@@ -134,21 +134,21 @@ public:
   virtual void HandleMessage(Header *header, MessageBuffer *message)
   {
     // INTERNAL metadata lookup
-/*    
+    /*
+        if (header->rpc() == "LOOKUP")
+        {
+          //在这判断一下是不是最终的位置，如果是了，
+          machine()->SendReplyMessage(
+              header,
+              GetMetadataEntry(header, header->misc_string(0)));
+        }*/
     if (header->rpc() == "LOOKUP")
     {
-      //在这判断一下是不是最终的位置，如果是了，
-      machine()->SendReplyMessage(
-          header,
-          GetMetadataEntry(header, header->misc_string(0)));
-    }*/
-    if (header->rpc() == "LOOKUP")
-    {
-      int depth;//用来记录当前遍历到那个深度了
-      //先获取元数据项
+      int depth; // 用来记录当前遍历到那个深度了
+      // 先获取元数据项
       string path;
       MessageBuffer *serialized = GetMetadataEntry(header, path = header->misc_string(0));
-      if(path == "")
+      if (path == "")
       {
         depth = 0;
       }
@@ -156,49 +156,66 @@ public:
       {
         depth = header->depth() + 1;
       }
-      if(depth == header->from_length() || Dir_dep(path) >2)//是最后一段,将最后结果发回
+      if (depth == header->from_length() || Dir_dep(path) > 2) // 是最后一段,将最后结果发回
       {
         machine()->SendReplyMessage(header, serialized);
         delete serialized;
-      }      
+      }
       else
       {
         Action b;
         b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
         delete serialized;
         MetadataAction::LookupOutput out;
-        out.ParseFromString(b.output());   
+        out.ParseFromString(b.output());
         MetadataEntry entry = out.entry();
-        //现在entry中存放的是这一步拿到的元数据项   
-        string LS_path ;
+        // 现在entry中存放的是这一步拿到的元数据项
+        string LS_path;
         string uid = entry.dir_contents(0);
-        if(metadata_->path_type[path] == 0)
+        if (metadata_->path_type[path] == 0)
         {
-          //树类型
-
+          // 树类型
           string filename = header->split_string_from(depth);
-          LS_path = "/" + uid + "/" + filename;
-        } 
+          string new_str;
+          // 这里要将字符串中的空格删除
+          for (int i = 0; i < filename.size(); i++)
+          {
+            if (filename[i] != ' ')
+            {
+              new_str += filename[i];
+            }
+          }
+          LS_path = "/" + uid + "/" + new_str;
+        }
         else
         {
           LS_path = path;
-          for(int i = depth; i < header->from_length(); i++)
+          for (int i = depth; i < header->from_length(); i++)
           {
-            LS_path = LS_path + "/" + header->split_string_from(i);
+            string filename = header->split_string_from(i);
+            string new_str;
+            // 这里要将字符串中的空格删除
+            for (int i = 0; i < filename.size(); i++)
+            {
+              if (filename[i] != ' ')
+              {
+                new_str += filename[i];
+              }
+            }
+            LS_path = LS_path + "/" + new_str;
           }
         }
-        //下面要对LS——path发lookup请求
-        uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(LS_path)), config_->LookupReplica(machine()->machine_id()));   
-        //这之前是发送lookup请求
-        //还是之前的header，只需要改路径，from, to就行
+        // 下面要对LS——path发lookup请求
+        uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(LS_path)), config_->LookupReplica(machine()->machine_id()));
+        // 这之前是发送lookup请求
+        // 还是之前的header，只需要改路径，from, to就行
         header->set_from(machine()->machine_id());
         header->set_to(mds_machine);
         header->clear_misc_string();
         header->add_misc_string(LS_path.c_str(), strlen(LS_path.c_str()));
         machine()->SendMessage(header, new MessageBuffer());
       }
-
-    }    
+    }
     else if (header->rpc() == "LS")
     {
       machine()->SendReplyMessage(header, LS(header->misc_string(0)));
@@ -947,12 +964,12 @@ public:
     string from_path;
     string to_path;
 
-    from_path = "/a" + IntToString(0) ;
+    from_path = "/a" + IntToString(0);
     to_path = "/a" + IntToString(1) + "/b" + IntToString(1) + "/d" + IntToString(machine()->GetGUID());
     uint64 from_id = config_->LookupMetadataShard(config_->HashFileName(from_path), config_->LookupReplica(machine()->machine_id()));
     uint64 to_id = config_->LookupMetadataShard(config_->HashFileName(to_path), config_->LookupReplica(machine()->machine_id()));
     LOG(ERROR) << from_path << " in machine[" << from_id << "]  renamed to   " << to_path << " in machine[" << to_id << "]";
-    BackgroundRenameFile(from_path,to_path);
+    BackgroundRenameFile(from_path, to_path);
 
     // Wait for all operations to finish.
     while (capacity_.load() < kMaxCapacity)
@@ -1012,7 +1029,7 @@ public:
     machine()->GlobalBarrier();
     Spin(1);
     double start = GetTime();
-    string path = "/a0/b0/c0";
+    string path = "/a0";
     LOG(ERROR) << machine()->machine_id() << " path: " << path << " in " << config_->LookupMetadataShard(config_->HashFileName(path), config_->LookupReplica(machine()->machine_id()));
     for (int i = 0; i < 1; i++)
     {
@@ -1119,7 +1136,7 @@ public:
   MessageBuffer *CreateFile(const Slice &path, FileType type = DATA);
   MessageBuffer *AppendStringToFile(const Slice &data, const Slice &path);
   MessageBuffer *ReadFile(const Slice &path);
-  int Dir_dep(const string &path);//获取深度
+  int Dir_dep(const string &path); // 获取深度
   MessageBuffer *LS(const Slice &path);
   MessageBuffer *CopyFile(const Slice &from_path, const Slice &to_path);
   MessageBuffer *RenameFile(const Slice &from_path, const Slice &to_path);
@@ -1477,7 +1494,6 @@ public:
     header->set_rpc("RENAME_FILE"); // gaoxuan --call RenameFile() in calvinfs_client_app.cc
     header->add_misc_string(from_path.data(), from_path.size());
     header->add_misc_string(to_path.data(), to_path.size());
-
 
     if (reporting_ && rand() % 2 == 0)
     { // gaoxuan --this branch will never be executed in RenameExperiment(),reporting_ is false
