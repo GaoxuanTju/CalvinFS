@@ -561,10 +561,8 @@ MessageBuffer *CalvinFSClientApp::RenameFile(const Slice &from_path, const Slice
   in.SerializeToString(a->mutable_input());
   metadata_->setAPPname(name()); // gaoxuan --this line is added by me which is uesd to getAPPname in metadata_store.cc
   metadata_->GetRWSets(a);
-
+/*
   log_->Append(a);
-  
-
   MessageBuffer *m = NULL;
   while (!channel->Pop(&m))
   {
@@ -577,8 +575,6 @@ MessageBuffer *CalvinFSClientApp::RenameFile(const Slice &from_path, const Slice
   delete m;
   MetadataAction::RenameOutput out;
   out.ParseFromString(result.output());
-
-
   if (out.success())
   {
     return new MessageBuffer();
@@ -587,7 +583,8 @@ MessageBuffer *CalvinFSClientApp::RenameFile(const Slice &from_path, const Slice
   {
     return new MessageBuffer(new string("error creating file/dir\n"));
   }
-
+*/
+return new MessageBuffer();
 }
 
 BTNode *CalvinFSClientApp::find_path(BTNode *dir_tree, string path, BTNode *&pre)

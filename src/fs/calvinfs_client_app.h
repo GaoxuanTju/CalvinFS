@@ -891,12 +891,11 @@ public:
     string to_path;
 
     from_path = "/a" + IntToString(0) ;
-    to_path = "/a" + IntToString(1) + "/b" + IntToString(0) + "/d" + IntToString(machine()->GetGUID());
+    to_path = "/a" + IntToString(1) + "/b" + IntToString(1) + "/d" + IntToString(machine()->GetGUID());
     uint64 from_id = config_->LookupMetadataShard(config_->HashFileName(from_path), config_->LookupReplica(machine()->machine_id()));
     uint64 to_id = config_->LookupMetadataShard(config_->HashFileName(to_path), config_->LookupReplica(machine()->machine_id()));
     LOG(ERROR) << from_path << " in machine[" << from_id << "]  renamed to   " << to_path << " in machine[" << to_id << "]";
-    BackgroundRenameFile(from_path,
-                         to_path);
+    BackgroundRenameFile(from_path,to_path);
 
     // Wait for all operations to finish.
     while (capacity_.load() < kMaxCapacity)
