@@ -68,7 +68,6 @@ public:
     case Header::DATA:
       if (header->has_data_ptr())
       {
-        LOG(ERROR)<<"receive in handlemessage";
         *reinterpret_cast<MessageBuffer **>(header->data_ptr()) = message;
       }
       else if (header->has_data_channel())
@@ -224,7 +223,6 @@ void Machine::SendMessage(Header *header, MessageBuffer *message)
 
 void Machine::SendReplyMessage(Header *header, MessageBuffer *message)
 {
-  LOG(ERROR)<<"send reply message";
   header->set_to(header->from());
   header->set_from(machine_id());
   if (header->to() == kExternalMachineID)
@@ -234,7 +232,6 @@ void Machine::SendReplyMessage(Header *header, MessageBuffer *message)
   }
   if (header->has_data_ptr() || header->has_data_channel())
   {
-    LOG(ERROR)<<"has_data_ptr";
     header->set_type(Header::DATA);
     SendMessage(header, message);
   }
