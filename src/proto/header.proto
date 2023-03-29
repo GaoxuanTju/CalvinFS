@@ -29,7 +29,8 @@ message Header {
   // Required for both RPC requests and CALLBACK invocations:
   optional string app = 5;
   optional string rpc = 6;
-
+  
+  optional uint64 original_from = 7;
   // RPCs and callbacks may specify priority at which the requested procedure
   // should run.
   enum Priority {

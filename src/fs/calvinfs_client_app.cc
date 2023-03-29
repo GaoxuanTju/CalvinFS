@@ -108,7 +108,7 @@ MessageBuffer *CalvinFSClientApp::GetMetadataEntry(Header *header, const Slice &
   }
   else
   {
-
+    LOG(ERROR)<<"getmetadataentry";
     MessageBuffer *m = NULL;
     header->set_data_ptr(reinterpret_cast<uint64>(&m));
     machine()->SendMessage(header, new MessageBuffer());
@@ -510,6 +510,7 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
   Header *header = new Header();
   header->set_flag(2); // 标识
   header->set_from(machine()->machine_id());
+  header->set_original_from(machine()->machine_id());//设置最终要返回的机器
   header->set_to(mds_machine);
   header->set_type(Header::RPC);
   header->set_app("client");
@@ -549,7 +550,7 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
   }
   else
   { 
-    LOG(ERROR)<<"is root";
+   
     int flag = 0; // 用来标识此时split_string 里面有多少子串
     while (flag != 8)
     {
@@ -572,14 +573,17 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
   MessageBuffer *m = NULL;
   header->set_data_ptr(reinterpret_cast<uint64>(&m));
   machine()->SendMessage(header, new MessageBuffer());
+
   while (m == NULL)
   {
     usleep(10);
     Noop<MessageBuffer *>(m);
   }
   MessageBuffer *serialized = m;
+
   Action b;
   b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
+
   delete serialized;
 /*
   if (b.input() == "switch processed")

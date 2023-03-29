@@ -144,6 +144,8 @@ public:
         }*/
     if (header->rpc() == "LOOKUP")
     {
+      //提前在这里设置一下data——ptr，避免被修改
+      header->set_data_ptr(header->data_ptr());
       int depth; // 用来记录当前遍历到那个深度了
       // 先获取元数据项
       string path;
@@ -159,19 +161,16 @@ public:
       }
       if (depth == header->from_length() || Dir_dep(path) > 2) // 是最后一段,将最后结果发回
       {
-        LOG(ERROR)<<path<<" finished";
+     
         Action b;
         b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
 
         MetadataAction::LookupOutput out;
         out.ParseFromString(b.output());     
-        for(int i = 0; i < out.entry().dir_contents_size(); i++)
-        {
-          LOG(ERROR)<<out.entry().dir_contents(i);
-        }   
-        //这上面是正常的，证明我们的确是能够正常把元数据项拿到了，只是发回去的过程出了点问题
-        machine()->SendReplyMessage(header, serialized);
 
+        header->set_from(header->original_from());//
+        machine()->SendReplyMessage(header, serialized);
+        
       }
       else
       {
@@ -198,6 +197,7 @@ public:
             }
           }
           LS_path = "/" + uid + "/" + new_str;
+          header->set_depth(depth);//当前所在深度
         }
         else
         {
@@ -216,8 +216,9 @@ public:
             }
             LS_path = LS_path + "/" + new_str;
           }
+          header->set_depth(header->from_length() - 1);//为了统一上面深度，depth = depth + 1
         }
-        LOG(ERROR)<<LS_path<<" send again";
+
         // 下面要对LS——path发lookup请求
         uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(LS_path)), config_->LookupReplica(machine()->machine_id()));
         // 这之前是发送lookup请求
@@ -227,6 +228,7 @@ public:
         header->set_to(mds_machine);
         header->clear_misc_string();
         header->add_misc_string(LS_path.c_str(), strlen(LS_path.c_str()));
+
         machine()->SendMessage(header, new MessageBuffer());
       }
     }
