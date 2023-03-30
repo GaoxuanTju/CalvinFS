@@ -144,66 +144,61 @@ public:
         }*/
     if (header->rpc() == "LOOKUP")
     {
-      //提前在这里设置一下data——ptr，避免被修改
+      // 提前在这里设置一下data——ptr，避免被修改
       header->set_data_ptr(header->data_ptr());
       int depth; // 用来记录当前遍历到那个深度了
       // 先获取元数据项
-      string path;
-      MessageBuffer *serialized = GetMetadataEntry(header, path = header->misc_string(0));
-      if (path == "")
+      int id = header->uid(); // 看看uid是不是被交换机修改了
+      if (id != 9999)
       {
-        depth = 0;
-      }
-      else
-      {
-        depth = header->depth() + 1;
-      }
-      if (depth == header->from_length() || Dir_dep(path) > 2) // 是最后一段,将最后结果发回
-      {
-     
-        Action b;
-        b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
-
-        MetadataAction::LookupOutput out;
-        out.ParseFromString(b.output());     
-
-        header->set_from(header->original_from());//
-        machine()->SendReplyMessage(header, serialized);
-        
-      }
-      else
-      {
-        Action b;
-        b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
-        delete serialized;
-        MetadataAction::LookupOutput out;
-        out.ParseFromString(b.output());
-        MetadataEntry entry = out.entry();
-        // 现在entry中存放的是这一步拿到的元数据项
-        string LS_path;
-        string uid = entry.dir_contents(0);
-        if (metadata_->path_type[path] == 0)
+        string uid = IntToString(id);                                 // 获取修改之后的uid
+        string filename = header->split_string_from(header->depth()); // 获取对应深度的路径
+        string new_str;
+        // 这里要将字符串中的空格删除
+        for (int i = 0; i < filename.size(); i++)
         {
-          // 树类型
-          string filename = header->split_string_from(depth);
-          string new_str;
-          // 这里要将字符串中的空格删除
-          for (int i = 0; i < filename.size(); i++)
+          if (filename[i] != ' ')
           {
-            if (filename[i] != ' ')
-            {
-              new_str += filename[i];
-            }
+            new_str += filename[i];
           }
-          LS_path = "/" + uid + "/" + new_str;
-          header->set_depth(depth);//当前所在深度
+        }
+        string path = "/" + uid + "/" + new_str; // 要发出的结果
+        MessageBuffer *serialized = GetMetadataEntry(header, path);
+        if (path == "")
+        {
+          depth = 0;
         }
         else
         {
-          LS_path = path;
-          for (int i = depth; i < header->from_length(); i++)
+          depth = header->depth() + 1;
+        }
+        if (depth == header->from_length() || Dir_dep(path) > 2) // 是最后一段,将最后结果发回
+        {
+
+          Action b;
+          b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
+
+          MetadataAction::LookupOutput out;
+          out.ParseFromString(b.output());
+
+          header->set_from(header->original_from()); //
+          machine()->SendReplyMessage(header, serialized);
+        }
+        else
+        {
+          Action b;
+          b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
+          delete serialized;
+          MetadataAction::LookupOutput out;
+          out.ParseFromString(b.output());
+          MetadataEntry entry = out.entry();
+          // 现在entry中存放的是这一步拿到的元数据项
+          string LS_path;
+          string uid = entry.dir_contents(0);
+          if (metadata_->path_type[path] == 0)
           {
-            string filename = header->split_string_from(i);
+            // 树类型
+            string filename = header->split_string_from(depth);
             string new_str;
             // 这里要将字符串中的空格删除
             for (int i = 0; i < filename.size(); i++)
@@ -213,22 +208,125 @@ public:
                 new_str += filename[i];
               }
             }
-            LS_path = LS_path + "/" + new_str;
+            LS_path = "/" + uid + "/" + new_str;
+            header->set_depth(depth); // 当前所在深度
           }
-          header->set_depth(header->from_length() - 1);//为了统一上面深度，depth = depth + 1
+          else
+          {
+            LS_path = path;
+            for (int i = depth; i < header->from_length(); i++)
+            {
+              string filename = header->split_string_from(i);
+              string new_str;
+              // 这里要将字符串中的空格删除
+              for (int i = 0; i < filename.size(); i++)
+              {
+                if (filename[i] != ' ')
+                {
+                  new_str += filename[i];
+                }
+              }
+              LS_path = LS_path + "/" + new_str;
+            }
+            header->set_depth(header->from_length() - 1); // 为了统一上面深度，depth = depth + 1
+          }
+
+          // 下面要对LS——path发lookup请求
+          uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(LS_path)), config_->LookupReplica(machine()->machine_id()));
+          // 这之前是发送lookup请求
+          // 还是之前的header，只需要改路径，from, to就行
+
+          header->set_from(machine()->machine_id());
+          header->set_to(mds_machine);
+          header->clear_misc_string();
+          header->add_misc_string(LS_path.c_str(), strlen(LS_path.c_str()));
+
+          machine()->SendMessage(header, new MessageBuffer());
         }
+      }
+      else
+      {
+        string path;
+        MessageBuffer *serialized = GetMetadataEntry(header, path = header->misc_string(0));
+        if (path == "")
+        {
+          depth = 0;
+        }
+        else
+        {
+          depth = header->depth() + 1;
+        }
+        if (depth == header->from_length() || Dir_dep(path) > 2) // 是最后一段,将最后结果发回
+        {
 
-        // 下面要对LS——path发lookup请求
-        uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(LS_path)), config_->LookupReplica(machine()->machine_id()));
-        // 这之前是发送lookup请求
-        // 还是之前的header，只需要改路径，from, to就行
-        
-        header->set_from(machine()->machine_id());
-        header->set_to(mds_machine);
-        header->clear_misc_string();
-        header->add_misc_string(LS_path.c_str(), strlen(LS_path.c_str()));
+          Action b;
+          b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
 
-        machine()->SendMessage(header, new MessageBuffer());
+          MetadataAction::LookupOutput out;
+          out.ParseFromString(b.output());
+
+          header->set_from(header->original_from()); //
+          machine()->SendReplyMessage(header, serialized);
+        }
+        else
+        {
+          Action b;
+          b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
+          delete serialized;
+          MetadataAction::LookupOutput out;
+          out.ParseFromString(b.output());
+          MetadataEntry entry = out.entry();
+          // 现在entry中存放的是这一步拿到的元数据项
+          string LS_path;
+          string uid = entry.dir_contents(0);
+          if (metadata_->path_type[path] == 0)
+          {
+            // 树类型
+            string filename = header->split_string_from(depth);
+            string new_str;
+            // 这里要将字符串中的空格删除
+            for (int i = 0; i < filename.size(); i++)
+            {
+              if (filename[i] != ' ')
+              {
+                new_str += filename[i];
+              }
+            }
+            LS_path = "/" + uid + "/" + new_str;
+            header->set_depth(depth); // 当前所在深度
+          }
+          else
+          {
+            LS_path = path;
+            for (int i = depth; i < header->from_length(); i++)
+            {
+              string filename = header->split_string_from(i);
+              string new_str;
+              // 这里要将字符串中的空格删除
+              for (int i = 0; i < filename.size(); i++)
+              {
+                if (filename[i] != ' ')
+                {
+                  new_str += filename[i];
+                }
+              }
+              LS_path = LS_path + "/" + new_str;
+            }
+            header->set_depth(header->from_length() - 1); // 为了统一上面深度，depth = depth + 1
+          }
+
+          // 下面要对LS——path发lookup请求
+          uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(LS_path)), config_->LookupReplica(machine()->machine_id()));
+          // 这之前是发送lookup请求
+          // 还是之前的header，只需要改路径，from, to就行
+
+          header->set_from(machine()->machine_id());
+          header->set_to(mds_machine);
+          header->clear_misc_string();
+          header->add_misc_string(LS_path.c_str(), strlen(LS_path.c_str()));
+
+          machine()->SendMessage(header, new MessageBuffer());
+        }
       }
     }
     else if (header->rpc() == "LS")
@@ -1044,12 +1142,10 @@ public:
     machine()->GlobalBarrier();
     Spin(1);
     double start = GetTime();
-    //string path = "/a0/b0";
-   // string path = "/a0/b0/c1";
-    //string path = "/a0/b0/c0/d0/e0";
-    string path = "/a0/b0/c0/d0/e0/f0/g0/h0";
+    string path = "/a0/b1";
+
     LOG(ERROR) << machine()->machine_id() << " path: " << path << " in " << config_->LookupMetadataShard(config_->HashFileName(path), config_->LookupReplica(machine()->machine_id()));
-    for (int i = 0; i < 100000; i++)
+    for (int i = 0; i < 1; i++)
     {
       //         double begin = GetTime();
       BackgroundLS(path);

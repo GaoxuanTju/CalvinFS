@@ -4275,7 +4275,6 @@ void MetadataStore::Init_from_txt(string filename)
       }
       temp = temp.substr(pos + 1);
       path_type[key] = type;
-
       if (IsLocal(key))
       {
         MetadataEntry entry;
