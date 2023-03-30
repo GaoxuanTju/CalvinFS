@@ -561,7 +561,7 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
     header->set_from_length(0);//设置长度为0为根目录
   }
   header->set_depth(0);//初始就为0
-  int uid = 9999;
+  int uid = switch_uid;
   header->set_uid(uid);
   string empty_str = "0000000000000000";
   for (int i = 0; i < 8; i++)

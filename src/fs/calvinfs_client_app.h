@@ -4,7 +4,7 @@
 
 #ifndef CALVIN_FS_CALVINFS_CLIENT_APP_H_
 #define CALVIN_FS_CALVINFS_CLIENT_APP_H_
-
+#define switch_uid 9999
 #include <leveldb/env.h>
 
 #include "components/scheduler/scheduler.h"
@@ -149,7 +149,7 @@ public:
       int depth; // 用来记录当前遍历到那个深度了
       // 先获取元数据项
       int id = header->uid(); // 看看uid是不是被交换机修改了
-      if (id != 9999)
+      if (id != switch_uid)//这种情况是交换机要修改
       {
         string uid = IntToString(id);                                 // 获取修改之后的uid
         string filename = header->split_string_from(header->depth()); // 获取对应深度的路径
