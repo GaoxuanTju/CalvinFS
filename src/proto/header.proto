@@ -30,7 +30,7 @@ message Header {
   optional string app = 5;
   optional string rpc = 6;
   
-  optional uint64 original_from = 7;
+ 
   // RPCs and callbacks may specify priority at which the requested procedure
   // should run.
   enum Priority {
@@ -74,6 +74,7 @@ message Header {
   repeated bytes  misc_string = 43;
   repeated double misc_double = 44;
   repeated Scalar misc_scalar = 45;
+  optional uint64 original_from = 46;
 
   // EXTERNAL connection info. (NOT FOR USE BY APPS)
   optional string external_host = 51;

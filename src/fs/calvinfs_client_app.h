@@ -150,7 +150,6 @@ public:
       // 先获取元数据项
       string path;
       MessageBuffer *serialized = GetMetadataEntry(header, path = header->misc_string(0));
-      LOG(ERROR)<<path;
       if (path == "")
       {
         depth = 0;
@@ -1045,9 +1044,12 @@ public:
     machine()->GlobalBarrier();
     Spin(1);
     double start = GetTime();
-    string path = "/a0";
+    //string path = "/a0/b0";
+   // string path = "/a0/b0/c1";
+    //string path = "/a0/b0/c0/d0/e0";
+    string path = "/a0/b0/c0/d0/e0/f0/g0/h0";
     LOG(ERROR) << machine()->machine_id() << " path: " << path << " in " << config_->LookupMetadataShard(config_->HashFileName(path), config_->LookupReplica(machine()->machine_id()));
-    for (int i = 0; i < 1; i++)
+    for (int i = 0; i < 100000; i++)
     {
       //         double begin = GetTime();
       BackgroundLS(path);
@@ -1061,7 +1063,7 @@ public:
     }
     // Report.
     LOG(ERROR) << "[" << machine()->machine_id() << "] "
-               << "LS " << 10000 << " files. Elapsed time: "
+               << "LS " << 100000 << " files. Elapsed time: "
                << (GetTime() - start) << " seconds";
   }
 
