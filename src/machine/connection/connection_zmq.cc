@@ -149,38 +149,37 @@ void ConnectionZMQ::SendMessageExternal(
 void ConnectionZMQ::SendMessage_UDP(uint64 recipient, MessageBuffer *message)
 {
   // Local messages can be given directly to the handler.
-  
-  // if (recipient == id_)
-  // {
-  //   MessagePart *part = message->PopBack();
+  if (recipient == id_)
+  {
+    MessagePart *part = message->PopBack();
 
-  //   Msg *mmsg = new Msg();
-  //   mmsg->ParseFromArray(part->buffer().data(), part->buffer().size());
+    Msg *mmsg = new Msg();
+    mmsg->ParseFromArray(part->buffer().data(), part->buffer().size());
 
-  //   delete part;
+    delete part;
 
-  //   Header *header = new Header();
-  //   *header = mmsg->header();
-  //   MessageBuffer *message1;
-  //   if (mmsg->type() == 3)
-  //   {
-  //     message1 = new MessageBuffer(mmsg->startappproto());
-  //   }
-  //   else if (mmsg->type() == 2)
-  //   {
-  //     message1 = new MessageBuffer(mmsg->action_batch());
-  //   }
-  //   else if (mmsg->type() == 1)
-  //   {
-  //     message1 = new MessageBuffer(mmsg->action());
-  //   }
-  //   else
-  //   {
-  //     message1 = new MessageBuffer();
-  //   }
-  //   handler_->HandleMessage(header, message1);
-  //   return;
-  // }
+    Header *header = new Header();
+    *header = mmsg->header();
+    MessageBuffer *message1;
+    if (mmsg->type() == 3)
+    {
+      message1 = new MessageBuffer(mmsg->startappproto());
+    }
+    else if (mmsg->type() == 2)
+    {
+      message1 = new MessageBuffer(mmsg->action_batch());
+    }
+    else if (mmsg->type() == 1)
+    {
+      message1 = new MessageBuffer(mmsg->action());
+    }
+    else
+    {
+      message1 = new MessageBuffer();
+    }
+    handler_->HandleMessage(header, message1);
+    return;
+  }
 
   Lock l(mutexes_UDP[recipient]);
 
