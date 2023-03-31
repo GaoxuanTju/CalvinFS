@@ -5,7 +5,7 @@
 #ifndef CALVIN_FS_CALVINFS_CLIENT_APP_H_
 #define CALVIN_FS_CALVINFS_CLIENT_APP_H_
 #define switch_uid 9999
-#define operation_num 1
+#define operation_num 2
 #include <leveldb/env.h>
 
 #include "components/scheduler/scheduler.h"
@@ -333,8 +333,9 @@ public:
     }
     else if (header->rpc() == "LS")
     {
+    
       machine()->SendReplyMessage(header, LS(header->misc_string(0)));
-
+   
       // EXTERNAL read file
     }
     else if (header->rpc() == "READ_FILE")
@@ -1144,7 +1145,7 @@ public:
     machine()->GlobalBarrier();
     Spin(1);
     double start = GetTime();
-    string path = "";
+    string path = "/a0/b1";
 
     LOG(ERROR) << machine()->machine_id() << " path: " << path << " in " << config_->LookupMetadataShard(config_->HashFileName(path), config_->LookupReplica(machine()->machine_id()));
     for (int i = 0; i < operation_num; i++)

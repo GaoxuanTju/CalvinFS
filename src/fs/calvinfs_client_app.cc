@@ -573,7 +573,8 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
 
   MessageBuffer *m = NULL;
   header->set_data_ptr(reinterpret_cast<uint64>(&m));
-  double start = GetTime(); 
+  double start = GetTime();
+
   machine()->SendMessage(header, new MessageBuffer());
 
   while (m == NULL)
