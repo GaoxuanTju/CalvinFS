@@ -249,6 +249,7 @@ public:
       {
         string path;
         MessageBuffer *serialized = GetMetadataEntry(header, path = header->misc_string(0));
+        LOG(ERROR)<<path<<" in machine["<<config_->LookupMetadataShard(config_->HashFileName(path), config_->LookupReplica(machine()->machine_id()));
         if (path == "")
         {
           depth = 0;
