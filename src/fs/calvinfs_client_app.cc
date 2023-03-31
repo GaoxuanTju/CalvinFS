@@ -621,6 +621,7 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
     //   LOG(ERROR)<<"file not open!";
     // }
     // outputfile.close();
+    LOG(ERROR)<<GetTime() - start;
     return new MessageBuffer(result);
   }
   else
