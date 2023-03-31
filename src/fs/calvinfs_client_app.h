@@ -1145,7 +1145,7 @@ public:
     string path = "/a0/b1";
 
     LOG(ERROR) << machine()->machine_id() << " path: " << path << " in " << config_->LookupMetadataShard(config_->HashFileName(path), config_->LookupReplica(machine()->machine_id()));
-    for (int i = 0; i < 1; i++)
+    for (int i = 0; i < 10; i++)
     {
       //         double begin = GetTime();
       BackgroundLS(path);
