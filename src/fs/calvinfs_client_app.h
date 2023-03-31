@@ -260,7 +260,7 @@ public:
         }
         if (depth == header->from_length() || Dir_dep(path) > 2) // 是最后一段,将最后结果发回
         {
-
+          LOG(ERROR)<<path<<" is end!";
           Action b;
           b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
 
