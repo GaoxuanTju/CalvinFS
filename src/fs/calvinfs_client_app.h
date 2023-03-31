@@ -5,6 +5,7 @@
 #ifndef CALVIN_FS_CALVINFS_CLIENT_APP_H_
 #define CALVIN_FS_CALVINFS_CLIENT_APP_H_
 #define switch_uid 9999
+#define operation_num 1
 #include <leveldb/env.h>
 
 #include "components/scheduler/scheduler.h"
@@ -1142,10 +1143,10 @@ public:
     machine()->GlobalBarrier();
     Spin(1);
     double start = GetTime();
-    string path = "/a0";
+    string path = "/a0/b1";
 
     LOG(ERROR) << machine()->machine_id() << " path: " << path << " in " << config_->LookupMetadataShard(config_->HashFileName(path), config_->LookupReplica(machine()->machine_id()));
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < operation_num; i++)
     {
       //         double begin = GetTime();
       BackgroundLS(path);
@@ -1159,7 +1160,7 @@ public:
     }
     // Report.
     LOG(ERROR) << "[" << machine()->machine_id() << "] "
-               << "LS " << 100000 << " files. Elapsed time: "
+               << "LS " << operation_num << " files. Elapsed time: "
                << (GetTime() - start) << " seconds";
   }
 

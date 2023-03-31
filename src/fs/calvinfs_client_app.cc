@@ -608,19 +608,19 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
       result->append(entry.dir_contents(i));
       result->append("\n");
     }
-    double end = GetTime();
-    string filename("/home/CalvinFS/src/fs/dataFile.txt");
-    std::ofstream outputfile;
-    outputfile.open(filename, std::ios_base::app);
-    if (outputfile.is_open())
-    {
-      outputfile<<end - start<<std::endl;
-    }
-    else
-    {
-      LOG(ERROR)<<"file not open!";
-    }
-    outputfile.close();
+    // double end = GetTime();
+    // string filename("/home/CalvinFS/src/fs/dataFile.txt");
+    // std::ofstream outputfile;
+    // outputfile.open(filename, std::ios_base::app);
+    // if (outputfile.is_open())
+    // {
+    //   outputfile<<end - start<<std::endl;
+    // }
+    // else
+    // {
+    //   LOG(ERROR)<<"file not open!";
+    // }
+    // outputfile.close();
     return new MessageBuffer(result);
   }
   else
