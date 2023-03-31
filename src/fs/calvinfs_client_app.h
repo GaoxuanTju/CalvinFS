@@ -249,7 +249,7 @@ public:
       {
         string path;
         MessageBuffer *serialized = GetMetadataEntry(header, path = header->misc_string(0));
-        LOG(ERROR)<<path<<" in machine["<<config_->LookupMetadataShard(config_->HashFileName(path), config_->LookupReplica(machine()->machine_id()));
+      //  LOG(ERROR)<<path<<" in machine["<<config_->LookupMetadataShard(config_->HashFileName(path), config_->LookupReplica(machine()->machine_id()));
         if (path == "")
         {
           depth = 0;
@@ -260,7 +260,7 @@ public:
         }
         if (depth == header->from_length() || Dir_dep(path) > 2) // 是最后一段,将最后结果发回
         {
-          LOG(ERROR)<<path<<" is end!";
+         // LOG(ERROR)<<path<<" is end!";
           Action b;
           b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
 
@@ -1144,7 +1144,7 @@ public:
     machine()->GlobalBarrier();
     Spin(1);
     double start = GetTime();
-    string path = "/a0";
+    string path = "";
 
     LOG(ERROR) << machine()->machine_id() << " path: " << path << " in " << config_->LookupMetadataShard(config_->HashFileName(path), config_->LookupReplica(machine()->machine_id()));
     for (int i = 0; i < operation_num; i++)
