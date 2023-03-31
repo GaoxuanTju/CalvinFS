@@ -504,7 +504,7 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &p)
 MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
 {
 
-  double start = GetTime(); 
+  
   MetadataEntry entry;
   string front = ""; // 最初的位置只发一个根目录的请求
   uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine()->machine_id()));
@@ -573,6 +573,7 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
 
   MessageBuffer *m = NULL;
   header->set_data_ptr(reinterpret_cast<uint64>(&m));
+  double start = GetTime(); 
   machine()->SendMessage(header, new MessageBuffer());
 
   while (m == NULL)
@@ -608,10 +609,18 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
       result->append("\n");
     }
     double end = GetTime();
-    string filename("/home/CalvinFS/src/fs/LS_time.txt");
-    ofstream outputfile;
+    string filename("/home/CalvinFS/src/fs/dataFile.txt");
+    std::ofstream outputfile;
     outputfile.open(filename, std::ios_base::app);
-    outputfile<<end - start<<endl;
+    if (outputfile.is_open())
+    {
+      outputfile<<end - start<<std::endl;
+    }
+    else
+    {
+      LOG(ERROR)<<"file not open!";
+    }
+    outputfile.close();
     return new MessageBuffer(result);
   }
   else
