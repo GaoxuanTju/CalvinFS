@@ -576,7 +576,7 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
   double start = GetTime();
 
   machine()->SendMessage(header, new MessageBuffer());
-
+ // LOG(ERROR)<<GetTime() - start;
   while (m == NULL)
   {
     usleep(10);
@@ -622,7 +622,7 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
     //   LOG(ERROR)<<"file not open!";
     // }
     // outputfile.close();
-    LOG(ERROR)<<GetTime() - start;
+    LOG(ERROR)<<"LOOKUP :"<<GetTime() - start;
     return new MessageBuffer(result);
   }
   else

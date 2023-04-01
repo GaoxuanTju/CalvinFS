@@ -243,8 +243,8 @@ public:
         MessageBuffer *serialized = GetMetadataEntry(header, path = header->misc_string(0));
         //  LOG(ERROR)<<path<<" in machine["<<config_->LookupMetadataShard(config_->HashFileName(path), config_->LookupReplica(machine()->machine_id()));
         // 下面这个时间节点是用于我去记录我新加的这些代码对性能的影响
-        double start = GetTime();
-        LOG(ERROR) << std::setprecision(20) << start<<"start "<<path;
+     //   double start = GetTime();
+     //   LOG(ERROR) << std::setprecision(20) << start<<"start "<<path;
 
         if (path == "")
         {
@@ -265,8 +265,8 @@ public:
 
           header->set_from(header->original_from()); //
                                                      // 记录时间节点
-          double end = GetTime();
-          LOG(ERROR) << std::setprecision(20) << end <<" final end " <<path;
+        //  double end = GetTime();
+         // LOG(ERROR)<<end -start;
           machine()->SendReplyMessage(header, serialized);
         }
         else
@@ -325,8 +325,8 @@ public:
           header->set_to(mds_machine);
           header->clear_misc_string();
           header->add_misc_string(LS_path.c_str(), strlen(LS_path.c_str()));
-          double end = GetTime();
-          LOG(ERROR) << std::setprecision(20) << end <<" final end " <<path;
+       //   double end = GetTime();
+        //  LOG(ERROR) << std::setprecision(20) << end <<" final end " <<path;
           machine()->SendMessage(header, new MessageBuffer());
         }
       }
