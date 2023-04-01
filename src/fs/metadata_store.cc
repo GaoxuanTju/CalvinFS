@@ -4275,7 +4275,7 @@ void MetadataStore::Init_from_txt(string filename)
       }
       temp = temp.substr(pos + 1);
       path_type[key] = type;
-      //LOG(ERROR)<<key<<" in "<<config_->LookupMetadataShard(config_->HashFileName(key), config_->LookupReplica(machine_->machine_id()));
+     // LOG(ERROR)<<key<<" in "<<config_->LookupMetadataShard(config_->HashFileName(key), config_->LookupReplica(machine_->machine_id()));
       if (IsLocal(key))
       {
         MetadataEntry entry;

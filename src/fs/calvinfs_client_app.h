@@ -5,7 +5,7 @@
 #ifndef CALVIN_FS_CALVINFS_CLIENT_APP_H_
 #define CALVIN_FS_CALVINFS_CLIENT_APP_H_
 #define switch_uid 9999
-#define operation_num 2
+#define operation_num 1
 #include <leveldb/env.h>
 
 #include "components/scheduler/scheduler.h"
@@ -134,15 +134,7 @@ public:
 
   virtual void HandleMessage(Header *header, MessageBuffer *message)
   {
-    // INTERNAL metadata lookup
-    /*
-        if (header->rpc() == "LOOKUP")
-        {
-          //在这判断一下是不是最终的位置，如果是了，
-          machine()->SendReplyMessage(
-              header,
-              GetMetadataEntry(header, header->misc_string(0)));
-        }*/
+
     if (header->rpc() == "LOOKUP")
     {
       // 提前在这里设置一下data——ptr，避免被修改
@@ -150,7 +142,7 @@ public:
       int depth; // 用来记录当前遍历到那个深度了
       // 先获取元数据项
       int id = header->uid(); // 看看uid是不是被交换机修改了
-      if (id != switch_uid)//这种情况是交换机要修改
+      if (id != switch_uid)   // 这种情况是交换机要修改
       {
         string uid = IntToString(id);                                 // 获取修改之后的uid
         string filename = header->split_string_from(header->depth()); // 获取对应深度的路径
@@ -249,7 +241,11 @@ public:
       {
         string path;
         MessageBuffer *serialized = GetMetadataEntry(header, path = header->misc_string(0));
-      //  LOG(ERROR)<<path<<" in machine["<<config_->LookupMetadataShard(config_->HashFileName(path), config_->LookupReplica(machine()->machine_id()));
+        //  LOG(ERROR)<<path<<" in machine["<<config_->LookupMetadataShard(config_->HashFileName(path), config_->LookupReplica(machine()->machine_id()));
+        // 下面这个时间节点是用于我去记录我新加的这些代码对性能的影响
+        double start = GetTime();
+        LOG(ERROR) << std::setprecision(20) << start<<"start "<<path;
+
         if (path == "")
         {
           depth = 0;
@@ -260,7 +256,7 @@ public:
         }
         if (depth == header->from_length() || Dir_dep(path) > 2) // 是最后一段,将最后结果发回
         {
-         // LOG(ERROR)<<path<<" is end!";
+          // LOG(ERROR)<<path<<" is end!";
           Action b;
           b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
 
@@ -268,6 +264,9 @@ public:
           out.ParseFromString(b.output());
 
           header->set_from(header->original_from()); //
+                                                     // 记录时间节点
+          double end = GetTime();
+          LOG(ERROR) << std::setprecision(20) << end <<" final end " <<path;
           machine()->SendReplyMessage(header, serialized);
         }
         else
@@ -326,16 +325,17 @@ public:
           header->set_to(mds_machine);
           header->clear_misc_string();
           header->add_misc_string(LS_path.c_str(), strlen(LS_path.c_str()));
-
+          double end = GetTime();
+          LOG(ERROR) << std::setprecision(20) << end <<" final end " <<path;
           machine()->SendMessage(header, new MessageBuffer());
         }
       }
     }
     else if (header->rpc() == "LS")
     {
-    
+
       machine()->SendReplyMessage(header, LS(header->misc_string(0)));
-   
+
       // EXTERNAL read file
     }
     else if (header->rpc() == "READ_FILE")
@@ -1145,7 +1145,7 @@ public:
     machine()->GlobalBarrier();
     Spin(1);
     double start = GetTime();
-    string path = "/a0/b1";
+    string path = "/a0/b1/c0/d1/e0/f1/g0/h1";
 
     LOG(ERROR) << machine()->machine_id() << " path: " << path << " in " << config_->LookupMetadataShard(config_->HashFileName(path), config_->LookupReplica(machine()->machine_id()));
     for (int i = 0; i < operation_num; i++)
