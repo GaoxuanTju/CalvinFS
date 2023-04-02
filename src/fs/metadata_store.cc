@@ -291,6 +291,7 @@ public:
   // Destructor installs all LOCAL writes.
   ~DistributedExecutionContext()
   {
+    double start = GetTime();
     if (!aborted_)
     {
       for (auto it = writes_.begin(); it != writes_.end(); ++it)
@@ -312,6 +313,7 @@ public:
         }
       }
     }
+    LOG(ERROR)<<"context des : "<<GetTime() - start;
   }
 
 private:
@@ -5384,7 +5386,10 @@ void MetadataStore::Run(Action *action)
 {
   // gaoxuan --this part will be executed by scheduler after action has beed append to log
   //  Prepare by performing all reads.
-
+  if (action->action_type() == MetadataAction::CREATE_FILE)
+  {
+    double start = GetTime();
+  }
   ExecutionContext *context;
   if (machine_ == NULL)
   {
@@ -5414,6 +5419,8 @@ void MetadataStore::Run(Action *action)
     in.ParseFromString(action->input());
     CreateFile_Internal(context, in, &out, action->from_hash(), action->from_parent());
     out.SerializeToString(action->mutable_output());
+
+    LOG(ERROR)<<"create run : "<<GetTime() - start;
   }
   else if (type == MetadataAction::ERASE)
   {
