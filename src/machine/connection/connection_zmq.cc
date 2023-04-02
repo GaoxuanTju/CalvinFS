@@ -255,9 +255,6 @@ void ConnectionZMQ::Init_UDP()
   char endpoint[256];
   snprintf(endpoint, sizeof(endpoint), "udp://*:5678");
 
-  // gaoxuan --这里想看一下端口是什么样的
-  LOG(ERROR) << "port is " << 5678;
-
   socket_in_UDP = new zmq::socket_t(*GetZMQContext(), ZMQ_DISH);
   socket_in_UDP->bind(endpoint);
   socket_in_UDP->join("test1");
@@ -292,12 +289,6 @@ void ConnectionZMQ::Init() {
   // Bind port for incoming socket.
   char endpoint[256];
   snprintf(endpoint, sizeof(endpoint), "tcp://*:%d", port_);
-
-
-  //gaoxuan --这里想看一下端口是什么样的
-  LOG(ERROR)<<"port is "<<port_;
-
-
   socket_in_ = new zmq::socket_t(*GetZMQContext(), ZMQ_PULL);
   socket_in_->bind(endpoint);
 

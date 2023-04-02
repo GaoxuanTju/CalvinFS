@@ -507,8 +507,6 @@ public:
                << "Created " << operation_num << " files. Elapsed time: "
                << (GetTime() - start) << " seconds";
 
-   BackgroundLS(path);
-
     
   }
 

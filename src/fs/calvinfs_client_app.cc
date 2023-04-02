@@ -412,7 +412,7 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
     string *result = new string();
     for (int i = 0; i < entry.dir_contents_size(); i++)
     {
-      LOG(ERROR) << entry.dir_contents(i)<< i;
+      LOG(ERROR) << entry.dir_contents(i);
       result->append(entry.dir_contents(i));
       result->append("\n");
     }

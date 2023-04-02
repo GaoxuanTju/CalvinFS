@@ -5538,7 +5538,7 @@ void MetadataStore::CreateFile_Internal(
   MetadataEntry entry;
   entry.mutable_permissions()->CopyFrom(in.permissions());
   entry.set_type(in.type());
-  entry.add_dir_contents(machine_->GetGUID());
+  entry.add_dir_contents(IntToString(machine_->GetGUID()));
   context->PutEntry(path, entry);
 }
 
