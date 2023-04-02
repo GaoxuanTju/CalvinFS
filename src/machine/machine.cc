@@ -41,16 +41,16 @@ public:
     //
     // TODO(agt): Support inline RPCs?
     case Header::RPC:
-      if(header->has_flag() && header->flag() == 3)
-      {
-        //3 represents this packet is modified by switch
-        Action b;
-        b.set_action_type(4);
-        b.set_input("switch processed");
-        MessageBuffer *m = new MessageBuffer(b);
-        *reinterpret_cast<MessageBuffer **>(header->data_ptr()) = m;
-        break;
-      }
+      // if(header->has_flag() && header->flag() == 3)
+      // {
+      //   //3 represents this packet is modified by switch
+      //   Action b;
+      //   b.set_action_type(4);
+      //   b.set_input("switch processed");
+      //   MessageBuffer *m = new MessageBuffer(b);
+      //   *reinterpret_cast<MessageBuffer **>(header->data_ptr()) = m;
+      //   break;
+      // }
       
     case Header::CALLBACK:
       tp_->HandleMessage(header, message);
@@ -191,6 +191,7 @@ Machine::~Machine()
 
 void Machine::SendMessage(Header *header, MessageBuffer *message)
 {
+  //double s = GetTime();
   // TODO(agt): Check header validity.
   if (header->rpc() == "LOOKUP")
   {
@@ -206,6 +207,7 @@ void Machine::SendMessage(Header *header, MessageBuffer *message)
     }
     MessageBuffer *m = new MessageBuffer(*msg);
     // TODO: change to connection_UDP
+    //LOG(ERROR)<<"sendmessage time is : "<<GetTime() -s;
     connection_->SendMessage_UDP(header->to(), m);
   }
   else

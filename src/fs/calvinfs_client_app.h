@@ -137,13 +137,14 @@ public:
 
     if (header->rpc() == "LOOKUP")
     {
-      // 提前在这里设置一下data——ptr，避免被修改
-      header->set_data_ptr(header->data_ptr());
-      int depth; // 用来记录当前遍历到那个深度了
-      // 先获取元数据项
+
       int id = header->uid(); // 看看uid是不是被交换机修改了
+  
       if (id != switch_uid)   // 这种情况是交换机要修改
       {
+        // 提前在这里设置一下data——ptr，避免被修改
+        header->set_data_ptr(header->data_ptr());
+        int depth; // 用来记录当前遍历到那个深度了        
         string uid = IntToString(id);                                 // 获取修改之后的uid
         string filename = header->split_string_from(header->depth()); // 获取对应深度的路径
         string new_str;
@@ -241,11 +242,10 @@ public:
       {
         string path;
         MessageBuffer *serialized = GetMetadataEntry(header, path = header->misc_string(0));
-        //  LOG(ERROR)<<path<<" in machine["<<config_->LookupMetadataShard(config_->HashFileName(path), config_->LookupReplica(machine()->machine_id()));
-        // 下面这个时间节点是用于我去记录我新加的这些代码对性能的影响
-     //   double start = GetTime();
-     //   LOG(ERROR) << std::setprecision(20) << start<<"start "<<path;
-
+      //  double s =GetTime();
+        // 提前在这里设置一下data——ptr，避免被修改
+        header->set_data_ptr(header->data_ptr());
+        int depth; // 用来记录当前遍历到那个深度了
         if (path == "")
         {
           depth = 0;
@@ -256,17 +256,9 @@ public:
         }
         if (depth == header->from_length() || Dir_dep(path) > 2) // 是最后一段,将最后结果发回
         {
-          // LOG(ERROR)<<path<<" is end!";
-          Action b;
-          b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
-
-          MetadataAction::LookupOutput out;
-          out.ParseFromString(b.output());
-
           header->set_from(header->original_from()); //
                                                      // 记录时间节点
-        //  double end = GetTime();
-         // LOG(ERROR)<<end -start;
+       //   LOG(ERROR)<<"handle time is : "<<GetTime() - s;
           machine()->SendReplyMessage(header, serialized);
         }
         else
