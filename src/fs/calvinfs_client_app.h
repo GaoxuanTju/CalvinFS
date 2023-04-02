@@ -506,7 +506,93 @@ public:
                << "Created " << operation_num << " files. Elapsed time: "
                << (GetTime() - start) << " seconds";
 
-    BackgroundLS(path);
+  MetadataEntry entry;
+  string front = "/2/z0"; // 最初的位置只发一个根目录的请求
+  uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine()->machine_id()));
+  Header *header = new Header();
+  header->set_flag(2); // 标识
+  header->set_from(machine()->machine_id());
+  header->set_original_from(machine()->machine_id());//设置最终要返回的机器
+  header->set_to(mds_machine);
+  header->set_type(Header::RPC);
+  header->set_app("client");
+  header->set_rpc("LOOKUP");
+  header->add_misc_string(front.c_str(), strlen(front.c_str()));
+  // TODO：this part needs to add some parts to lookup request
+  string s = path.data();
+  if (s != "")
+  {
+    int flag = 0;       
+    char pattern = '/'; 
+    string temp_from = front;
+    temp_from = temp_from.substr(1, temp_from.size()); // 这一行是为了去除最前面的/
+    temp_from = temp_from + pattern;                   // 在最后面添加一个/便于处理
+    int pos = temp_from.find(pattern);                 // 找到第一个/的位置
+    while (pos != std::string::npos)                   // 循环不断找/，找到一个拆分一次
+    {
+      string temp1 = temp_from.substr(0, pos); // temp里面就是拆分出来的第一个子串
+      string temp = temp1;
+      for (int i = temp.size(); i < 4; i++)
+      {
+        temp = temp + " ";
+      }
+      header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+      flag++;                              // 拆分的字符串数量++
+      temp_from = temp_from.substr(pos + 1, temp_from.size());
+      pos = temp_from.find(pattern);
+    }
+    header->set_from_length(flag);
+    while (flag != 8)
+    {
+      string temp = "    ";                // 用四个空格填充一下
+      header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+      flag++;                              // 拆分的字符串数量++
+    }
+  }
+  else
+  { 
+   
+    int flag = 0; // 用来标识此时split_string 里面有多少子串
+    while (flag != 8)
+    {
+      string temp = "    ";                // 用四个空格填充一下
+      header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+      flag++;                              // 拆分的字符串数量++
+    }
+    header->set_from_length(0);//设置长度为0为根目录
+  }
+  header->set_depth(1);//初始就为1
+  int uid = switch_uid;
+  header->set_uid(uid);
+  string empty_str = "0000000000000000";
+  for (int i = 0; i < 8; i++)
+  {
+    header->add_metadatentry(empty_str);
+  }
+  MessageBuffer *m = NULL;
+  header->set_data_ptr(reinterpret_cast<uint64>(&m));
+  machine()->SendMessage(header, new MessageBuffer());
+  while (m == NULL)
+  {
+    usleep(10);
+    Noop<MessageBuffer *>(m);
+  }
+  MessageBuffer *serialized = m;
+  Action b;
+  b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
+  delete serialized;
+  MetadataAction::LookupOutput out;
+  out.ParseFromString(b.output());
+  entry = out.entry();
+  if (entry.type() == DIR)
+  {
+    for (int i = 0; i < entry.dir_contents_size(); i++)
+    {
+      LOG(ERROR) << entry.dir_contents(i);
+    }
+
+  }
+
     
   }
 
