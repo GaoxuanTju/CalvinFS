@@ -4629,6 +4629,7 @@ void MetadataStore::
       action->add_writeset(child);  
       action->set_from_parent(entry_path);//父目录路径
       action->set_from_hash(child);//要创建的目录路径
+      LOG(ERROR)<<"father : "<<entry_path<<" and child: "<<child;
     }
     else
     {
@@ -5510,7 +5511,7 @@ void MetadataStore::CreateFile_Internal(
     out->add_errors(MetadataAction::PermissionDenied);
     return;
   }
-
+  LOG(ERROR)<<"Internal :"<<path <<"  and  "<<parent_path;
   MetadataEntry parent_entry;
   if (!context->GetEntry(parent_path, &parent_entry))
   {
@@ -5538,6 +5539,7 @@ void MetadataStore::CreateFile_Internal(
   MetadataEntry entry;
   entry.mutable_permissions()->CopyFrom(in.permissions());
   entry.set_type(in.type());
+  entry.add_dir_contents(IntToString(machine_->GetGUID()));
   context->PutEntry(path, entry);
 }
 

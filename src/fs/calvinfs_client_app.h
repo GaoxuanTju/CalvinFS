@@ -493,7 +493,8 @@ public:
     machine()->GlobalBarrier();
     Spin(1);
     double start = GetTime();
-    string path = "/a0/b1";
+    string path = "/a0/b1/z0";
+    LOG(ERROR)<<"create dir "<<path;
     BackgroundCreateFile(path);
     // Wait for all operations to finish.
     while (capacity_.load() < kMaxCapacity)
