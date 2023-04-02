@@ -388,7 +388,7 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
 
   MessageBuffer *m = NULL;
   header->set_data_ptr(reinterpret_cast<uint64>(&m));
-  double start = GetTime();
+  //double start = GetTime();
 
   machine()->SendMessage(header, new MessageBuffer());
  // LOG(ERROR)<<GetTime() - start;
@@ -412,15 +412,16 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
     string *result = new string();
     for (int i = 0; i < entry.dir_contents_size(); i++)
     {
-      LOG(ERROR) << entry.dir_contents(i);
+      LOG(ERROR) << entry.dir_contents(i)<< i;
       result->append(entry.dir_contents(i));
       result->append("\n");
     }
-    LOG(ERROR)<<"LOOKUP :"<<GetTime() - start;
+   // LOG(ERROR)<<"LOOKUP :"<<GetTime() - start;
     return new MessageBuffer(result);
   }
   else
   {
+    //LOG(ERROR)<<"IS DATA?";
     return new MessageBuffer(new string("metadata lookup error\n"));
   }
 }

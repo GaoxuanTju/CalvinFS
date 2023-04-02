@@ -75,7 +75,6 @@ message Header {
   repeated double misc_double = 44;
   repeated Scalar misc_scalar = 45;
   optional uint64 original_from = 46;
-
   // EXTERNAL connection info. (NOT FOR USE BY APPS)
   optional string external_host = 51;
   optional int32 external_port = 52;
