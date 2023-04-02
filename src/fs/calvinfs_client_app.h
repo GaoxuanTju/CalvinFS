@@ -505,6 +505,9 @@ public:
     LOG(ERROR) << "[" << machine()->machine_id() << "] "
                << "Created " << operation_num << " files. Elapsed time: "
                << (GetTime() - start) << " seconds";
+
+    BackgroundLS(path);
+    
   }
 
   void ConflictingAppendExperiment()
