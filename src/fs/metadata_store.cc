@@ -222,7 +222,7 @@ public:
     {
 
       string path = action->writeset(i);
-      
+
       string hash_name;
 
       hash_name = path;
@@ -4275,7 +4275,7 @@ void MetadataStore::Init_from_txt(string filename)
       }
       temp = temp.substr(pos + 1);
       path_type[key] = type;
-     // LOG(ERROR)<<key<<" in "<<config_->LookupMetadataShard(config_->HashFileName(key), config_->LookupReplica(machine_->machine_id()));
+      // LOG(ERROR)<<key<<" in "<<config_->LookupMetadataShard(config_->HashFileName(key), config_->LookupReplica(machine_->machine_id()));
       if (IsLocal(key))
       {
         MetadataEntry entry;
@@ -4379,7 +4379,7 @@ bool MetadataStore::IsLocal(const string &path)
 }
 
 void MetadataStore::getLOOKUP(string path)
-{ 
+{
   string from_hash = "";
   std::queue<string> level_queue;
   level_queue.push(from_hash);
@@ -4524,10 +4524,116 @@ void MetadataStore::
   {
     MetadataAction::CreateFileInput in;
     in.ParseFromString(action->input());
-    action->add_readset(in.path());
-    action->add_writeset(in.path());
-    action->add_readset(ParentDir(in.path()));
-    action->add_writeset(ParentDir(in.path()));
+    string parent_path = ParentDir(in.path());
+    // 创建的话，这里需要进行搜索，发出lookup的根请求，别的还是直接等待请求回来，其实和LS里面一模一样啊
+    // 只搜到他父亲的元数据项就可以，因为下一级的元数据还没创建，肯定是还不存在
+    string front = ""; // 最初的位置只发一个根目录的请求
+    uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
+    Header *header = new Header();
+    header->set_flag(2); // 标识
+    header->set_from(machine_->machine_id());
+    header->set_original_from(machine_->machine_id()); // 设置最终要返回的机器
+    header->set_to(mds_machine);
+    header->set_type(Header::RPC);
+    header->set_app("client");
+    header->set_rpc("LOOKUP");
+    header->add_misc_string(front.c_str(), strlen(front.c_str()));
+    // TODO：this part needs to add some parts to lookup request
+    string s = parent_path;
+    if (s != "")
+    {
+      int flag = 0;
+      char pattern = '/';
+      string temp_from = parent_path;
+      temp_from = temp_from.substr(1, temp_from.size()); // 这一行是为了去除最前面的/
+      temp_from = temp_from + pattern;                   // 在最后面添加一个/便于处理
+      int pos = temp_from.find(pattern);                 // 找到第一个/的位置
+      while (pos != std::string::npos)                   // 循环不断找/，找到一个拆分一次
+      {
+        string temp1 = temp_from.substr(0, pos); // temp里面就是拆分出来的第一个子串
+        string temp = temp1;
+        for (int i = temp.size(); i < 4; i++)
+        {
+          temp = temp + " ";
+        }
+        header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+        flag++;                              // 拆分的字符串数量++
+        temp_from = temp_from.substr(pos + 1, temp_from.size());
+        pos = temp_from.find(pattern);
+      }
+      header->set_from_length(flag);
+      while (flag != 8)
+      {
+        string temp = "    ";                // 用四个空格填充一下
+        header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+        flag++;                              // 拆分的字符串数量++
+      }
+    }
+    else
+    {
+
+      int flag = 0; // 用来标识此时split_string 里面有多少子串
+      while (flag != 8)
+      {
+        string temp = "    ";                // 用四个空格填充一下
+        header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+        flag++;                              // 拆分的字符串数量++
+      }
+      header->set_from_length(0); // 设置长度为0为根目录
+    }
+    header->set_depth(0); // 初始就为0
+    int uid = switch_uid;
+    header->set_uid(uid);
+    string empty_str = "0000000000000000";
+    for (int i = 0; i < 8; i++)
+    {
+      header->add_metadatentry(empty_str);
+    }
+    // before this part is split
+
+    MessageBuffer *m = NULL;
+    header->set_data_ptr(reinterpret_cast<uint64>(&m));
+    machine_->SendMessage(header, new MessageBuffer());
+    while (m == NULL)
+    {
+      usleep(10);
+      Noop<MessageBuffer *>(m);
+    }
+    MessageBuffer *serialized = m;
+
+    Action b;
+    b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
+
+    delete serialized;
+    MetadataAction::LookupOutput out;
+    out.ParseFromString(b.output());
+    // 上面部分就是发出lookup请求，获取其父目录的元数据项的过程
+    if(out.success() && out.entry().type() == DIR)
+    {
+      string entry_path = out.path();
+      string child;
+      //将父目录添加读写集
+      action->add_readset(entry_path);
+      action->add_writeset(entry_path);  
+      if(path_type[entry_path] == 0)//树
+      {
+        child = "/" + out.entry().dir_contents(0) + "/" + FileName(in.path());       
+        path_type[child] = 0;
+      }
+      else//hash
+      {
+        child = entry_path + "/" + FileName(in.path());
+        path_type[child] = 1;
+      }
+      action->add_readset(child);
+      action->add_writeset(child);  
+      action->set_from_parent(entry_path);//父目录路径
+      action->set_from_hash(child);//要创建的目录路径
+    }
+    else
+    {
+      LOG(ERROR)<<"can't create!";
+    }
   }
   else if (type == MetadataAction::ERASE)
   {
@@ -4950,7 +5056,7 @@ void MetadataStore::
           action->add_readset(front);
           action->add_writeset(front);
           action->add_writeset(target_front);
-//          LOG(ERROR) << "writeset: " << target_front;
+          //          LOG(ERROR) << "writeset: " << target_front;
           path_type[target_front] = 1; // 目的位置是hash，下面全是hash
           // get its child
           uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
@@ -5306,7 +5412,7 @@ void MetadataStore::Run(Action *action)
     MetadataAction::CreateFileInput in;
     MetadataAction::CreateFileOutput out;
     in.ParseFromString(action->input());
-    CreateFile_Internal(context, in, &out);
+    CreateFile_Internal(context, in, &out, action->from_hash(), action->from_parent());
     out.SerializeToString(action->mutable_output());
   }
   else if (type == MetadataAction::ERASE)
@@ -5395,7 +5501,7 @@ void MetadataStore::Run(Action *action)
 void MetadataStore::CreateFile_Internal(
     ExecutionContext *context,
     const MetadataAction::CreateFileInput &in,
-    MetadataAction::CreateFileOutput *out)
+    MetadataAction::CreateFileOutput *out, string path, string parent_path)
 {
   // Don't fuck with the root dir.
   if (in.path() == "")
@@ -5405,8 +5511,6 @@ void MetadataStore::CreateFile_Internal(
     return;
   }
 
-  // Look up parent dir.
-  string parent_path = ParentDir(in.path());
   MetadataEntry parent_entry;
   if (!context->GetEntry(parent_path, &parent_entry))
   {
@@ -5416,12 +5520,8 @@ void MetadataStore::CreateFile_Internal(
     return;
   }
 
-  // TODO(agt): Check permissions.
-
-  // If file already exists, fail.
-  // TODO(agt): Look up file directly instead of looking through parent dir?
   string filename = FileName(in.path());
-  for (int i = 0; i < parent_entry.dir_contents_size(); i++)
+  for (int i = 1; i < parent_entry.dir_contents_size(); i++)
   {
     if (parent_entry.dir_contents(i) == filename)
     {
@@ -5430,9 +5530,7 @@ void MetadataStore::CreateFile_Internal(
       return;
     }
   }
-
   // Update parent.
-  // TODO(agt): Keep dir_contents sorted?
   parent_entry.add_dir_contents(filename);
   context->PutEntry(parent_path, parent_entry);
 
@@ -5440,7 +5538,7 @@ void MetadataStore::CreateFile_Internal(
   MetadataEntry entry;
   entry.mutable_permissions()->CopyFrom(in.permissions());
   entry.set_type(in.type());
-  context->PutEntry(in.path(), entry);
+  context->PutEntry(path, entry);
 }
 
 void MetadataStore::Erase_Internal(
@@ -5558,7 +5656,7 @@ void MetadataStore::Rename_Internal(
     const MetadataAction::RenameInput &in,
     MetadataAction::RenameOutput *out, string from_hash, string to_hash, string from_parent, string to_parent)
 {
-   LOG(ERROR)<<"rename internal in machine [" <<machine_->machine_id();
+  LOG(ERROR) << "rename internal in machine [" << machine_->machine_id();
   MetadataEntry from_parent_entry;
   if (!context->GetEntry(from_parent, &from_parent_entry))
   {
@@ -5682,15 +5780,15 @@ void MetadataStore::Rename_Internal(
         {
           MetadataEntry to;   // gaoxuan --the entry which will be added
           MetadataEntry from; // gaoxuan --the entry which will be used to copy to to_entry
-          if(!context->GetEntry(front, &from))
+          if (!context->GetEntry(front, &from))
           {
-            LOG(ERROR)<<"dont getentry";
+            LOG(ERROR) << "dont getentry";
           }
           to.CopyFrom(from);
 
           context->PutEntry(hash_front, to);
           // Erase the from_entry
-        //  LOG(ERROR) << hash_front << " and " << to.dir_contents(0);
+          //  LOG(ERROR) << hash_front << " and " << to.dir_contents(0);
           if (to.type() == DIR)
           {
             string uid = to.dir_contents(0);
@@ -5712,7 +5810,6 @@ void MetadataStore::Rename_Internal(
             }
             context->DeleteEntry(front);
           }
-          
         }
         else
         {
@@ -6026,6 +6123,7 @@ void MetadataStore::Lookup_Internal(
   // TODO(agt): Check permissions.
 
   // Return entry.
+  out->set_path(in.path());
   out->mutable_entry()->CopyFrom(entry);
 }
 

@@ -338,21 +338,8 @@ public:
     }
     else if (header->rpc() == "CREATE_FILE")
     {
-      string s1;
-      machine()->SendReplyMessage(header, CreateFile(
-                                              s1 = header->misc_string(0),
-                                              header->misc_bool(0) ? DIR : DATA));
-      // 用于发送汇总请求的地方
-      Header *temp = new Header();
-      temp->set_from(header->from());
-      temp->set_to(0);
-      temp->set_type(Header::RPC);
-      temp->set_app(name());
-      temp->set_rpc("SUMMARY_CREATE");
 
-      temp->add_misc_string(s1);
-      machine()->SendMessage(temp, new MessageBuffer());
-
+      machine()->SendReplyMessage(header, CreateFile(header->misc_string(0), header->misc_bool(0) ? DIR : DATA));
       // EXTERNAL file append
     }
     else if (header->rpc() == "DELETE_FILE")
@@ -499,30 +486,15 @@ public:
   }
 
   void FillExperiment()
-  { // gaoxuan --这个地方就是创建文件的实验
+  { 
     Spin(1);
-    dir_tree = new BTNode;
-    metadata_->Init(dir_tree);
+    metadata_->Init_from_txt("/home/CalvinFS/src/fs/Init.txt");
     Spin(1);
     machine()->GlobalBarrier();
     Spin(1);
-
-    string tld("/a" + UInt64ToString(machine()->machine_id()));
-    int dirs = 1000;
-    int files = 10;
-
-    // Put files into second-level dir.
     double start = GetTime();
-    for (int i = 0; i < 3; i++)
-    {
-      string file = "/d" + IntToString(i);
-      for (int j = 0; j < 3; j++)
-      {
-        BackgroundCreateFile(tld + "/b" + IntToString(j) + file);
-      }
-      LOG(ERROR) << "[" << machine()->machine_id() << "] "
-                 << "Added file d" << i << " to " << dirs << " dirs";
-    }
+    string path = "/a0/b1";
+    BackgroundCreateFile(path);
     // Wait for all operations to finish.
     while (capacity_.load() < kMaxCapacity)
     {
@@ -530,10 +502,8 @@ public:
     }
     // Report.
     LOG(ERROR) << "[" << machine()->machine_id() << "] "
-               << "Created " << dirs * files << " files. Elapsed time: "
+               << "Created " << operation_num << " files. Elapsed time: "
                << (GetTime() - start) << " seconds";
-    Spin(1);
-    print_dir_tree(dir_tree);
   }
 
   void ConflictingAppendExperiment()
@@ -1137,7 +1107,7 @@ public:
     machine()->GlobalBarrier();
     Spin(1);
     double start = GetTime();
-    string path = "";
+    string path = "/a0/b1";
 
     LOG(ERROR) << machine()->machine_id() << " path: " << path << " in " << config_->LookupMetadataShard(config_->HashFileName(path), config_->LookupReplica(machine()->machine_id()));
     for (int i = 0; i < operation_num; i++)
@@ -1261,8 +1231,6 @@ public:
     header->set_rpc("CREATE_FILE");
     header->add_misc_bool(type == DIR); // DIR = true, DATA = false
     header->add_misc_string(path.data(), path.size());
-    // gaoxuan --在这里发出消息之前，把from_path.data()和to_path.data()拆分一下
-
     if (reporting_ && rand() % 2 == 0)
     {
       header->set_callback_app(name());

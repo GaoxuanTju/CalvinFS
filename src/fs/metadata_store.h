@@ -5,7 +5,7 @@
 
 #ifndef CALVIN_FS_METADATA_STORE_H_
 #define CALVIN_FS_METADATA_STORE_H_
-
+#define switch_uid 9999
 #include <string>
 #include "btree/btree_map.h"
 #include "common/types.h"
@@ -73,7 +73,7 @@ private:
   void CreateFile_Internal(
       ExecutionContext *context,
       const MetadataAction::CreateFileInput &in,
-      MetadataAction::CreateFileOutput *out);
+      MetadataAction::CreateFileOutput *out, string path, string parent_path);
 
   void Erase_Internal(
       ExecutionContext *context,

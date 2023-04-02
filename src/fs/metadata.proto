@@ -157,6 +157,7 @@ message LookupOutput {
 
   // Entry that was looked up. This field should appear iff success == true.
   optional MetadataEntry entry = 3;
+  optional string path = 4;
 }
 
 

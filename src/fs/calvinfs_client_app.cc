@@ -303,51 +303,6 @@ MessageBuffer *CalvinFSClientApp::ReadFile(const Slice &path)
   }
 }
 
-/*
-MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
-{
-  uint64 distinct_id = machine()->GetGUID();
-  string channel_name = "action-result-" + UInt64ToString(distinct_id);
-  auto channel = machine()->DataChannel(channel_name);
-  CHECK(!channel->Pop(NULL));
-  Action *a = new Action();
-  a->set_client_machine(machine()->machine_id());
-  a->set_client_channel(channel_name);
-  a->set_action_type(MetadataAction::TREE_LOOKUP);
-  MetadataAction::Tree_LookupInput in;
-  in.set_path(path.data(), path.size());
-  in.SerializeToString(a->mutable_input());
-  metadata_->setAPPname(name());
-  metadata_->GetRWSets(a);
-  log_->Append(a);
-  MessageBuffer *m = NULL;
-  while (!channel->Pop(&m))
-  {
-    // Wait for action to complete and be sent back.
-    usleep(100);
-  }
-  Action result;
-  result.ParseFromArray((*m)[0].data(), (*m)[0].size());
-  delete m;
-  MetadataAction::Tree_LookupOutput out;
-  out.ParseFromString(result.output());
-  if (out.success() && out.entry().type() == DIR)
-  {
-    //LOG(ERROR)<<"metadataentry is "<<out.entry().dir_contents(0);
-    string *result = new string();
-    for (int i = 0; i < out.entry().dir_contents_size(); i++)
-    {
-
-      result->append(out.entry().dir_contents(i));
-      result->append("\n");
-    }
-    return new MessageBuffer(result);
-  }
-  else
-  {
-    return new MessageBuffer(new string("metadata lookup error\n"));
-  }
-}*/
 int CalvinFSClientApp::Dir_dep(const string &path)
 {
   int depth = 0;
@@ -363,148 +318,9 @@ int CalvinFSClientApp::Dir_dep(const string &path)
 
   return depth;
 }
-/*
-MessageBuffer *CalvinFSClientApp::LS(const Slice &p)
-{
-  MetadataEntry entry;
-  string path = p.data();
-  // TODO vector PATH_SPLIT[]
-  std::vector<string> PATH_SPLIT;
-  PATH_SPLIT.push_back(""); // add root dir to split_string
-  char pattern = '/';
-  path = path + pattern; // add / so that we can deal with it more conveniently
-  path = path.substr(1);
-  bool hash_flag = false;
-  string hash_path;
-  int pos;
-  while ((pos = path.find(pattern)) != std::string::npos)
-  {
-    string split_string = path.substr(0, pos);
-    PATH_SPLIT.push_back(split_string);
-    path = path.substr(pos + 1);
-  }
-  // ok, now all the split_string has been put to PATH_SPLIT, then use it to loop
-  string uid;
-  int i;
-  for (i = 0; i < PATH_SPLIT.size(); i++)
-  {
-    // get split string and send lookup to get metadataentry
-    string front;
-    if (i == 0)
-    {
-      front = PATH_SPLIT[i];
-    }
-    else
-    {
-      front = "/" + uid + "/" + PATH_SPLIT[i];
-    }
 
-    //if the path is hash type, we need to jump to deal with hash lookup
-    if(metadata_->path_type[front] == 1)//1 represents hash
-    {
-      i++;
-      hash_flag = true;
-      hash_path = front;
-      break;
-    }
-
-    uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine()->machine_id()));
-    Header *header = new Header();
-    header->set_flag(2); // 标识
-    header->set_from(machine()->machine_id());
-    header->set_to(mds_machine);
-    header->set_type(Header::RPC);
-    header->set_app("client");
-    header->set_rpc("LOOKUP");
-    header->add_misc_string(front.c_str(), strlen(front.c_str()));
-    // TODO：this part needs to add some parts to lookup request
-
-    MessageBuffer *m = NULL;
-    header->set_data_ptr(reinterpret_cast<uint64>(&m));
-    machine()->SendMessage(header, new MessageBuffer());
-    while (m == NULL)
-    {
-      usleep(10);
-      Noop<MessageBuffer *>(m);
-    }
-    MessageBuffer *serialized = m;
-    Action b;
-    b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
-    delete serialized;
-
-    if (b.input() == "switch processed")
-    {
-      entry.set_type(DIR);
-      entry.add_dir_contents("gaoxuan");
-      break;
-    }
-    MetadataAction::LookupOutput out;
-    out.ParseFromString(b.output());
-
-    //this situation is just for tree, I will wirte hash later
-    uid = out.entry().dir_contents(0);
-    if(i == PATH_SPLIT.size() - 1)
-    {
-      entry = out.entry();
-    }
-  }
-
-  if(hash_flag == true)
-  {
-    //hash,we need to get hash path;
-    for(; i < PATH_SPLIT.size(); i++)
-    {
-      hash_path = hash_path + "/" + PATH_SPLIT[i];
-    }
-    uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(hash_path)), config_->LookupReplica(machine()->machine_id()));
-    Header *header = new Header();
-    header->set_flag(2); // 标识
-    header->set_from(machine()->machine_id());
-    header->set_to(mds_machine);
-    header->set_type(Header::RPC);
-    header->set_app("client");
-    header->set_rpc("LOOKUP");
-    header->add_misc_string(hash_path.c_str(), strlen(hash_path.c_str()));
-    // TODO：this part needs to add some parts to lookup request
-
-    MessageBuffer *m = NULL;
-    header->set_data_ptr(reinterpret_cast<uint64>(&m));
-    machine()->SendMessage(header, new MessageBuffer());
-    while (m == NULL)
-    {
-      usleep(10);
-      Noop<MessageBuffer *>(m);
-    }
-    MessageBuffer *serialized = m;
-    Action b;
-    b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
-    delete serialized;
-    MetadataAction::LookupOutput out;
-    out.ParseFromString(b.output());
-    entry = out.entry();
-  }
-
-  if (entry.type() == DIR)
-  {
-    string *result = new string();
-    for (int i = 0; i < entry.dir_contents_size(); i++)
-    {
-      LOG(ERROR) << entry.dir_contents(i);
-      result->append(entry.dir_contents(i));
-      result->append("\n");
-    }
-    return new MessageBuffer(result);
-  }
-  else
-  {
-    return new MessageBuffer(new string("metadata lookup error\n"));
-  }
-}
-*/
 MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
 {
-
-  
   MetadataEntry entry;
   string front = ""; // 最初的位置只发一个根目录的请求
   uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine()->machine_id()));
@@ -521,7 +337,6 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
   string s = path.data();
   if (s != "")
   {
-
     int flag = 0;       
     char pattern = '/'; 
     string temp_from = path.data();
@@ -588,14 +403,6 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
   b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
 
   delete serialized;
-/*
-  if (b.input() == "switch processed")
-  {
-    entry.set_type(DIR);
-    entry.add_dir_contents("gaoxuan");
-    break;
-  }
-*/  
   MetadataAction::LookupOutput out;
   out.ParseFromString(b.output());
   //LOG(ERROR) << path.data() << "'s metadataentry is :";
@@ -609,19 +416,6 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
       result->append(entry.dir_contents(i));
       result->append("\n");
     }
-    // double end = GetTime();
-    // string filename("/home/CalvinFS/src/fs/dataFile.txt");
-    // std::ofstream outputfile;
-    // outputfile.open(filename, std::ios_base::app);
-    // if (outputfile.is_open())
-    // {
-    //   outputfile<<end - start<<std::endl;
-    // }
-    // else
-    // {
-    //   LOG(ERROR)<<"file not open!";
-    // }
-    // outputfile.close();
     LOG(ERROR)<<"LOOKUP :"<<GetTime() - start;
     return new MessageBuffer(result);
   }
