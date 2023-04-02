@@ -4526,6 +4526,7 @@ void MetadataStore::
   {
     MetadataAction::CreateFileInput in;
     in.ParseFromString(action->input());
+    double start = GetTime();
     string parent_path = ParentDir(in.path());
     // 创建的话，这里需要进行搜索，发出lookup的根请求，别的还是直接等待请求回来，其实和LS里面一模一样啊
     // 只搜到他父亲的元数据项就可以，因为下一级的元数据还没创建，肯定是还不存在
@@ -4631,6 +4632,7 @@ void MetadataStore::
       action->add_writeset(child);  
       action->set_from_parent(entry_path);//父目录路径
       action->set_from_hash(child);//要创建的目录路径
+      LOG(ERROR)<<"GetRW time: "<<GetTime() - start;
     }
     else
     {
@@ -5386,9 +5388,10 @@ void MetadataStore::Run(Action *action)
 {
   // gaoxuan --this part will be executed by scheduler after action has beed append to log
   //  Prepare by performing all reads.
+  double start;
   if (action->action_type() == MetadataAction::CREATE_FILE)
   {
-    double start = GetTime();
+    start = GetTime();
   }
   ExecutionContext *context;
   if (machine_ == NULL)
