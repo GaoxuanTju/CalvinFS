@@ -405,18 +405,17 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
   delete serialized;
   MetadataAction::LookupOutput out;
   out.ParseFromString(b.output());
-  LOG(ERROR) << path.data() << "'s metadataentry is :";
+ // LOG(ERROR) << path.data() << "'s metadataentry is :";
   entry = out.entry();
   if (entry.type() == DIR)
   {
     string *result = new string();
     for (int i = 0; i < entry.dir_contents_size(); i++)
     {
-      LOG(ERROR) << entry.dir_contents(i);
+    //  LOG(ERROR) << entry.dir_contents(i);
       result->append(entry.dir_contents(i));
       result->append("\n");
     }
-   // LOG(ERROR)<<"LOOKUP :"<<GetTime() - start;
     return new MessageBuffer(result);
   }
   else

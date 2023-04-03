@@ -5,7 +5,7 @@
 #ifndef CALVIN_FS_CALVINFS_CLIENT_APP_H_
 #define CALVIN_FS_CALVINFS_CLIENT_APP_H_
 #define switch_uid 9999
-#define operation_num 1
+#define operation_num 100000
 #include <leveldb/env.h>
 
 #include "components/scheduler/scheduler.h"
@@ -494,8 +494,8 @@ public:
     machine()->GlobalBarrier();
     Spin(1);
     double start = GetTime();
-    string path = "/a0/b1/z0";
-    LOG(ERROR)<<"create dir "<<path;
+    string path = "/z1";
+   // LOG(ERROR)<<"create dir "<<path;
     BackgroundCreateFile(path);
     // Wait for all operations to finish.
     while (capacity_.load() < kMaxCapacity)
@@ -1111,9 +1111,9 @@ public:
     machine()->GlobalBarrier();
     Spin(1);
     double start = GetTime();
-    string path = "/a0/b1/c0";
+    string path = "";
 
-    LOG(ERROR) << machine()->machine_id() << " path: " << path << " in " << config_->LookupMetadataShard(config_->HashFileName(path), config_->LookupReplica(machine()->machine_id()));
+   // LOG(ERROR) << machine()->machine_id() << " path: " << path << " in " << config_->LookupMetadataShard(config_->HashFileName(path), config_->LookupReplica(machine()->machine_id()));
     for (int i = 0; i < operation_num; i++)
     {
       //         double begin = GetTime();
