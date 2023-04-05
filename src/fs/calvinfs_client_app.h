@@ -5,7 +5,7 @@
 #ifndef CALVIN_FS_CALVINFS_CLIENT_APP_H_
 #define CALVIN_FS_CALVINFS_CLIENT_APP_H_
 #define switch_uid 9999
-#define operation_num 2000
+#define operation_num 1
 #include <leveldb/env.h>
 
 #include "components/scheduler/scheduler.h"
@@ -1116,9 +1116,10 @@ public:
     machine()->GlobalBarrier();
     Spin(1);
     double start = GetTime();
+    string path = "";
     for (int j = 0; j < operation_num; j++)
     {
-      string path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(j%1000);
+     // string path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(j%1000);
       BackgroundLS(path);
     }
 
