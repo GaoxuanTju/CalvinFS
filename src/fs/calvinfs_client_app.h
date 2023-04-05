@@ -1116,17 +1116,13 @@ public:
     machine()->GlobalBarrier();
     Spin(1);
     double start = GetTime();
-    string path = "";
-
-   // LOG(ERROR) << machine()->machine_id() << " path: " << path << " in " << config_->LookupMetadataShard(config_->HashFileName(path), config_->LookupReplica(machine()->machine_id()));
-    for (int i = 0; i < operation_num; i++)
+    for (int j = 0; j < operation_num; j++)
     {
-      //         double begin = GetTime();
+      string path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(j%1000);
       BackgroundLS(path);
-      //         double end = GetTime();
     }
 
-    // Wait for all operations to finish.
+
     while (capacity_.load() < kMaxCapacity)
     {
       usleep(10);

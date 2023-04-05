@@ -28,6 +28,8 @@ const string& ClusterManager::ssh_key(uint64 m) {
     return ssh_key2_;
   } else if (m / repsize == 2) {
     return ssh_key3_;
+  }else if (m / repsize == 3) {
+    return ssh_key_;
   }
   LOG(FATAL) << "bad machine id: " << m;
 }
