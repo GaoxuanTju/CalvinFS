@@ -390,7 +390,7 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
   MessageBuffer *m = NULL;
   header->set_data_ptr(reinterpret_cast<uint64>(&m));
   //double start = GetTime();
-
+  double start = GetTime();
   machine()->SendMessage(header, new MessageBuffer());
  // LOG(ERROR)<<GetTime() - start;
   while (m == NULL)
@@ -398,6 +398,7 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
     usleep(10);
     Noop<MessageBuffer *>(m);
   }
+
   MessageBuffer *serialized = m;
 
   Action b;
@@ -417,6 +418,7 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
       result->append(entry.dir_contents(i));
       result->append("\n");
     }
+    LOG(ERROR)<<GetTime() - start;
     return new MessageBuffer(result);
   }
   else
