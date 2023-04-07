@@ -372,6 +372,12 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
       prefix_num++;   
     }
     header->set_long_prefix(prefix);
+    while (flag != 20)
+    {
+      string temp = "    ";                // 用四个空格填充一下
+      header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+      flag++;                              // 拆分的字符串数量++
+    }
   }
   else
   { 
@@ -390,7 +396,8 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
       string temp = "     ";                // 用5个空格填充一下
       prefix = prefix + temp;
       prefix_num++;   
-    }    
+    }
+    header->set_long_prefix(prefix);    
   }
   header->set_depth(0);//初始就为0
   int uid = switch_uid;
