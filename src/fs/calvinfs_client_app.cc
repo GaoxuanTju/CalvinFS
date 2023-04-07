@@ -354,14 +354,11 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
         temp = temp + " ";
       }
       header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
-
       //把这个路径添加到前缀里面去
-      prefix = prefix + "/" + temp;
-      prefix_num++;
-      if(prefix_num == 16)
+      if(prefix_num != 16)
       {
-        //最多匹配17层
-        break;
+        prefix = prefix + "/" + temp;
+        prefix_num++;
       }
       flag++;                              // 拆分的字符串数量++
       temp_from = temp_from.substr(pos + 1, temp_from.size());
@@ -374,11 +371,12 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
       prefix = prefix + temp;
       prefix_num++;   
     }
+    header->set_long_prefix(prefix);
   }
   else
   { 
     int prefix_num = 0;
-    
+    string prefix = "";
     int flag = 0; // 用来标识此时split_string 里面有多少子串
     while (flag != 20)
     {
