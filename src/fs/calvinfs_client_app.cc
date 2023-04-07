@@ -337,6 +337,8 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
   string s = path.data();
   if (s != "")
   {
+    int prefix_num = 0;
+    string prefix = "";
     int flag = 0;       
     char pattern = '/'; 
     string temp_from = path.data();
@@ -352,30 +354,45 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
         temp = temp + " ";
       }
       header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+
+      //把这个路径添加到前缀里面去
+      prefix = prefix + "/" + temp;
+      prefix_num++;
+      if(prefix_num == 16)
+      {
+        //最多匹配17层
+        break;
+      }
       flag++;                              // 拆分的字符串数量++
       temp_from = temp_from.substr(pos + 1, temp_from.size());
       pos = temp_from.find(pattern);
     }
     header->set_from_length(flag);
-    //TODO：下面这里是因为20层实验才被注释掉了，记得跑完需要修改回来，不然和交换机协同会报错的
-    // while (flag != 8)
-    // {
-    //   string temp = "    ";                // 用四个空格填充一下
-    //   header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
-    //   flag++;                              // 拆分的字符串数量++
-    // }
+    while(prefix_num != 16)
+    {
+      string temp = "     ";                // 用5个空格填充一下
+      prefix = prefix + temp;
+      prefix_num++;   
+    }
   }
   else
   { 
-    //这里和上面同理，需要修改回来
-    // int flag = 0; // 用来标识此时split_string 里面有多少子串
-    // while (flag != 8)
-    // {
-    //   string temp = "    ";                // 用四个空格填充一下
-    //   header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
-    //   flag++;                              // 拆分的字符串数量++
-    // }
+    int prefix_num = 0;
+    
+    int flag = 0; // 用来标识此时split_string 里面有多少子串
+    while (flag != 20)
+    {
+      string temp = "    ";                // 用四个空格填充一下
+      header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+      flag++;                              // 拆分的字符串数量++
+    }
     header->set_from_length(0);//设置长度为0为根目录
+    while(prefix_num != 16)
+    {
+      string temp = "     ";                // 用5个空格填充一下
+      prefix = prefix + temp;
+      prefix_num++;   
+    }    
   }
   header->set_depth(0);//初始就为0
   int uid = switch_uid;
