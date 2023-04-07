@@ -63,6 +63,8 @@ message Header {
   //    (2) request an ack by setting ack_counter to a point to an atomic<int>
   optional fixed64 ack_counter = 23;
   //    (3) request a data response by setting data_ptr to point to a
+  optional string long_prefix = 24;
+
   //        MessageBuffer*
   optional fixed64 data_ptr = 31;
   //    (4) request a data response by setting data_channel
