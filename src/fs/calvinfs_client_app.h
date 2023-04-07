@@ -5,7 +5,7 @@
 #ifndef CALVIN_FS_CALVINFS_CLIENT_APP_H_
 #define CALVIN_FS_CALVINFS_CLIENT_APP_H_
 #define switch_uid 9999
-#define operation_num 1000
+#define operation_num 100
 #include <leveldb/env.h>
 
 #include "components/scheduler/scheduler.h"
@@ -1115,26 +1115,27 @@ public:
     Spin(1);
     machine()->GlobalBarrier();
     Spin(1);
-    // double start = GetTime();
-    // // string path = "/a0/b1/c2/d3/e4/f5/g6/h7/i8/j9/k0/l1/m2/n3/o4/p5/q6/r7/s8";
-    // //string path = "/a2/b1/c1";
-    // string path = "/a2/b1/c2/d7/e1/f9/g4/h9/i7/j8/k2/l1/m7/n7/o2/p8/q3/r7/s9";
-    // LOG(ERROR)<<"LS :"<<path;
-    // for (int j = 0; j < operation_num; j++)
-    // {
-    //  // string path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(j%1000);
-    //   BackgroundLS(path);
-    // }
+    double start = GetTime();
+
+    //string path = "/a2/b1/c2/d7/e1/f9/g4/h9/i7/j8/k2/l1/m7/n7/o2/p8/q3/r7/s9";
+    string path = "/a2/b1/c2/d7/e1/f9/g4/h9/i7/j8/k2/l1/m7/n7/o2/p8/q3";
+    LOG(ERROR)<<"LS :"<<path;
+    for (int j = 0; j < operation_num; j++)
+    {
+     // string path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(j%1000);
+      BackgroundLS(path);
+      sleep(1);
+    }
 
 
-    // while (capacity_.load() < kMaxCapacity)
-    // {
-    //   usleep(10);
-    // }
-    // // Report.
-    // LOG(ERROR) << "[" << machine()->machine_id() << "] "
-    //            << "LS " << operation_num << " files. Elapsed time: "
-    //            << (GetTime() - start) << " seconds";
+    while (capacity_.load() < kMaxCapacity)
+    {
+      usleep(10);
+    }
+    // Report.
+    LOG(ERROR) << "[" << machine()->machine_id() << "] "
+               << "LS " << operation_num << " files. Elapsed time: "
+               << (GetTime() - start) << " seconds";
   }
 
   void LatencyExperimentRenameFile()
