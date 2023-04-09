@@ -65,9 +65,9 @@ int main(int argc, char **argv)
   ClusterConfig cc;
   cc.FromFile(FLAGS_config); // gaoxuan --这个地方是获得集群中机器的ip地址，从calvin.conf
 
-  int replicas = (cc.size() >= 3) ? 4 : 1; // gaoxuan --在这里cc.size根据上面的ip地址就能确定是2了,replicas是1
+  int replicas = (cc.size() >= 3) ? 3 : 1; // gaoxuan --在这里cc.size根据上面的ip地址就能确定是2了,replicas是1
   //int partitions = cc.size() / replicas;   // gaoxuan --partions是2，就代表划分到两台机器上了
-  int partitions = 4;
+  int partitions = 3;
   LOG(ERROR) << "Starting CalvinFS node " << FLAGS_machine_id
              << " (partition " << (FLAGS_machine_id % partitions)
              << "/" << partitions

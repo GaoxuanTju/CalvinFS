@@ -5,7 +5,7 @@
 #ifndef CALVIN_FS_CALVINFS_CLIENT_APP_H_
 #define CALVIN_FS_CALVINFS_CLIENT_APP_H_
 #define switch_uid 9999
-#define operation_num 100
+#define operation_num 1
 #include <leveldb/env.h>
 #include <iomanip>
 
@@ -1120,7 +1120,7 @@ public:
     LOG(ERROR)<<machine()->machine_id()<<" start "<<std::setprecision(20)<<start;
     //string path = "/a2/b1/c2/d7/e1/f9/g4/h9/i7/j8/k2/l1/m7/n7/o2/p8/q3/r7/s9";
     string path = "";
-    LOG(ERROR)<<"LS :"<<path;
+  //  LOG(ERROR)<<"LS :"<<path;
     for (int j = 0; j < operation_num; j++)
     {
      // string path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(j%1000);
@@ -1140,9 +1140,9 @@ public:
                << end -start << " seconds";
     LOG(ERROR)<<machine()->machine_id()<<" end "<<std::setprecision(20)<<end;
 
-    double s = GetTime();
-    LOG(ERROR)<<machine()->machine_id()<<" std "<<std::setprecision(20)<<s;
-    LOG(ERROR)<<machine()->machine_id()<<"  "<<"std::time :"<<GetTime() - s;
+    // double s = GetTime();
+    // LOG(ERROR)<<machine()->machine_id()<<" std "<<std::setprecision(20)<<s;
+    // LOG(ERROR)<<machine()->machine_id()<<"  "<<"std::time :"<<GetTime() - s;
   }
 
   void LatencyExperimentRenameFile()
