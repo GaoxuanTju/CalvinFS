@@ -7,6 +7,7 @@
 #define switch_uid 9999
 #define operation_num 100
 #include <leveldb/env.h>
+#include <iomanip>
 
 #include "components/scheduler/scheduler.h"
 #include "components/store/store.h"
@@ -1116,7 +1117,7 @@ public:
     machine()->GlobalBarrier();
     Spin(1);
     double start = GetTime();
-
+    LOG(ERROR)<<std::setprecision(20)<<start;
     //string path = "/a2/b1/c2/d7/e1/f9/g4/h9/i7/j8/k2/l1/m7/n7/o2/p8/q3/r7/s9";
     string path = "";
     LOG(ERROR)<<"LS :"<<path;
@@ -1133,9 +1134,15 @@ public:
       usleep(10);
     }
     // Report.
+    double end = GetTime() - start;
     LOG(ERROR) << "[" << machine()->machine_id() << "] "
                << "LS " << operation_num << " files. Elapsed time: "
-               << (GetTime() - start) << " seconds";
+               << end << " seconds";
+    LOG(ERROR)<<std::setprecision(20)<<end;
+
+    double s = GetTime();
+    LOG(ERROR)<<std::setprecision(20)<<s;
+    LOG(ERROR)<<"std::time :"<<GetTime() - s;
   }
 
   void LatencyExperimentRenameFile()
