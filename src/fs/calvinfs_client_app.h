@@ -1117,7 +1117,7 @@ public:
     machine()->GlobalBarrier();
     Spin(1);
     double start = GetTime();
-    LOG(ERROR)<<std::setprecision(20)<<start;
+    LOG(ERROR)<<machine()->machine_id()<<"  "<<std::setprecision(20)<<start;
     //string path = "/a2/b1/c2/d7/e1/f9/g4/h9/i7/j8/k2/l1/m7/n7/o2/p8/q3/r7/s9";
     string path = "";
     LOG(ERROR)<<"LS :"<<path;
@@ -1138,11 +1138,11 @@ public:
     LOG(ERROR) << "[" << machine()->machine_id() << "] "
                << "LS " << operation_num << " files. Elapsed time: "
                << end << " seconds";
-    LOG(ERROR)<<std::setprecision(20)<<end;
+    LOG(ERROR)<<machine()->machine_id()<<"  "<<std::setprecision(20)<<end;
 
     double s = GetTime();
-    LOG(ERROR)<<std::setprecision(20)<<s;
-    LOG(ERROR)<<"std::time :"<<GetTime() - s;
+    LOG(ERROR)<<machine()->machine_id()<<"  "<<std::setprecision(20)<<s;
+    LOG(ERROR)<<machine()->machine_id()<<"  "<<"std::time :"<<GetTime() - s;
   }
 
   void LatencyExperimentRenameFile()
