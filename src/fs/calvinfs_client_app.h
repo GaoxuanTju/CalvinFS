@@ -1119,7 +1119,7 @@ public:
     double start = GetTime();
     LOG(ERROR)<<machine()->machine_id()<<" start "<<std::setprecision(20)<<start;
     //string path = "/a2/b1/c2/d7/e1/f9/g4/h9/i7/j8/k2/l1/m7/n7/o2/p8/q3/r7/s9";
-    string path = "/a2";
+    string path = "";
     LOG(ERROR)<<"LS :"<<path;
     for (int j = 0; j < operation_num; j++)
     {
