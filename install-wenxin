@@ -4,6 +4,14 @@
 
 cd ext
 
+# protobuf
+git clone https://github.com/google/protobuf.git
+cd protobuf
+./autogen.sh
+./configure --prefix=$PWD
+make -j
+cd ..
+
 # gtest
 wget https://github.com/google/googletest/archive/release-1.6.0.tar.gz
 tar -zxf release-1.6.0.tar.gz 
@@ -37,8 +45,6 @@ cd leveldb
 make -j
 make libmemenv.a
 cd ..
-
-
 
 #gperftools
 git clone https://github.com/gperftools/gperftools.git
