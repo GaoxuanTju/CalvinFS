@@ -8,6 +8,7 @@ cd ext
 wget  https://github.com/protocolbuffers/protobuf/releases/download/v3.7.1/protobuf-cpp-3.7.1.tar.gz
 tar -xzvf protobuf-cpp-3.7.1.tar.gz
 mv protobuf-3.7.1/ protobuf
+cd protobuf
 ./autogen.sh
 ./configure --prefix=$PWD
 make -j
