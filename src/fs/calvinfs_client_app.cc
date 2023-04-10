@@ -424,7 +424,7 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
   delete serialized;
   MetadataAction::LookupOutput out;
   out.ParseFromString(b.output());
- // LOG(ERROR) << path.data() << "'s metadataentry is :";
+  //LOG(ERROR) << path.data() << "'s metadataentry is :";
   entry = out.entry();
   if (entry.type() == DIR)
   {
