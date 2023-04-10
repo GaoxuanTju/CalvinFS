@@ -30,11 +30,9 @@ using std::make_pair;
 class CalvinFSClientApp : public App
 {
 public:
-
   CalvinFSClientApp()
       : go_(true), going_(false), reporting_(false)
   {
-
   }
   virtual ~CalvinFSClientApp()
   {
@@ -140,16 +138,14 @@ public:
 
     if (header->rpc() == "LOOKUP")
     {
-
       int id = header->uid(); // 看看uid是不是被交换机修改了
-  
-      if (id != switch_uid)   // 这种情况是交换机要修改
+      if (id != switch_uid) // 这种情况是交换机要修改
       {
-        // 提前在这里设置一下data——ptr，避免被修改
         header->set_data_ptr(header->data_ptr());
-        int depth; // 用来记录当前遍历到那个深度了        
-        string uid = IntToString(id);                                 // 获取修改之后的uid
-        string filename = header->split_string_from(header->depth()); // 获取对应深度的路径
+        int depth;                                              // 用来记录当前遍历到那个深度了
+        string uid = IntToString(id);                           // 获取修改之后的uid
+        depth = header->depth() - 1;                        // 获得交换机修改之后的深度
+        string filename = header->split_string_from(depth); // 交换机是采用++的方式的
         string new_str;
         // 这里要将字符串中的空格删除
         for (int i = 0; i < filename.size(); i++)
@@ -160,58 +156,52 @@ public:
           }
         }
         string path = "/" + uid + "/" + new_str; // 要发出的结果
-        MessageBuffer *serialized = GetMetadataEntry(header, path);
-        if (path == "")
-        {
-          depth = 0;
-        }
-        else
-        {
-          depth = header->depth() + 1;
-        }
-        if (depth == header->from_length() || Dir_dep(path) > 2) // 是最后一段,将最后结果发回
-        {
-
-          Action b;
-          b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
-
-          MetadataAction::LookupOutput out;
-          out.ParseFromString(b.output());
+        MessageBuffer *serialized = GetMetadataEntry(header, path);      
+        if (depth + 1 == header->from_length() || Dir_dep(path) > 2)
+        { // 交换机匹配到了，而且一直匹配到最后一段位置
+          // 要做的是获取直接获取元数据项，然后返回即可
 
           header->set_from(header->original_from()); //
           machine()->SendReplyMessage(header, serialized);
         }
         else
         {
+           // 解析一下，没有结束，拼接一下路径，继续发出请求
           Action b;
           b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
-          delete serialized;
           MetadataAction::LookupOutput out;
-          out.ParseFromString(b.output());
-          MetadataEntry entry = out.entry();
-          // 现在entry中存放的是这一步拿到的元数据项
-          string LS_path;
-          string uid = entry.dir_contents(0);
-          if (metadata_->path_type[path] == 0)
+          out.ParseFromString(b.output());          
+          if (path == "")
           {
-            // 树类型
-            string filename = header->split_string_from(depth);
-            string new_str;
-            // 这里要将字符串中的空格删除
-            for (int i = 0; i < filename.size(); i++)
-            {
-              if (filename[i] != ' ')
-              {
-                new_str += filename[i];
-              }
-            }
-            LS_path = "/" + uid + "/" + new_str;
-            header->set_depth(depth); // 当前所在深度
+            depth = 0;
           }
           else
           {
+            depth = depth + 1;
+          }
+          string uid1 = out.entry().dir_contents(0);
+          string LS_path;
+          if(metadata_->path_type[path] == 0)
+          {
+            //父目录是树
+            string file = header->split_string_from(depth);
+            string str;
+             // 这里要将字符串中的空格删除
+            for (int i = 0; i < file.size(); i++)
+            {
+              if (file[i] != ' ')
+              {
+                str += file[i];
+              }
+            } 
+            LS_path = "/" + uid1 + "/" + str;
+            header->set_depth(depth); // 当前所在深度                      
+          }
+          else
+          {
+            //父目录是hash
             LS_path = path;
-            for (int i = depth; i < header->from_length(); i++)
+            for (int i = depth-1; i < header->from_length(); i++)
             {
               string filename = header->split_string_from(i);
               string new_str;
@@ -225,28 +215,26 @@ public:
               }
               LS_path = LS_path + "/" + new_str;
             }
-            header->set_depth(header->from_length() - 1); // 为了统一上面深度，depth = depth + 1
+            header->set_depth(header->from_length() - 1); // 为了统一上面深度，depth = depth + 1            
           }
-
-          // 下面要对LS——path发lookup请求
+          // 下面要对LS_path发lookup请求
           uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(LS_path)), config_->LookupReplica(machine()->machine_id()));
           // 这之前是发送lookup请求
           // 还是之前的header，只需要改路径，from, to就行
-          //第一次被修改过后，重新设置回来
+          // 第一次被修改过后，重新设置回来
           header->set_uid(switch_uid);
           header->set_from(machine()->machine_id());
           header->set_to(mds_machine);
           header->clear_misc_string();
           header->add_misc_string(LS_path.c_str(), strlen(LS_path.c_str()));
-
-          machine()->SendMessage(header, new MessageBuffer());
+          machine()->SendMessage(header, new MessageBuffer());         
         }
       }
       else
       {
         string path;
         MessageBuffer *serialized = GetMetadataEntry(header, path = header->misc_string(0));
-      //  double s =GetTime();
+        //  double s =GetTime();
         // 提前在这里设置一下data——ptr，避免被修改
         header->set_data_ptr(header->data_ptr());
         int depth; // 用来记录当前遍历到那个深度了
@@ -262,7 +250,7 @@ public:
         {
           header->set_from(header->original_from()); //
                                                      // 记录时间节点
-       //   LOG(ERROR)<<"handle time is : "<<GetTime() - s;
+                                                     //   LOG(ERROR)<<"handle time is : "<<GetTime() - s;
           machine()->SendReplyMessage(header, serialized);
         }
         else
@@ -311,18 +299,11 @@ public:
             }
             header->set_depth(header->from_length() - 1); // 为了统一上面深度，depth = depth + 1
           }
-
-          // 下面要对LS——path发lookup请求
           uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(LS_path)), config_->LookupReplica(machine()->machine_id()));
-          // 这之前是发送lookup请求
-          // 还是之前的header，只需要改路径，from, to就行
-
           header->set_from(machine()->machine_id());
           header->set_to(mds_machine);
           header->clear_misc_string();
           header->add_misc_string(LS_path.c_str(), strlen(LS_path.c_str()));
-       //   double end = GetTime();
-        //  LOG(ERROR) << std::setprecision(20) << end <<" final end " <<path;
           machine()->SendMessage(header, new MessageBuffer());
         }
       }
@@ -490,20 +471,20 @@ public:
   }
 
   void FillExperiment()
-  { 
+  {
     Spin(1);
     metadata_->Init_from_txt("/home/CalvinFS/src/fs/Init.txt");
     Spin(1);
     machine()->GlobalBarrier();
     Spin(1);
     double start = GetTime();
-    
-   // LOG(ERROR)<<"create dir "<<path;
-   for(int i = 0; i < operation_num; i++)
-   {
+
+    // LOG(ERROR)<<"create dir "<<path;
+    for (int i = 0; i < operation_num; i++)
+    {
       string path = "/z" + IntToString(i);
       BackgroundCreateFile(path);
-   }
+    }
 
     // Wait for all operations to finish.
     while (capacity_.load() < kMaxCapacity)
@@ -514,8 +495,6 @@ public:
     LOG(ERROR) << "[" << machine()->machine_id() << "] "
                << "Created " << operation_num << " files. Elapsed time: "
                << (GetTime() - start) << " seconds";
-
-    
   }
 
   void ConflictingAppendExperiment()
@@ -1119,27 +1098,26 @@ public:
     machine()->GlobalBarrier();
     Spin(1);
     double start = GetTime();
-    //string path = "/a2/b1/c2/d7/e1/f9/g4/h9/i7/j8/k2/l1/m7/n7/o2/p8/q3/r7/s9";
-    string path = "/a2/b1/c2/d7/e1/f9/g4/h9/i7/j8/k2/l1/m7/n7/o2/p8/q3/r7/s9";
-  //  LOG(ERROR)<<"LS :"<<path;
+    // string path = "/a2/b1/c2/d7/e1/f9/g4/h9/i7/j8/k2/l1/m7/n7/o2/p8/q3/r7/s9";
+    string path = "";
+    //  LOG(ERROR)<<"LS :"<<path;
     for (int j = 0; j < operation_num; j++)
     {
-     // string path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(j%1000);
+      // string path = "/a" + IntToString(machine()->machine_id()) + "/b" + IntToString(j%1000);
       BackgroundLS(path);
-     // sleep(1);
+      // sleep(1);
     }
-
 
     while (capacity_.load() < kMaxCapacity)
     {
       usleep(10);
-    //   LOG(ERROR)<<capacity_.load();
+      //   LOG(ERROR)<<capacity_.load();
     }
     // Report.
-    double end = GetTime() ;
+    double end = GetTime();
     LOG(ERROR) << "[" << machine()->machine_id() << "] "
                << "LS " << operation_num << " files. Elapsed time: "
-               << end -start << " seconds";
+               << end - start << " seconds";
   }
 
   void LatencyExperimentRenameFile()
