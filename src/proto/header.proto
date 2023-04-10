@@ -40,17 +40,16 @@ message Header {
   optional Priority priority = 13 [default = HIGH];
 
   
-  optional fixed32 from_length = 14;//源路径拆分后的子串数量
+  optional uint64 from_length = 14;//源路径拆分后的子串数量
   repeated string split_string_from = 15;//存放被拆分后的全路径
-  optional fixed32 to_length = 16;//目的路径拆分后的子串数量
+  optional uint64 to_length = 16;//目的路径拆分后的子串数量
   repeated string split_string_to = 17;//存放被拆分后的目的路径
 
 //the depth of full path
-  optional fixed32 depth = 18;
+  optional uint64 depth = 18;
 //uid of file; fixed 4 bytes
   optional fixed32 uid = 19;
-//eight metadatentry, every one is 16 bytes
-  repeated string metadatentry = 20;
+
 
   // Optional for RPC requests (should NOT appear for CALLBACK invocations):
   //

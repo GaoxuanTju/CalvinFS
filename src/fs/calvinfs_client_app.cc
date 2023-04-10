@@ -357,7 +357,7 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
      
       if(prefix_num != 16)
       {
-        prefix = prefix + "/" + temp;
+        prefix = prefix + temp;
         prefix_num++;
       }
       flag++;                              
@@ -367,7 +367,7 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
     header->set_from_length(flag);
     while(prefix_num != 16)
     {
-      string temp = "     ";              
+      string temp = "    ";              
       prefix = prefix + temp;
       prefix_num++;   
     }
@@ -393,7 +393,7 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
     header->set_from_length(0);//设置长度为0为根目录
     while(prefix_num != 16)
     {
-      string temp = "     ";                // 用5个空格填充一下
+      string temp = "    ";                // 用4个空格填充一下
       prefix = prefix + temp;
       prefix_num++;   
     }
@@ -402,11 +402,6 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
   header->set_depth(0);
   int uid = switch_uid;
   header->set_uid(uid);
-  string empty_str = "0000000000000000";
-  for (int i = 0; i < 8; i++)
-  {
-    header->add_metadatentry(empty_str);
-  }
   // before this part is split
 
   MessageBuffer *m = NULL;
