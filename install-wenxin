@@ -1,0 +1,63 @@
+#!/bin/bash
+
+# requires: make, g++, autoconf, libtool, libreadline-dev, svn(subversion),git,unzip,tar,cmake, libsnappy-dev
+
+cd ext
+
+# gtest
+wget https://github.com/google/googletest/archive/release-1.6.0.tar.gz
+tar -zxf release-1.6.0.tar.gz 
+rm release-1.6.0.tar.gz 
+mv googletest-release-1.6.0/ gtest
+cd gtest
+mkdir mybuild    
+cd mybuild
+cmake $PWD/..
+make -j
+cd ..
+cd ..
+
+# glog
+wget https://github.com/google/glog/archive/v0.3.4.tar.gz
+tar -xzf v0.3.4.tar.gz
+mv glog-0.3.4/ glog
+rm -fr v0.3.4.tar.gz
+cd glog
+./configure --prefix=$PWD
+make -j
+make install
+cd ..
+
+# leveldb
+wget https://github.com/google/leveldb/archive/v1.9.tar.gz
+tar -zxf v1.9.tar.gz
+mv leveldb-1.9/ leveldb
+rm -fr v1.9.tar.gz
+cd leveldb
+make -j
+make libmemenv.a
+cd ..
+
+
+
+#gperftools
+git clone https://github.com/gperftools/gperftools.git
+cd gperftools
+./autogen.sh
+./configure --prefix=$PWD --enable-frame-pointers
+make -j
+make install
+cd ..
+
+#gflags
+wget https://github.com/gflags/gflags/archive/v2.0.tar.gz
+tar -xzf v2.0.tar.gz
+rm v2.0.tar.gz
+mv gflags-2.0/ gflags
+cd gflags
+./configure --prefix=$PWD
+make -j
+make install
+cd ..
+
+
