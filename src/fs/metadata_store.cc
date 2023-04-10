@@ -4588,11 +4588,6 @@ void MetadataStore::
     header->set_depth(0); // 初始就为0
     int uid = switch_uid;
     header->set_uid(uid);
-    string empty_str = "0000000000000000";
-    for (int i = 0; i < 8; i++)
-    {
-      header->add_metadatentry(empty_str);
-    }
     // before this part is split
 
     MessageBuffer *m = NULL;
@@ -6393,11 +6388,6 @@ void MetadataStore::Tree_Lookup_Internal(
       header->set_depth(depth);
       int uid = 9999;
       header->set_uid(uid);
-      string empty_str = "0000000000000000";
-      for (int i = 0; i < 8; i++)
-      {
-        header->add_metadatentry(empty_str);
-      }
       MessageBuffer *m = NULL;
       header->set_data_ptr(reinterpret_cast<uint64>(&m));
       machine_->SendMessage(header, new MessageBuffer());
