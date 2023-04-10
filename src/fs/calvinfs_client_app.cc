@@ -322,18 +322,18 @@ int CalvinFSClientApp::Dir_dep(const string &path)
 MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
 {
   MetadataEntry entry;
-  string front = ""; // 最初的位置只发一个根目录的请求
+  string front = "/0/t4"; 
   uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine()->machine_id()));
   Header *header = new Header();
-  header->set_flag(2); // 标识
+  header->set_flag(2); 
   header->set_from(machine()->machine_id());
-  header->set_original_from(machine()->machine_id());//设置最终要返回的机器
+  header->set_original_from(machine()->machine_id());
   header->set_to(mds_machine);
   header->set_type(Header::RPC);
   header->set_app("client");
   header->set_rpc("LOOKUP");
   header->add_misc_string(front.c_str(), strlen(front.c_str()));
-  // TODO：this part needs to add some parts to lookup request
+
   string s = path.data();
   if (s != "")
   {
@@ -342,41 +342,41 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
     int flag = 0;       
     char pattern = '/'; 
     string temp_from = path.data();
-    temp_from = temp_from.substr(1, temp_from.size()); // 这一行是为了去除最前面的/
-    temp_from = temp_from + pattern;                   // 在最后面添加一个/便于处理
-    int pos = temp_from.find(pattern);                 // 找到第一个/的位置
-    while (pos != std::string::npos)                   // 循环不断找/，找到一个拆分一次
+    temp_from = temp_from.substr(1, temp_from.size()); 
+    temp_from = temp_from + pattern;                  
+    int pos = temp_from.find(pattern);                 
+    while (pos != std::string::npos)                  
     {
-      string temp1 = temp_from.substr(0, pos); // temp里面就是拆分出来的第一个子串
+      string temp1 = temp_from.substr(0, pos); 
       string temp = temp1;
       for (int i = temp.size(); i < 4; i++)
       {
         temp = temp + " ";
       }
-      header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
-      //把这个路径添加到前缀里面去
+      header->add_split_string_from(temp); 
+     
       if(prefix_num != 16)
       {
         prefix = prefix + "/" + temp;
         prefix_num++;
       }
-      flag++;                              // 拆分的字符串数量++
+      flag++;                              
       temp_from = temp_from.substr(pos + 1, temp_from.size());
       pos = temp_from.find(pattern);
     }
     header->set_from_length(flag);
     while(prefix_num != 16)
     {
-      string temp = "     ";                // 用5个空格填充一下
+      string temp = "     ";              
       prefix = prefix + temp;
       prefix_num++;   
     }
     header->set_long_prefix(prefix);
     while (flag != 20)
     {
-      string temp = "    ";                // 用四个空格填充一下
-      header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
-      flag++;                              // 拆分的字符串数量++
+      string temp = "    ";                
+      header->add_split_string_from(temp); 
+      flag++;                              
     }
   }
   else
@@ -399,7 +399,7 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
     }
     header->set_long_prefix(prefix);    
   }
-  header->set_depth(0);//初始就为0
+  header->set_depth(0);
   int uid = switch_uid;
   header->set_uid(uid);
   string empty_str = "0000000000000000";
@@ -412,9 +412,9 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
   MessageBuffer *m = NULL;
   header->set_data_ptr(reinterpret_cast<uint64>(&m));
   //double start = GetTime();
- // double start = GetTime();
+
   machine()->SendMessage(header, new MessageBuffer());
- // LOG(ERROR)<<GetTime() - start;
+
   while (m == NULL)
   {
     usleep(10);
@@ -445,7 +445,6 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
   }
   else
   {
-    //LOG(ERROR)<<"IS DATA?";
     return new MessageBuffer(new string("metadata lookup error\n"));
   }
 }

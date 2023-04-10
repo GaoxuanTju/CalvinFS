@@ -30,15 +30,11 @@ using std::make_pair;
 class CalvinFSClientApp : public App
 {
 public:
-  int lookup_num; 
-  double start;
-  bool flag;
+
   CalvinFSClientApp()
       : go_(true), going_(false), reporting_(false)
   {
-    lookup_num = 0;
-    start = 0.0;
-    flag = false;
+
   }
   virtual ~CalvinFSClientApp()
   {
@@ -1122,8 +1118,7 @@ public:
     Spin(1);
     machine()->GlobalBarrier();
     Spin(1);
-    start = GetTime();
-    LOG(ERROR)<<machine()->machine_id()<<" start "<<std::setprecision(20)<<start;
+    double start = GetTime();
     //string path = "/a2/b1/c2/d7/e1/f9/g4/h9/i7/j8/k2/l1/m7/n7/o2/p8/q3/r7/s9";
     string path = "/t4";
   //  LOG(ERROR)<<"LS :"<<path;
@@ -1145,11 +1140,6 @@ public:
     LOG(ERROR) << "[" << machine()->machine_id() << "] "
                << "LS " << operation_num << " files. Elapsed time: "
                << end -start << " seconds";
-    LOG(ERROR)<<machine()->machine_id()<<" end "<<std::setprecision(20)<<end;
-
-    // double s = GetTime();
-    // LOG(ERROR)<<machine()->machine_id()<<" std "<<std::setprecision(20)<<s;
-    // LOG(ERROR)<<machine()->machine_id()<<"  "<<"std::time :"<<GetTime() - s;
   }
 
   void LatencyExperimentRenameFile()
