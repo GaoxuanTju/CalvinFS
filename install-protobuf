@@ -14,5 +14,4 @@ cd protobuf
 make -j
 make check
 sudo make install
-sudo ldconfig
 
