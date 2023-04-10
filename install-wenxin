@@ -4,7 +4,6 @@
 
 cd ext
 
-
 # gtest
 wget https://github.com/google/googletest/archive/release-1.6.0.tar.gz
 tar -zxf release-1.6.0.tar.gz 
@@ -69,4 +68,9 @@ cd protobuf
 make -j
 make check
 make install
+
+cd ..
+cd ..
+
+sudo apt-get install libreadline-dev
 
