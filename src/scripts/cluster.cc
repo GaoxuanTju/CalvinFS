@@ -9,7 +9,7 @@
 DEFINE_string(command, "status", "cluster command");
 DEFINE_string(config, "calvin.conf", "conf file of Calvin cluster");
 
-DEFINE_string(calvin_path, "/home/CalvinFS",
+DEFINE_string(calvin_path, "/home/wenxin/CalvinFS",
                "path to the main calvin directory");
 
 DEFINE_string(binary, "calvinfs_server", "Calvin binary executable program");
