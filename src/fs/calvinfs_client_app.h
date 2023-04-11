@@ -5,7 +5,7 @@
 #ifndef CALVIN_FS_CALVINFS_CLIENT_APP_H_
 #define CALVIN_FS_CALVINFS_CLIENT_APP_H_
 #define switch_uid 9999
-#define operation_num 5000
+#define operation_num 2
 #include <leveldb/env.h>
 #include <iomanip>
 
@@ -1099,7 +1099,7 @@ public:
     Spin(1);
     double start = GetTime();
     // string path = "/a2/b1/c2/d7/e1/f9/g4/h9/i7/j8/k2/l1/m7/n7/o2/p8/q3/r7/s9";
-    string path = "/t4";
+    string path = "";
     
     //  LOG(ERROR)<<"LS :"<<path;
     for (int j = 0; j < operation_num; j++)
