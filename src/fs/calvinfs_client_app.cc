@@ -323,16 +323,6 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
 {
   MetadataEntry entry;
   string front  = ""; 
-
-  // if(path.size() != 0)
-  // {
-  //   front = "/0/a2";
-  // }
-  // else
-  // {
-  //   front = "";
-  // }
-
   uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine()->machine_id()));
   Header *header = new Header();
   header->set_flag(2); 
@@ -416,7 +406,7 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
 
   MessageBuffer *m = NULL;
   header->set_data_ptr(reinterpret_cast<uint64>(&m));
-  double start = GetTime();
+ // double start = GetTime();
 
   machine()->SendMessage(header, new MessageBuffer());
 
@@ -445,7 +435,7 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
       result->append(entry.dir_contents(i));
       result->append("\n");
     }
-    LOG(ERROR)<<GetTime() - start;
+  //  LOG(ERROR)<<GetTime() - start;
     return new MessageBuffer(result);
   }
   else
