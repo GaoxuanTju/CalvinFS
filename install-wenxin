@@ -1,9 +1,15 @@
 #!/bin/bash
-
 # requires: make, g++, autoconf, libtool, libreadline-dev, svn(subversion),git,unzip,tar,cmake, libsnappy-dev
-
 cd ext
-
+#   Git make,g++ autoconf, libtool,libreadline-dev,libsnappy-dev   unzip, tar cmake
+sudo apt install make
+sudo apt install g++
+sudo apt install autoconf
+sudo apt install libtool-bin
+sudo apt-get install libreadline-dev
+sudo apt-get install libsnappy-dev
+sudo apt install unzip
+sudo apt install cmake
 # gtest
 wget https://github.com/google/googletest/archive/release-1.6.0.tar.gz
 tar -zxf release-1.6.0.tar.gz 
@@ -72,5 +78,5 @@ make install
 cd ..
 cd ..
 
-sudo apt-get install libreadline-dev
+
 
