@@ -322,7 +322,17 @@ int CalvinFSClientApp::Dir_dep(const string &path)
 MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
 {
   MetadataEntry entry;
-  string front = ""; 
+  string front  = ""; 
+
+  // if(path.size() != 0)
+  // {
+  //   front = "/0/a2";
+  // }
+  // else
+  // {
+  //   front = "";
+  // }
+
   uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine()->machine_id()));
   Header *header = new Header();
   header->set_flag(2); 
