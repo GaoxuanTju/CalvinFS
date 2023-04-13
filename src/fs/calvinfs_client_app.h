@@ -1123,7 +1123,7 @@ public:
   //   LOG(ERROR) << "[" << machine()->machine_id() << "] "
   //              << "LS " << operation_num << " files. Elapsed time: "
   //              << end - start << " seconds";
-  // }
+   }
 
   void LatencyExperimentRenameFile()
   {
