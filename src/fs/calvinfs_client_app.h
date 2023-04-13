@@ -1099,12 +1099,17 @@ public:
     Spin(1);
     double start = GetTime();
     // string path = "/a2/b1/c2/d7/e1/f9/g4/h9/i7/j8/k2/l1/m7/n7/o2/p8/q3/r7/s9";
-    string path = "";
-    
+    string path1 = "/a0";
+    string path2 = "/a1";
+    string path3 = "/a2";
+    string path4 = "/a3";
     //  LOG(ERROR)<<"LS :"<<path;
     for (int j = 0; j < operation_num; j++)
     {
-      BackgroundLS(path);
+    //  BackgroundLS(path2);
+      // BackgroundLS(path2);
+      // BackgroundLS(path3);
+      BackgroundLS("/a1");
       //sleep(1);
     }
 
