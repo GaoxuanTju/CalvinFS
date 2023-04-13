@@ -5,7 +5,7 @@
 #ifndef CALVIN_FS_CALVINFS_CLIENT_APP_H_
 #define CALVIN_FS_CALVINFS_CLIENT_APP_H_
 #define switch_uid 9999
-#define operation_num 2
+#define operation_num 5000
 #include <leveldb/env.h>
 #include <iomanip>
 
@@ -473,7 +473,7 @@ public:
   void FillExperiment()
   {
     Spin(1);
-    metadata_->Init_from_txt("/home/wenxin/CalvinFS/src/fs/Init.txt");
+    metadata_->Init_from_txt("/home/CalvinFS/src/fs/Init.txt");
     Spin(1);
     machine()->GlobalBarrier();
     Spin(1);
@@ -1019,7 +1019,7 @@ public:
     Spin(1);
     // dir_tree = new BTNode;
     // metadata_->Init_tree_20(dir_tree);
-    metadata_->Init_from_txt("/home/wenxin/CalvinFS/src/fs/Init.txt");
+    metadata_->Init_from_txt("/home/CalvinFS/src/fs/Init.txt");
     Spin(1);
     machine()->GlobalBarrier();
     Spin(1);
@@ -1093,7 +1093,7 @@ public:
     Spin(1);
     // dir_tree = new BTNode;
     // metadata_->Init_tree_20(dir_tree);
-    metadata_->Init_from_txt("/home/wenxin/CalvinFS/src/fs/Init.txt");
+    metadata_->Init_from_txt("/home/CalvinFS/src/fs/Init.txt");
     Spin(1);
     machine()->GlobalBarrier();
     Spin(1);
