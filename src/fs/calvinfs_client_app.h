@@ -470,32 +470,32 @@ public:
     return 1000000 / (1 + rand() % 9999);
   }
 
-  void FillExperiment()
-  {
-    Spin(1);
-    metadata_->Init_from_txt("/home/CalvinFS/src/fs/Init.txt");
-    Spin(1);
-    machine()->GlobalBarrier();
-    Spin(1);
-    double start = GetTime();
+  // void FillExperiment()
+  // {
+  //   Spin(1);
+  //   metadata_->Init_from_txt("/home/CalvinFS/src/fs/Init.txt");
+  //   Spin(1);
+  //   machine()->GlobalBarrier();
+  //   Spin(1);
+  //   double start = GetTime();
 
-    // LOG(ERROR)<<"create dir "<<path;
-    for (int i = 0; i < operation_num; i++)
-    {
-      string path = "/z" + IntToString(i);
-      BackgroundCreateFile(path);
-    }
+  //   // LOG(ERROR)<<"create dir "<<path;
+  //   for (int i = 0; i < operation_num; i++)
+  //   {
+  //     string path = "/z" + IntToString(i);
+  //     BackgroundCreateFile(path);
+  //   }
 
-    // Wait for all operations to finish.
-    while (capacity_.load() < kMaxCapacity)
-    {
-      usleep(10);
-    }
-    // Report.
-    LOG(ERROR) << "[" << machine()->machine_id() << "] "
-               << "Created " << operation_num << " files. Elapsed time: "
-               << (GetTime() - start) << " seconds";
-  }
+  //   // Wait for all operations to finish.
+  //   while (capacity_.load() < kMaxCapacity)
+  //   {
+  //     usleep(10);
+  //   }
+  //   // Report.
+  //   LOG(ERROR) << "[" << machine()->machine_id() << "] "
+  //              << "Created " << operation_num << " files. Elapsed time: "
+  //              << (GetTime() - start) << " seconds";
+  // }
 
   void ConflictingAppendExperiment()
   {
@@ -1014,47 +1014,47 @@ public:
     print_dir_tree(dir_tree);
   }
 
-  void RenameExperiment()
-  {
-    Spin(1);
-    // dir_tree = new BTNode;
-    // metadata_->Init_tree_20(dir_tree);
-    metadata_->Init_from_txt("/home/CalvinFS/src/fs/Init.txt");
-    Spin(1);
-    machine()->GlobalBarrier();
-    Spin(1);
+  // void RenameExperiment()
+  // {
+  //   Spin(1);
+  //   // dir_tree = new BTNode;
+  //   // metadata_->Init_tree_20(dir_tree);
+  //   metadata_->Init_from_txt("/home/CalvinFS/src/fs/Init.txt");
+  //   Spin(1);
+  //   machine()->GlobalBarrier();
+  //   Spin(1);
 
-    std::vector<int> file_suffix;
-    for (int i = 0; i < 20; i++)
-    {
-      file_suffix.push_back(rand() % 2);
-    }
-    double start = GetTime();
-    string from_path;
-    string to_path;
+  //   std::vector<int> file_suffix;
+  //   for (int i = 0; i < 20; i++)
+  //   {
+  //     file_suffix.push_back(rand() % 2);
+  //   }
+  //   double start = GetTime();
+  //   string from_path;
+  //   string to_path;
 
-    from_path = "/a" + IntToString(0);
-    to_path = "/a" + IntToString(1) + "/b" + IntToString(1) + "/d" + IntToString(machine()->GetGUID());
-    uint64 from_id = config_->LookupMetadataShard(config_->HashFileName(from_path), config_->LookupReplica(machine()->machine_id()));
-    uint64 to_id = config_->LookupMetadataShard(config_->HashFileName(to_path), config_->LookupReplica(machine()->machine_id()));
-    LOG(ERROR) << from_path << " in machine[" << from_id << "]  renamed to   " << to_path << " in machine[" << to_id << "]";
-    BackgroundRenameFile(from_path, to_path);
+  //   from_path = "/a" + IntToString(0);
+  //   to_path = "/a" + IntToString(1) + "/b" + IntToString(1) + "/d" + IntToString(machine()->GetGUID());
+  //   uint64 from_id = config_->LookupMetadataShard(config_->HashFileName(from_path), config_->LookupReplica(machine()->machine_id()));
+  //   uint64 to_id = config_->LookupMetadataShard(config_->HashFileName(to_path), config_->LookupReplica(machine()->machine_id()));
+  //   LOG(ERROR) << from_path << " in machine[" << from_id << "]  renamed to   " << to_path << " in machine[" << to_id << "]";
+  //   BackgroundRenameFile(from_path, to_path);
 
-    // Wait for all operations to finish.
-    while (capacity_.load() < kMaxCapacity)
-    {
-      usleep(10);
-      // LOG(ERROR)<<capacity_.load();
-    }
+  //   // Wait for all operations to finish.
+  //   while (capacity_.load() < kMaxCapacity)
+  //   {
+  //     usleep(10);
+  //     // LOG(ERROR)<<capacity_.load();
+  //   }
 
-    // Report.
+  //   // Report.
 
-    LOG(ERROR) << "Renamed "
-               << "1 files. Elapsed time:"
-               << (GetTime() - start) << " seconds";
-    Spin(1);
-    metadata_->getLOOKUP("");
-  }
+  //   LOG(ERROR) << "Renamed "
+  //              << "1 files. Elapsed time:"
+  //              << (GetTime() - start) << " seconds";
+  //   Spin(1);
+  //   metadata_->getLOOKUP("");
+  // }
   void DeleteExperiment()
   { // gaoxuan --删除文件的实验
     Spin(1);
@@ -1093,31 +1093,31 @@ public:
     Spin(1);
     // dir_tree = new BTNode;
     // metadata_->Init_tree_20(dir_tree);
-    metadata_->Init_from_txt("/home/CalvinFS/src/fs/Init.txt");
+    metadata_->Init_from_txt("/home/wenxin/CalvinFS/src/fs/Init.txt");
     Spin(1);
     machine()->GlobalBarrier();
     Spin(1);
-    double start = GetTime();
-    // string path = "/a2/b1/c2/d7/e1/f9/g4/h9/i7/j8/k2/l1/m7/n7/o2/p8/q3/r7/s9";
-    string path = "";
+    // double start = GetTime();
+    // // string path = "/a2/b1/c2/d7/e1/f9/g4/h9/i7/j8/k2/l1/m7/n7/o2/p8/q3/r7/s9";
+    // string path = "";
     
-    //  LOG(ERROR)<<"LS :"<<path;
-    for (int j = 0; j < operation_num; j++)
-    {
-      BackgroundLS(path);
-      //sleep(1);
-    }
+    // //  LOG(ERROR)<<"LS :"<<path;
+    // for (int j = 0; j < operation_num; j++)
+    // {
+    //   BackgroundLS(path);
+    //   //sleep(1);
+    // }
 
-    while (capacity_.load() < kMaxCapacity)
-    {
-      usleep(10);
-    //  LOG(ERROR)<<capacity_.load();
-    }
-    // Report.
-    double end = GetTime();
-    LOG(ERROR) << "[" << machine()->machine_id() << "] "
-               << "LS " << operation_num << " files. Elapsed time: "
-               << end - start << " seconds";
+    // while (capacity_.load() < kMaxCapacity)
+    // {
+    //   usleep(10);
+    // //  LOG(ERROR)<<capacity_.load();
+    // }
+    // // Report.
+    // double end = GetTime();
+    // LOG(ERROR) << "[" << machine()->machine_id() << "] "
+    //            << "LS " << operation_num << " files. Elapsed time: "
+    //            << end - start << " seconds";
   }
 
   void LatencyExperimentRenameFile()
