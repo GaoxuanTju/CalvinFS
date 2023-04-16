@@ -18,20 +18,32 @@
 using std::string;
 
 const string& ClusterManager::ssh_key(uint64 m) {
+  // if (config_.size() < 3) {
+  //   return ssh_key_;
+  // }
+  // int repsize = config_.size() / 3;
+  // if (m / repsize == 0) {
+  //   return ssh_key_;
+  // } else if (m / repsize == 1) {
+  //   return ssh_key2_;
+  // } else if (m / repsize == 2) {
+  //   return ssh_key3_;
+  // }else if (m / repsize == 3) {
+  //   return ssh_key_;
+  // }
+  // LOG(FATAL) << "bad machine id: " << m;
   if (config_.size() < 3) {
     return ssh_key_;
   }
-  int repsize = config_.size() / 3;
-  if (m / repsize == 0) {
+  int repsize = 3;
+  if (m % repsize == 0) {
     return ssh_key_;
-  } else if (m / repsize == 1) {
+  } else if (m % repsize == 1) {
     return ssh_key2_;
-  } else if (m / repsize == 2) {
+  } else if (m % repsize == 2) {
     return ssh_key3_;
-  }else if (m / repsize == 3) {
-    return ssh_key_;
   }
-  LOG(FATAL) << "bad machine id: " << m;
+  LOG(FATAL) << "bad machine id: " << m;  
 }
 
 void* SystemFunction(void* arg) {

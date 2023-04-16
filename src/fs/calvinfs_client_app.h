@@ -470,6 +470,7 @@ public:
     return 1000000 / (1 + rand() % 9999);
   }
 
+<<<<<<< HEAD
   // void FillExperiment()
   // {
   //   Spin(1);
@@ -478,6 +479,16 @@ public:
   //   machine()->GlobalBarrier();
   //   Spin(1);
   //   double start = GetTime();
+=======
+  void FillExperiment()
+  {
+    Spin(1);
+    metadata_->Init_from_txt("/home/wenxin/CalvinFS/src/fs/Init.txt");
+    Spin(1);
+    machine()->GlobalBarrier();
+    Spin(1);
+    double start = GetTime();
+>>>>>>> 78c41535deb06d67f71ac14593063233104299e1
 
   //   // LOG(ERROR)<<"create dir "<<path;
   //   for (int i = 0; i < operation_num; i++)
@@ -1014,6 +1025,7 @@ public:
     print_dir_tree(dir_tree);
   }
 
+<<<<<<< HEAD
   // void RenameExperiment()
   // {
   //   Spin(1);
@@ -1023,6 +1035,17 @@ public:
   //   Spin(1);
   //   machine()->GlobalBarrier();
   //   Spin(1);
+=======
+  void RenameExperiment()
+  {
+    Spin(1);
+    // dir_tree = new BTNode;
+    // metadata_->Init_tree_20(dir_tree);
+    metadata_->Init_from_txt("/home/wenxin/CalvinFS/src/fs/Init.txt");
+    Spin(1);
+    machine()->GlobalBarrier();
+    Spin(1);
+>>>>>>> 78c41535deb06d67f71ac14593063233104299e1
 
   //   std::vector<int> file_suffix;
   //   for (int i = 0; i < 20; i++)
@@ -1097,6 +1120,7 @@ public:
     Spin(1);
     machine()->GlobalBarrier();
     Spin(1);
+<<<<<<< HEAD
     // double start = GetTime();
     // // string path = "/a2/b1/c2/d7/e1/f9/g4/h9/i7/j8/k2/l1/m7/n7/o2/p8/q3/r7/s9";
     // string path = "";
@@ -1119,6 +1143,35 @@ public:
     //            << "LS " << operation_num << " files. Elapsed time: "
     //            << end - start << " seconds";
   }
+=======
+    double start = GetTime();
+    // string path = "/a2/b1/c2/d7/e1/f9/g4/h9/i7/j8/k2/l1/m7/n7/o2/p8/q3/r7/s9";
+    string path1 = "/a0";
+    string path2 = "/a1";
+    string path3 = "/a2";
+    string path4 = "/a3";
+    //  LOG(ERROR)<<"LS :"<<path;
+    for (int j = 0; j < operation_num; j++)
+    {
+    //  BackgroundLS(path2);
+      // BackgroundLS(path2);
+      // BackgroundLS(path3);
+      BackgroundLS("/a3");
+      //sleep(1);
+    }
+
+    while (capacity_.load() < kMaxCapacity)
+    {
+      usleep(10);
+    //  LOG(ERROR)<<capacity_.load();
+    }
+    // Report.
+    double end = GetTime();
+    LOG(ERROR) << "[" << machine()->machine_id() << "] "
+               << "LS " << operation_num << " files. Elapsed time: "
+               << end - start << " seconds";
+   }
+>>>>>>> 78c41535deb06d67f71ac14593063233104299e1
 
   void LatencyExperimentRenameFile()
   {
