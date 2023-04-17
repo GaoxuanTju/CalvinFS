@@ -252,7 +252,8 @@ public:
           machine()->SendReplyMessage(header, serialized);
         }
         else
-        {
+        { 
+          LOG(ERROR)<<"check correctness.";
           Action b;
           b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
           delete serialized;
@@ -310,9 +311,7 @@ public:
     }
     else if (header->rpc() == "LS")
     {
-
       machine()->SendReplyMessage(header, LS(header->misc_string(0)));
-
       // EXTERNAL read file
     }
     else if (header->rpc() == "READ_FILE")
