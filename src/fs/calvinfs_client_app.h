@@ -156,7 +156,7 @@ public:
           }
         }
         string path = "/" + uid + "/" + new_str; // 要发出的结果
-        MessageBuffer *serialized = GetMetadataEntry(header, path);      
+        MessageBuffer *serialized = GetMetadataEntry(path);      
         if (depth + 1 == header->from_length() || Dir_dep(path) > 2)
         { // 交换机匹配到了，而且一直匹配到最后一段位置
           // 要做的是获取直接获取元数据项，然后返回即可
@@ -227,7 +227,9 @@ public:
           header->set_to(mds_machine);
           header->clear_misc_string();
           header->add_misc_string(LS_path.c_str(), strlen(LS_path.c_str()));
-          machine()->SendMessage(header, new MessageBuffer());         
+          Header* h = new Header();
+          h->CopyFrom(*header);
+          machine()->SendMessage(h, new MessageBuffer());         
         }
       }
       else
