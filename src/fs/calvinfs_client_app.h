@@ -1206,7 +1206,6 @@ public:
   // Caller takes ownership of returned MessageBuffers.
   // Returns serialized MetadataEntry protobuf.
   MessageBuffer *GetMetadataEntry(const Slice &path);
-  MessageBuffer *GetMetadataEntry(Header *header, const Slice &path);
   // Returns client-side printable output.
   MessageBuffer *CreateFile(const Slice &path, FileType type = DATA);
   MessageBuffer *AppendStringToFile(const Slice &data, const Slice &path);

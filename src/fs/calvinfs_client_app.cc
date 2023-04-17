@@ -82,7 +82,6 @@ MessageBuffer *CalvinFSClientApp::GetMetadataEntry(const Slice &path)
     return m;
   }
 }
-
 MessageBuffer *CalvinFSClientApp::CreateFile(const Slice &path, FileType type)
 {
   string channel_name = "action-result-" + UInt64ToString(machine()->GetGUID());
