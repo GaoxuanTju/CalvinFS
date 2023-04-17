@@ -108,7 +108,6 @@ MessageBuffer *CalvinFSClientApp::GetMetadataEntry(Header *header, const Slice &
   }
   else
   {
-    LOG(ERROR)<<"getmetadataentry";
     MessageBuffer *m = NULL;
     header->set_data_ptr(reinterpret_cast<uint64>(&m));
     machine()->SendMessage(header, new MessageBuffer());
@@ -322,7 +321,7 @@ int CalvinFSClientApp::Dir_dep(const string &path)
 MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
 {
   MetadataEntry entry;
-  string front  = "/0/a0"; 
+  string front  = ""; 
   uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine()->machine_id()));
   Header *header = new Header();
   header->set_flag(2); 
@@ -333,7 +332,7 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
   header->set_app("client");
   header->set_rpc("LOOKUP");
   header->add_misc_string(front.c_str(), strlen(front.c_str()));
-
+  //拆分字符串
   string s = path.data();
   if (s != "")
   {
@@ -403,24 +402,18 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
   int uid = switch_uid;
   header->set_uid(uid);
   // before this part is split
-
   MessageBuffer *m = NULL;
   header->set_data_ptr(reinterpret_cast<uint64>(&m));
  // double start = GetTime();
-
   machine()->SendMessage(header, new MessageBuffer());
-
   while (m == NULL)
   {
     usleep(10);
     Noop<MessageBuffer *>(m);
   }
-
   MessageBuffer *serialized = m;
-
   Action b;
   b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
-
   delete serialized;
   MetadataAction::LookupOutput out;
   out.ParseFromString(b.output());

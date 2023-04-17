@@ -234,8 +234,6 @@ public:
       {
         string path;
         MessageBuffer *serialized = GetMetadataEntry(header, path = header->misc_string(0));
-        //  double s =GetTime();
-        // 提前在这里设置一下data——ptr，避免被修改
         header->set_data_ptr(header->data_ptr());
         int depth; // 用来记录当前遍历到那个深度了
         if (path == "")
@@ -248,9 +246,7 @@ public:
         }
         if (depth == header->from_length() || Dir_dep(path) > 2) // 是最后一段,将最后结果发回
         {
-          header->set_from(header->original_from()); //
-                                                     // 记录时间节点
-                                                     //   LOG(ERROR)<<"handle time is : "<<GetTime() - s;
+          header->set_from(header->original_from()); 
           machine()->SendReplyMessage(header, serialized);
         }
         else
@@ -261,7 +257,6 @@ public:
           MetadataAction::LookupOutput out;
           out.ParseFromString(b.output());
           MetadataEntry entry = out.entry();
-          // 现在entry中存放的是这一步拿到的元数据项
           string LS_path;
           string uid = entry.dir_contents(0);
           if (metadata_->path_type[path] == 0)
