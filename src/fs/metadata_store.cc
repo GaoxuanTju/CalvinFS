@@ -41,113 +41,86 @@ REGISTER_APP(MetadataStoreApp)
 //            Extend this to be a DISTRIBUTED one.
 // TODO(agt): Generalize and move to components/store/store.{h,cc}.
 //
-class ExecutionContext
-{
-public:
+class ExecutionContext {
+ public:
   // Constructor performs all reads.
-  ExecutionContext(VersionedKVStore *store, Action *action)
-      : store_(store), version_(action->version()), aborted_(false)
-  {
-    for (int i = 0; i < action->readset_size(); i++)
-    {
-      string path = action->readset(i);
-      // 判断涉不涉及分层，目前是看有没有b，如果有b就分层
-
-      string hash_name;
-      hash_name = path;
-
-      if (!store_->Get(hash_name,
+  ExecutionContext(VersionedKVStore* store, Action* action)
+      : store_(store), version_(action->version()), aborted_(false) {
+    for (int i = 0; i < action->readset_size(); i++) {
+      if (!store_->Get(action->readset(i),
                        version_,
-                       &reads_[hash_name]))
-      {
+                       &reads_[action->readset(i)])) {
         reads_.erase(action->readset(i));
       }
     }
 
-    if (action->readset_size() > 0)
-    {
+    if (action->readset_size() > 0) {
       reader_ = true;
-    }
-    else
-    {
+    } else {
       reader_ = false;
     }
 
-    if (action->writeset_size() > 0)
-    {
+    if (action->writeset_size() > 0) {
       writer_ = true;
-    }
-    else
-    {
+    } else {
       writer_ = false;
     }
+
   }
 
   // Destructor installs all writes.
-  ~ExecutionContext()
-  {
-    if (!aborted_)
-    {
-      for (auto it = writes_.begin(); it != writes_.end(); ++it)
-      {
+  ~ExecutionContext() {
+    if (!aborted_) {
+      for (auto it = writes_.begin(); it != writes_.end(); ++it) {
         store_->Put(it->first, it->second, version_);
       }
-      for (auto it = deletions_.begin(); it != deletions_.end(); ++it)
-      {
+      for (auto it = deletions_.begin(); it != deletions_.end(); ++it) {
         store_->Delete(*it, version_);
       }
     }
   }
 
-  bool EntryExists(const string &path)
-  {
+  bool EntryExists(const string& path) {
     return reads_.count(path) != 0;
   }
 
-  bool GetEntry(const string &path, MetadataEntry *entry)
-  {
+  bool GetEntry(const string& path, MetadataEntry* entry) {
     entry->Clear();
-    if (reads_.count(path) != 0)
-    {
+    if (reads_.count(path) != 0) {
       entry->ParseFromString(reads_[path]);
       return true;
     }
     return false;
   }
 
-  void PutEntry(const string &path, const MetadataEntry &entry)
-  {
+  void PutEntry(const string& path, const MetadataEntry& entry) {
     deletions_.erase(path);
     entry.SerializeToString(&writes_[path]);
-    if (reads_.count(path) != 0)
-    {
+    if (reads_.count(path) != 0) {
       entry.SerializeToString(&reads_[path]);
     }
   }
 
-  void DeleteEntry(const string &path)
-  {
+  void DeleteEntry(const string& path) {
     reads_.erase(path);
     writes_.erase(path);
     deletions_.insert(path);
   }
 
-  bool IsWriter()
-  {
+  bool IsWriter() {
     if (writer_)
       return true;
     else
       return false;
   }
 
-  void Abort()
-  {
+  void Abort() {
     aborted_ = true;
   }
 
-protected:
+ protected:
   ExecutionContext() {}
-  VersionedKVStore *store_;
+  VersionedKVStore* store_;
   uint64 version_;
   bool aborted_;
   map<string, string> reads_;
@@ -165,17 +138,15 @@ protected:
 //
 // TODO(agt): Generalize and move to components/store/store.{h,cc}.
 //
-class DistributedExecutionContext : public ExecutionContext
-{
-public:
+class DistributedExecutionContext : public ExecutionContext {
+ public:
   // Constructor performs all reads.
   DistributedExecutionContext(
-      Machine *machine,
-      CalvinFSConfigMap *config,
-      VersionedKVStore *store,
-      Action *action)
-      : machine_(machine), config_(config)
-  {
+      Machine* machine,
+      CalvinFSConfigMap* config,
+      VersionedKVStore* store,
+      Action* action)
+        : machine_(machine), config_(config) {
     // Initialize parent class variables.
     store_ = store;
     version_ = action->version();
@@ -187,30 +158,18 @@ public:
     // Figure out what machines are readers (and perform local reads).
     reader_ = false;
     set<uint64> remote_readers;
-    for (int i = 0; i < action->readset_size(); i++)
-    { // gaoxuan --now handle the read/write set passed from GetRWs
-
-      string path = action->readset(i); // 获取这个路径
-      // 判断涉不涉及分层，目前是看有没有b，如果有b就分层
-
-      string hash_name;
-      hash_name = path;
-
-      uint64 mds = config_->HashFileName(hash_name);
-      uint64 machine = config_->LookupMetadataShard(mds, replica_); // gaoxuan --get right machine of the path
-      if (machine == machine_->machine_id())
-      { // gaoxuan --if the path in read/write set is local,put it's metadataentry into map reads_,key is path,value is entry
+    for (int i = 0; i < action->readset_size(); i++) {
+      uint64 mds = config_->HashFileName(action->readset(i));
+      uint64 machine = config_->LookupMetadataShard(mds, replica_);
+      if (machine == machine_->machine_id()) {
         // Local read.
-        if (!store_->Get(hash_name,
+        if (!store_->Get(action->readset(i),
                          version_,
-                         &reads_[hash_name]))
-        {
-          reads_.erase(hash_name);
+                         &reads_[action->readset(i)])) {
+          reads_.erase(action->readset(i));
         }
         reader_ = true;
-      }
-      else
-      { // gaoxuan --this machine is that we want to read. Put it into set remote_readers
+      } else {
         remote_readers.insert(machine);
       }
     }
@@ -218,67 +177,48 @@ public:
     // Figure out what machines are writers.
     writer_ = false;
     set<uint64> remote_writers;
-    for (int i = 0; i < action->writeset_size(); i++)
-    {
-
-      string path = action->writeset(i);
-
-      string hash_name;
-
-      hash_name = path;
-
-      uint64 mds = config_->HashFileName(hash_name);
+    for (int i = 0; i < action->writeset_size(); i++) {
+      uint64 mds = config_->HashFileName(action->writeset(i));
       uint64 machine = config_->LookupMetadataShard(mds, replica_);
-      if (machine == machine_->machine_id())
-      {
+      if (machine == machine_->machine_id()) {
         writer_ = true;
-      }
-      else
-      {
+      } else {
         remote_writers.insert(machine);
       }
     }
 
     // If any reads were performed locally, broadcast them to writers.
-    if (reader_)
-    {
+    if (reader_) {
       MapProto local_reads;
-      for (auto it = reads_.begin(); it != reads_.end(); ++it)
-      {
-        MapProto::Entry *e = local_reads.add_entries();
+      for (auto it = reads_.begin(); it != reads_.end(); ++it) {
+        MapProto::Entry* e = local_reads.add_entries();
         e->set_key(it->first);
         e->set_value(it->second);
       }
-      // gaoxuan --why do we want to read but we need to broadcast to writers?
-      for (auto it = remote_writers.begin(); it != remote_writers.end(); ++it)
-      {
-        Header *header = new Header();
+      for (auto it = remote_writers.begin(); it != remote_writers.end(); ++it) {
+        Header* header = new Header();
         header->set_from(machine_->machine_id());
         header->set_to(*it);
-        header->set_type(Header::DATA);                                 // gaoxuan --deliver packets directly,and the specific logic refers to lock
-        header->set_data_channel("action-" + UInt64ToString(version_)); // gaoxuan --Can this version make a difference ?
+        header->set_type(Header::DATA);
+        header->set_data_channel("action-" + UInt64ToString(version_));
         machine_->SendMessage(header, new MessageBuffer(local_reads));
       }
     }
 
     // If any writes will be performed locally, wait for all remote reads.
-    if (writer_)
-    {
+    if (writer_) {
       // Get channel.
-      AtomicQueue<MessageBuffer *> *channel =
+      AtomicQueue<MessageBuffer*>* channel =
           machine_->DataChannel("action-" + UInt64ToString(version_));
-      for (uint32 i = 0; i < remote_readers.size(); i++)
-      { // gaoxuan --in this part we get remote entry
-        MessageBuffer *m = NULL;
+      for (uint32 i = 0; i < remote_readers.size(); i++) {
+        MessageBuffer* m = NULL;
         // Get results.
-        while (!channel->Pop(&m))
-        {
+        while (!channel->Pop(&m)) {
           usleep(10);
         }
         MapProto remote_read;
         remote_read.ParseFromArray((*m)[0].data(), (*m)[0].size());
-        for (int j = 0; j < remote_read.entries_size(); j++)
-        {
+        for (int j = 0; j < remote_read.entries_size(); j++) {
           CHECK(reads_.count(remote_read.entries(j).key()) == 0);
           reads_[remote_read.entries(j).key()] = remote_read.entries(j).value();
         }
@@ -289,43 +229,35 @@ public:
   }
 
   // Destructor installs all LOCAL writes.
-  ~DistributedExecutionContext()
-  {
-    LOG(ERROR)<<"context distructor";
-    double start = GetTime();
-    if (!aborted_)
-    {
-      for (auto it = writes_.begin(); it != writes_.end(); ++it)
-      {
+  ~DistributedExecutionContext() {
+    if (!aborted_) {
+      for (auto it = writes_.begin(); it != writes_.end(); ++it) {
         uint64 mds = config_->HashFileName(it->first);
         uint64 machine = config_->LookupMetadataShard(mds, replica_);
-        if (machine == machine_->machine_id())
-        {
+        if (machine == machine_->machine_id()) {
           store_->Put(it->first, it->second, version_);
         }
       }
-      for (auto it = deletions_.begin(); it != deletions_.end(); ++it)
-      {
+      for (auto it = deletions_.begin(); it != deletions_.end(); ++it) {
         uint64 mds = config_->HashFileName(*it);
         uint64 machine = config_->LookupMetadataShard(mds, replica_);
-        if (machine == machine_->machine_id())
-        {
+        if (machine == machine_->machine_id()) {
           store_->Delete(*it, version_);
         }
       }
     }
-    LOG(ERROR)<<"context des : "<<GetTime() - start;
   }
 
-private:
+ private:
   // Local machine.
-  Machine *machine_;
+  Machine* machine_;
 
   // Deployment configuration.
-  CalvinFSConfigMap *config_;
+  CalvinFSConfigMap* config_;
 
   // Local replica id.
   uint64 replica_;
+
 };
 
 ///////////////////////          MetadataStore          ///////////////////////
@@ -5456,14 +5388,6 @@ void MetadataStore::Run(Action *action)
     Lookup_Internal(context, in, &out);
     out.SerializeToString(action->mutable_output());
   }
-  else if (type == MetadataAction::TREE_LOOKUP)
-  {
-    MetadataAction::Tree_LookupInput in;
-    MetadataAction::Tree_LookupOutput out;
-    in.ParseFromString(action->input());
-    Tree_Lookup_Internal(context, in, &out);
-    out.SerializeToString(action->mutable_output());
-  }
   else if (type == MetadataAction::RESIZE)
   {
     MetadataAction::ResizeInput in;
@@ -6126,18 +6050,13 @@ void MetadataStore::Lookup_Internal(
     out->add_errors(MetadataAction::FileDoesNotExist);
     return;
   }
-
   // TODO(agt): Check permissions.
-
   // Return entry.
   out->set_path(in.path());
   out->mutable_entry()->CopyFrom(entry);
 }
 
-void MetadataStore::Tree_Lookup_Internal(
-    ExecutionContext *context,
-    const MetadataAction::Tree_LookupInput &in,
-    MetadataAction::Tree_LookupOutput *out)
+
 {
 
   // 原本的遍历代码

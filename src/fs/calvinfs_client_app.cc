@@ -377,6 +377,8 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
   Action b;
   b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
   delete serialized;
+
+  
   MetadataAction::LookupOutput out;
   out.ParseFromString(b.output());
   //LOG(ERROR) << path.data() << "'s metadataentry is :";

@@ -253,7 +253,6 @@ public:
         }
         else
         { 
-          LOG(ERROR)<<"check correctness.";
           Action b;
           b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
           delete serialized;
@@ -1088,41 +1087,39 @@ public:
     print_dir_tree(dir_tree);
   }
   void LsExperiment()
-  { // gaoxuan --删除文件的实验
+  { 
     Spin(1);
-    // dir_tree = new BTNode;
-    // metadata_->Init_tree_20(dir_tree);
     metadata_->Init_from_txt("/home/wenxin/CalvinFS/src/fs/Init.txt");
     Spin(1);
     machine()->GlobalBarrier();
     Spin(1);
 
-    double start = GetTime();
-    // string path = "/a2/b1/c2/d7/e1/f9/g4/h9/i7/j8/k2/l1/m7/n7/o2/p8/q3/r7/s9";
-    string path1 = "/a0";
-    string path2 = "/a1";
-    string path3 = "/a2";
-    string path4 = "/a3";
-    //  LOG(ERROR)<<"LS :"<<path;
-    for (int j = 0; j < operation_num; j++)
-    {
-    //  BackgroundLS(path2);
-      // BackgroundLS(path2);
-      // BackgroundLS(path3);
-      BackgroundLS("/a0");
-      //sleep(1);
-    }
+    // double start = GetTime();
+    // // string path = "/a2/b1/c2/d7/e1/f9/g4/h9/i7/j8/k2/l1/m7/n7/o2/p8/q3/r7/s9";
+    // string path1 = "/a0";
+    // string path2 = "/a1";
+    // string path3 = "/a2";
+    // string path4 = "/a3";
+    // //  LOG(ERROR)<<"LS :"<<path;
+    // for (int j = 0; j < operation_num; j++)
+    // {
+    // //  BackgroundLS(path2);
+    //   // BackgroundLS(path2);
+    //   // BackgroundLS(path3);
+    //   BackgroundLS("/a0");
+    //   //sleep(1);
+    // }
 
-    while (capacity_.load() < kMaxCapacity)
-    {
-      usleep(10);
-    //  LOG(ERROR)<<capacity_.load();
-    }
-    // Report.
-    double end = GetTime();
-    LOG(ERROR) << "[" << machine()->machine_id() << "] "
-               << "LS " << operation_num << " files. Elapsed time: "
-               << end - start << " seconds";
+    // while (capacity_.load() < kMaxCapacity)
+    // {
+    //   usleep(10);
+    // //  LOG(ERROR)<<capacity_.load();
+    // }
+    // // Report.
+    // double end = GetTime();
+    // LOG(ERROR) << "[" << machine()->machine_id() << "] "
+    //            << "LS " << operation_num << " files. Elapsed time: "
+    //            << end - start << " seconds";
    }
 
   void LatencyExperimentRenameFile()
