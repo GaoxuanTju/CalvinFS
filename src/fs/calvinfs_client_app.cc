@@ -83,43 +83,6 @@ MessageBuffer *CalvinFSClientApp::GetMetadataEntry(const Slice &path)
   }
 }
 
-MessageBuffer *CalvinFSClientApp::GetMetadataEntry(Header *header, const Slice &path)
-{
-  // Find out what machine to run this on.
-  uint64 mds_machine =
-      config_->LookupMetadataShard(config_->HashFileName(path), replica_);
-
-  // Run if local.
-  if (mds_machine == machine()->machine_id())
-  {
-    Action a;
-
-    a.set_action_type(MetadataAction::LOOKUP);
-    MetadataAction::LookupInput in;
-    in.set_path(path.data(), path.size());
-
-    a.set_version(1000000000); // gaoxuan --this line is very important for LOOKUP
-    in.SerializeToString(a.mutable_input());
-    metadata_->GetRWSets(&a);
-    metadata_->Run(&a);
-    return new MessageBuffer(a);
-
-    // If not local, get result from the right machine (within this replica).
-  }
-  else
-  {
-    MessageBuffer *m = NULL;
-    header->set_data_ptr(reinterpret_cast<uint64>(&m));
-    machine()->SendMessage(header, new MessageBuffer());
-    while (m == NULL)
-    {
-      usleep(10);
-      Noop<MessageBuffer *>(m);
-    }
-    return m;
-  }
-}
-
 MessageBuffer *CalvinFSClientApp::CreateFile(const Slice &path, FileType type)
 {
   string channel_name = "action-result-" + UInt64ToString(machine()->GetGUID());

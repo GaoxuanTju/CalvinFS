@@ -233,7 +233,7 @@ public:
       else
       {
         string path;
-        MessageBuffer *serialized = GetMetadataEntry(header, path = header->misc_string(0));
+        MessageBuffer *serialized = GetMetadataEntry(path = header->misc_string(0));
         header->set_data_ptr(header->data_ptr());
         int depth; // 用来记录当前遍历到那个深度了
         if (path == "")
@@ -299,7 +299,10 @@ public:
           header->set_to(mds_machine);
           header->clear_misc_string();
           header->add_misc_string(LS_path.c_str(), strlen(LS_path.c_str()));
-          machine()->SendMessage(header, new MessageBuffer());
+          Header * h = new Header();
+          h->CopyFrom(header);
+          delete header;
+          machine()->SendMessage(h, new MessageBuffer());
         }
       }
     }
@@ -1092,7 +1095,7 @@ public:
     Spin(1);
     machine()->GlobalBarrier();
     Spin(1);
-    
+
     // double start = GetTime();
     // // string path = "/a2/b1/c2/d7/e1/f9/g4/h9/i7/j8/k2/l1/m7/n7/o2/p8/q3/r7/s9";
     // string path1 = "/a0";
