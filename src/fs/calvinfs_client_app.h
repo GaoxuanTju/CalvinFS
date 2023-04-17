@@ -1097,8 +1097,8 @@ public:
   void LsExperiment()
   { 
     Spin(1);
-   // metadata_->Init_from_txt("/home/wenxin/CalvinFS/src/fs/Init.txt");
-   metadata_->Init();
+    metadata_->Init_from_txt("/home/wenxin/CalvinFS/src/fs/Init.txt");
+
     Spin(1);
     machine()->GlobalBarrier();
     Spin(1);
@@ -1113,26 +1113,26 @@ public:
     //  LOG(ERROR)<<path2<<" in "<<config_->LookupMetadataShard(config_->HashFileName(path2), config_->LookupReplica(machine()->machine_id()));
     //   LOG(ERROR)<<path3<<" in "<<config_->LookupMetadataShard(config_->HashFileName(path3), config_->LookupReplica(machine()->machine_id()));
     //    LOG(ERROR)<<path4<<" in "<<config_->LookupMetadataShard(config_->HashFileName(path4), config_->LookupReplica(machine()->machine_id()));
-     LOG(ERROR)<<"LS :"<<path1;
-    for (int j = 0; j < operation_num; j++)
-    {
-    //  BackgroundLS(path2);
-      // BackgroundLS(path2);
-      // BackgroundLS(path3);
-      BackgroundLS("/a0");
-      //sleep(1);
-    }
+    //  LOG(ERROR)<<"LS :"<<path1;
+    // for (int j = 0; j < operation_num; j++)
+    // {
+    // //  BackgroundLS(path2);
+    //   // BackgroundLS(path2);
+    //   // BackgroundLS(path3);
+    //   BackgroundLS("/a0");
+    //   //sleep(1);
+    // }
 
-    while (capacity_.load() < kMaxCapacity)
-    {
-      usleep(10);
-    //  LOG(ERROR)<<capacity_.load();
-    }
-    // Report.
-    double end = GetTime();
-    LOG(ERROR) << "[" << machine()->machine_id() << "] "
-               << "LS " << operation_num << " files. Elapsed time: "
-               << end - start << " seconds";
+    // while (capacity_.load() < kMaxCapacity)
+    // {
+    //   usleep(10);
+    // //  LOG(ERROR)<<capacity_.load();
+    // }
+    // // Report.
+    // double end = GetTime();
+    // LOG(ERROR) << "[" << machine()->machine_id() << "] "
+    //            << "LS " << operation_num << " files. Elapsed time: "
+    //            << end - start << " seconds";
     }
 
   void LatencyExperimentRenameFile()
