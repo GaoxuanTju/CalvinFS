@@ -335,24 +335,19 @@ int RandomSize()
 {
   return 1 + rand() % 2047;
 }
-// 最初始的三层Init
-void MetadataStore::Init()
-{
-
+void MetadataStore::Init() {
   int asize = machine_->config().size();
-  int bsize = 1000;
-  int csize = 500;
+  int bsize = 1;
+  int csize = 1;
 
   double start = GetTime();
 
   // Update root dir.
-  if (IsLocal(""))
-  {
+  if (IsLocal("")) {
     MetadataEntry entry;
     entry.mutable_permissions();
     entry.set_type(DIR);
-    for (int i = 0; i < 1000; i++)
-    {
+    for (int i = 0; i < 1000; i++) {
       entry.add_dir_contents("a" + IntToString(i));
     }
     string serialized_entry;
@@ -361,16 +356,13 @@ void MetadataStore::Init()
   }
 
   // Add dirs.
-  for (int i = 0; i < asize; i++)
-  {
+  for (int i = 0; i < asize; i++) {
     string dir("/a" + IntToString(i));
-    if (IsLocal(dir))
-    {
+    if (IsLocal(dir)) {
       MetadataEntry entry;
       entry.mutable_permissions();
       entry.set_type(DIR);
-      for (int j = 0; j < bsize; j++)
-      {
+      for (int j = 0; j < bsize; j++) {
         entry.add_dir_contents("b" + IntToString(j));
       }
       string serialized_entry;
@@ -378,16 +370,13 @@ void MetadataStore::Init()
       store_->Put(dir, serialized_entry, 0);
     }
     // Add subdirs.
-    for (int j = 0; j < bsize; j++)
-    {
+    for (int j = 0; j < bsize; j++) {
       string subdir(dir + "/b" + IntToString(j));
-      if (IsLocal(subdir))
-      {
+      if (IsLocal(subdir)) {
         MetadataEntry entry;
         entry.mutable_permissions();
         entry.set_type(DIR);
-        for (int k = 0; k < csize; k++)
-        {
+        for (int k = 0; k < csize; k++) {
           entry.add_dir_contents("c" + IntToString(k));
         }
         string serialized_entry;
@@ -395,15 +384,13 @@ void MetadataStore::Init()
         store_->Put(subdir, serialized_entry, 0);
       }
       // Add files.
-      for (int k = 0; k < csize; k++)
-      {
+      for (int k = 0; k < csize; k++) {
         string file(subdir + "/c" + IntToString(k));
-        if (IsLocal(file))
-        {
+        if (IsLocal(file)) {
           MetadataEntry entry;
           entry.mutable_permissions();
           entry.set_type(DATA);
-          FilePart *fp = entry.add_file_parts();
+          FilePart* fp = entry.add_file_parts();
           fp->set_length(RandomSize());
           fp->set_block_id(0);
           fp->set_block_offset(0);
@@ -412,19 +399,107 @@ void MetadataStore::Init()
           store_->Put(file, serialized_entry, 0);
         }
       }
-      if (j % 100 == 0)
-      {
+      if (j % 100 == 0) {
         LOG(ERROR) << "[" << machine_->machine_id() << "] "
                    << "MDS::Init() progress: " << (i * bsize + j) / 100 + 1
                    << "/" << asize * bsize / 100;
       }
     }
   }
-
   LOG(ERROR) << "[" << machine_->machine_id() << "] "
              << "MDS::Init() complete. Elapsed time: "
              << GetTime() - start << " seconds";
 }
+// 最初始的三层Init
+// void MetadataStore::Init()
+// {
+
+//   int asize = machine_->config().size();
+//   int bsize = 1000;
+//   int csize = 500;
+
+//   double start = GetTime();
+
+//   // Update root dir.
+//   if (IsLocal(""))
+//   {
+//     MetadataEntry entry;
+//     entry.mutable_permissions();
+//     entry.set_type(DIR);
+//     for (int i = 0; i < 1000; i++)
+//     {
+//       entry.add_dir_contents("a" + IntToString(i));
+//     }
+//     string serialized_entry;
+//     entry.SerializeToString(&serialized_entry);
+//     store_->Put("", serialized_entry, 0);
+//   }
+
+//   // Add dirs.
+//   for (int i = 0; i < asize; i++)
+//   {
+//     string dir("/a" + IntToString(i));
+//     if (IsLocal(dir))
+//     {
+//       MetadataEntry entry;
+//       entry.mutable_permissions();
+//       entry.set_type(DIR);
+//       for (int j = 0; j < bsize; j++)
+//       {
+//         entry.add_dir_contents("b" + IntToString(j));
+//       }
+//       string serialized_entry;
+//       entry.SerializeToString(&serialized_entry);
+//       store_->Put(dir, serialized_entry, 0);
+//     }
+//     // Add subdirs.
+//     for (int j = 0; j < bsize; j++)
+//     {
+//       string subdir(dir + "/b" + IntToString(j));
+//       if (IsLocal(subdir))
+//       {
+//         MetadataEntry entry;
+//         entry.mutable_permissions();
+//         entry.set_type(DIR);
+//         for (int k = 0; k < csize; k++)
+//         {
+//           entry.add_dir_contents("c" + IntToString(k));
+//         }
+//         string serialized_entry;
+//         entry.SerializeToString(&serialized_entry);
+//         store_->Put(subdir, serialized_entry, 0);
+//       }
+//       // Add files.
+//       for (int k = 0; k < csize; k++)
+//       {
+//         string file(subdir + "/c" + IntToString(k));
+//         if (IsLocal(file))
+//         {
+//           MetadataEntry entry;
+//           entry.mutable_permissions();
+//           entry.set_type(DATA);
+//           FilePart *fp = entry.add_file_parts();
+//           fp->set_length(RandomSize());
+//           fp->set_block_id(0);
+//           fp->set_block_offset(0);
+//           string serialized_entry;
+//           entry.SerializeToString(&serialized_entry);
+//           store_->Put(file, serialized_entry, 0);
+//         }
+//       }
+//       if (j % 100 == 0)
+//       {
+//         LOG(ERROR) << "[" << machine_->machine_id() << "] "
+//                    << "MDS::Init() progress: " << (i * bsize + j) / 100 + 1
+//                    << "/" << asize * bsize / 100;
+//       }
+//     }
+//   }
+
+//   LOG(ERROR) << "[" << machine_->machine_id() << "] "
+//              << "MDS::Init() complete. Elapsed time: "
+//              << GetTime() - start << " seconds";
+// }
 // 增加了数指针的三层Init
 void MetadataStore::Init(BTNode *dir_tree)
 {
