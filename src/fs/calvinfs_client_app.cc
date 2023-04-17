@@ -283,7 +283,7 @@ int CalvinFSClientApp::Dir_dep(const string &path)
 MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
 {
   MetadataEntry entry;
-  string front  = "/0/a0"; 
+  string front  = "/0/a2"; 
   uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine()->machine_id()));
   Header *header = new Header();
   header->set_flag(2); 
@@ -378,7 +378,7 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
   b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
   delete serialized;
 
-  
+
   MetadataAction::LookupOutput out;
   out.ParseFromString(b.output());
   //LOG(ERROR) << path.data() << "'s metadataentry is :";
