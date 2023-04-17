@@ -300,7 +300,7 @@ public:
           header->clear_misc_string();
           header->add_misc_string(LS_path.c_str(), strlen(LS_path.c_str()));
           Header * h = new Header();
-          h->CopyFrom(header);
+          h->CopyFrom(*header);
           delete header;
           machine()->SendMessage(h, new MessageBuffer());
         }
