@@ -280,123 +280,145 @@ int CalvinFSClientApp::Dir_dep(const string &path)
   return depth;
 }
 
-MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
-{
-  MetadataEntry entry;
-  string front  = "/0/a2"; 
-  uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine()->machine_id()));
-  Header *header = new Header();
-  header->set_flag(2); 
-  header->set_from(machine()->machine_id());
-  header->set_original_from(machine()->machine_id());
-  header->set_to(mds_machine);
-  header->set_type(Header::RPC);
-  header->set_app("client");
-  header->set_rpc("LOOKUP");
-  header->add_misc_string(front.c_str(), strlen(front.c_str()));
-  //拆分字符串
-  string s = path.data();
-  if (s != "")
-  {
-    int prefix_num = 0;
-    string prefix = "";
-    int flag = 0;       
-    char pattern = '/'; 
-    string temp_from = path.data();
-    temp_from = temp_from.substr(1, temp_from.size()); 
-    temp_from = temp_from + pattern;                  
-    int pos = temp_from.find(pattern);                 
-    while (pos != std::string::npos)                  
-    {
-      string temp1 = temp_from.substr(0, pos); 
-      string temp = temp1;
-      for (int i = temp.size(); i < 4; i++)
-      {
-        temp = temp + " ";
-      }
-      header->add_split_string_from(temp); 
+// MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
+// {
+//   MetadataEntry entry;
+//   string front  = "/0/a2"; 
+//   uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine()->machine_id()));
+//   Header *header = new Header();
+//   header->set_flag(2); 
+//   header->set_from(machine()->machine_id());
+//   header->set_original_from(machine()->machine_id());
+//   header->set_to(mds_machine);
+//   header->set_type(Header::RPC);
+//   header->set_app("client");
+//   header->set_rpc("LOOKUP");
+//   header->add_misc_string(front.c_str(), strlen(front.c_str()));
+//   //拆分字符串
+//   string s = path.data();
+//   if (s != "")
+//   {
+//     int prefix_num = 0;
+//     string prefix = "";
+//     int flag = 0;       
+//     char pattern = '/'; 
+//     string temp_from = path.data();
+//     temp_from = temp_from.substr(1, temp_from.size()); 
+//     temp_from = temp_from + pattern;                  
+//     int pos = temp_from.find(pattern);                 
+//     while (pos != std::string::npos)                  
+//     {
+//       string temp1 = temp_from.substr(0, pos); 
+//       string temp = temp1;
+//       for (int i = temp.size(); i < 4; i++)
+//       {
+//         temp = temp + " ";
+//       }
+//       header->add_split_string_from(temp); 
      
-      if(prefix_num != 16)
-      {
-        prefix = prefix + temp;
-        prefix_num++;
-      }
-      flag++;                              
-      temp_from = temp_from.substr(pos + 1, temp_from.size());
-      pos = temp_from.find(pattern);
-    }
-    header->set_from_length(flag);
-    while(prefix_num != 16)
-    {
-      string temp = "    ";              
-      prefix = prefix + temp;
-      prefix_num++;   
-    }
-    header->set_long_prefix(prefix);
-    while (flag != 20)
-    {
-      string temp = "    ";                
-      header->add_split_string_from(temp); 
-      flag++;                              
-    }
-  }
-  else
-  { 
-    int prefix_num = 0;
-    string prefix = "";
-    int flag = 0; // 用来标识此时split_string 里面有多少子串
-    while (flag != 20)
-    {
-      string temp = "    ";                // 用四个空格填充一下
-      header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
-      flag++;                              // 拆分的字符串数量++
-    }
-    header->set_from_length(0);//设置长度为0为根目录
-    while(prefix_num != 16)
-    {
-      string temp = "    ";                // 用4个空格填充一下
-      prefix = prefix + temp;
-      prefix_num++;   
-    }
-    header->set_long_prefix(prefix);    
-  }
-  header->set_depth(0);
-  int uid = switch_uid;
-  header->set_uid(uid);
-  // before this part is split
-  MessageBuffer *m = NULL;
-  header->set_data_ptr(reinterpret_cast<uint64>(&m));
- // double start = GetTime();
-  machine()->SendMessage(header, new MessageBuffer());
-  while (m == NULL)
-  {
-    usleep(10);
-    Noop<MessageBuffer *>(m);
-  }
-  MessageBuffer *serialized = m;
-  Action b;
-  b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
+//       if(prefix_num != 16)
+//       {
+//         prefix = prefix + temp;
+//         prefix_num++;
+//       }
+//       flag++;                              
+//       temp_from = temp_from.substr(pos + 1, temp_from.size());
+//       pos = temp_from.find(pattern);
+//     }
+//     header->set_from_length(flag);
+//     while(prefix_num != 16)
+//     {
+//       string temp = "    ";              
+//       prefix = prefix + temp;
+//       prefix_num++;   
+//     }
+//     header->set_long_prefix(prefix);
+//     while (flag != 20)
+//     {
+//       string temp = "    ";                
+//       header->add_split_string_from(temp); 
+//       flag++;                              
+//     }
+//   }
+//   else
+//   { 
+//     int prefix_num = 0;
+//     string prefix = "";
+//     int flag = 0; // 用来标识此时split_string 里面有多少子串
+//     while (flag != 20)
+//     {
+//       string temp = "    ";                // 用四个空格填充一下
+//       header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+//       flag++;                              // 拆分的字符串数量++
+//     }
+//     header->set_from_length(0);//设置长度为0为根目录
+//     while(prefix_num != 16)
+//     {
+//       string temp = "    ";                // 用4个空格填充一下
+//       prefix = prefix + temp;
+//       prefix_num++;   
+//     }
+//     header->set_long_prefix(prefix);    
+//   }
+//   header->set_depth(0);
+//   int uid = switch_uid;
+//   header->set_uid(uid);
+//   // before this part is split
+//   MessageBuffer *m = NULL;
+//   header->set_data_ptr(reinterpret_cast<uint64>(&m));
+//  // double start = GetTime();
+//   machine()->SendMessage(header, new MessageBuffer());
+//   while (m == NULL)
+//   {
+//     usleep(10);
+//     Noop<MessageBuffer *>(m);
+//   }
+//   MessageBuffer *serialized = m;
+//   Action b;
+//   b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
+//   delete serialized;
+
+
+//   MetadataAction::LookupOutput out;
+//   out.ParseFromString(b.output());
+//   //LOG(ERROR) << path.data() << "'s metadataentry is :";
+//   entry = out.entry();
+//   if (entry.type() == DIR)
+//   {
+//     string *result = new string();
+//     for (int i = 0; i < entry.dir_contents_size(); i++)
+//     {
+//     //  LOG(ERROR) << entry.dir_contents(i);
+//       result->append(entry.dir_contents(i));
+//       result->append("\n");
+//     }
+//   //  LOG(ERROR)<<GetTime() - start;
+//     return new MessageBuffer(result);
+//   }
+//   else
+//   {
+//     return new MessageBuffer(new string("metadata lookup error\n"));
+//   }
+// }
+MessageBuffer* CalvinFSClientApp::LS(const Slice& path) {
+  double start = GetTime();
+  MessageBuffer* serialized = GetMetadataEntry(path);
+  Action a;
+  a.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
   delete serialized;
 
-
   MetadataAction::LookupOutput out;
-  out.ParseFromString(b.output());
-  //LOG(ERROR) << path.data() << "'s metadataentry is :";
-  entry = out.entry();
-  if (entry.type() == DIR)
-  {
-    string *result = new string();
-    for (int i = 0; i < entry.dir_contents_size(); i++)
-    {
-    //  LOG(ERROR) << entry.dir_contents(i);
-      result->append(entry.dir_contents(i));
+  out.ParseFromString(a.output());
+  if (out.success() && out.entry().type() == DIR) {
+    string* result = new string();
+    for (int i = 0; i < out.entry().dir_contents_size(); i++) {
+      result->append(out.entry().dir_contents(i));
       result->append("\n");
     }
-  //  LOG(ERROR)<<GetTime() - start;
+ //  LOG(ERROR)<<GetTime() - start;
     return new MessageBuffer(result);
-  }
-  else
-  {
+
+  } else {
     return new MessageBuffer(new string("metadata lookup error\n"));
   }
 }
