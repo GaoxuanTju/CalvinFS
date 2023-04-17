@@ -1108,31 +1108,31 @@ public:
     string path1 = "/a0";
     string path2 = "/a1";
     string path3 = "/a2";
-    // string path4 = "/a3";
+    string path4 = "/a3";
     // LOG(ERROR)<<path1<<" in "<<config_->LookupMetadataShard(config_->HashFileName(path1), config_->LookupReplica(machine()->machine_id()));
     //  LOG(ERROR)<<path2<<" in "<<config_->LookupMetadataShard(config_->HashFileName(path2), config_->LookupReplica(machine()->machine_id()));
     //   LOG(ERROR)<<path3<<" in "<<config_->LookupMetadataShard(config_->HashFileName(path3), config_->LookupReplica(machine()->machine_id()));
     //    LOG(ERROR)<<path4<<" in "<<config_->LookupMetadataShard(config_->HashFileName(path4), config_->LookupReplica(machine()->machine_id()));
-    //  LOG(ERROR)<<"LS :"<<path1;
-    // for (int j = 0; j < operation_num; j++)
-    // {
-    // //  BackgroundLS(path2);
-    //   // BackgroundLS(path2);
-    //   // BackgroundLS(path3);
-    //   BackgroundLS("/a0");
-    //   //sleep(1);
-    // }
+     LOG(ERROR)<<"LS :"<<path1<<" in "<<config_->LookupMetadataShard(config_->HashFileName(path1), config_->LookupReplica(machine()->machine_id()));
+    for (int j = 0; j < operation_num; j++)
+    {
+    //  BackgroundLS(path2);
+      // BackgroundLS(path2);
+      // BackgroundLS(path3);
+      BackgroundLS(path1);
+      //sleep(1);
+    }
 
-    // while (capacity_.load() < kMaxCapacity)
-    // {
-    //   usleep(10);
-    // //  LOG(ERROR)<<capacity_.load();
-    // }
-    // // Report.
-    // double end = GetTime();
-    // LOG(ERROR) << "[" << machine()->machine_id() << "] "
-    //            << "LS " << operation_num << " files. Elapsed time: "
-    //            << end - start << " seconds";
+    while (capacity_.load() < kMaxCapacity)
+    {
+      usleep(10);
+    //  LOG(ERROR)<<capacity_.load();
+    }
+    // Report.
+    double end = GetTime();
+    LOG(ERROR) << "[" << machine()->machine_id() << "] "
+               << "LS " << operation_num << " files. Elapsed time: "
+               << end - start << " seconds";
     }
 
   void LatencyExperimentRenameFile()
