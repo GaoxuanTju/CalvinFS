@@ -50,7 +50,7 @@ MessageBuffer *CalvinFSClientApp::GetMetadataEntry(const Slice &path)
     a.set_action_type(MetadataAction::LOOKUP);
     MetadataAction::LookupInput in;
     in.set_path(path.data(), path.size());
-
+    //a.set_version(1000000000);
     a.set_version(1000); // gaoxuan --this line is very important for LOOKUP
     in.SerializeToString(a.mutable_input());
     metadata_->GetRWSets(&a);
