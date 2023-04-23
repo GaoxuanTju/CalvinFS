@@ -1030,36 +1030,30 @@ public:
     machine()->GlobalBarrier();
     Spin(1);
 
-    std::vector<int> file_suffix;
-    for (int i = 0; i < 20; i++)
-    {
-      file_suffix.push_back(rand() % 2);
-    }
-    double start = GetTime();
-    string from_path;
-    string to_path;
+    // double start = GetTime();
+    // string from_path;
+    // string to_path;
 
-    from_path = "/a" + IntToString(0);
-    to_path = "/a" + IntToString(1) + "/b" + IntToString(1) + "/d" + IntToString(machine()->GetGUID());
-    uint64 from_id = config_->LookupMetadataShard(config_->HashFileName(from_path), config_->LookupReplica(machine()->machine_id()));
-    uint64 to_id = config_->LookupMetadataShard(config_->HashFileName(to_path), config_->LookupReplica(machine()->machine_id()));
-    LOG(ERROR) << from_path << " in machine[" << from_id << "]  renamed to   " << to_path << " in machine[" << to_id << "]";
-    BackgroundRenameFile(from_path, to_path);
+    // from_path = "/a" + IntToString(0);
+    // to_path = "/a" + IntToString(1) + "/b" + IntToString(1) + "/d" + IntToString(machine()->GetGUID());
+    // uint64 from_id = config_->LookupMetadataShard(config_->HashFileName(from_path), config_->LookupReplica(machine()->machine_id()));
+    // uint64 to_id = config_->LookupMetadataShard(config_->HashFileName(to_path), config_->LookupReplica(machine()->machine_id()));
+    // LOG(ERROR) << from_path << " in machine[" << from_id << "]  renamed to   " << to_path << " in machine[" << to_id << "]";
+    // BackgroundRenameFile(from_path, to_path);
 
-    // Wait for all operations to finish.
-    while (capacity_.load() < kMaxCapacity)
-    {
-      usleep(10);
-      // LOG(ERROR)<<capacity_.load();
-    }
+    // // Wait for all operations to finish.
+    // while (capacity_.load() < kMaxCapacity)
+    // {
+    //   usleep(10);
+    //   // LOG(ERROR)<<capacity_.load();
+    // }
 
-    // Report.
+    // // Report.
 
-    LOG(ERROR) << "Renamed "
-               << "1 files. Elapsed time:"
-               << (GetTime() - start) << " seconds";
-    Spin(1);
-    metadata_->getLOOKUP("");
+    // LOG(ERROR) << "Renamed "
+    //            << "1 files. Elapsed time:"
+    //            << (GetTime() - start) << " seconds";
+
   }
   void DeleteExperiment()
   { // gaoxuan --删除文件的实验
@@ -1103,36 +1097,36 @@ public:
     machine()->GlobalBarrier();
     Spin(1);
 
-    double start = GetTime();
-    // string path = "/a2/b1/c2/d7/e1/f9/g4/h9/i7/j8/k2/l1/m7/n7/o2/p8/q3/r7/s9";
-    string path1 = "/0/a0";
-    string path2 = "/a1";
-    string path3 = "/a2";
-    string path4 = "/a3";
-    // LOG(ERROR)<<path1<<" in "<<config_->LookupMetadataShard(config_->HashFileName(path1), config_->LookupReplica(machine()->machine_id()));
-    //  LOG(ERROR)<<path2<<" in "<<config_->LookupMetadataShard(config_->HashFileName(path2), config_->LookupReplica(machine()->machine_id()));
-    //   LOG(ERROR)<<path3<<" in "<<config_->LookupMetadataShard(config_->HashFileName(path3), config_->LookupReplica(machine()->machine_id()));
-    //    LOG(ERROR)<<path4<<" in "<<config_->LookupMetadataShard(config_->HashFileName(path4), config_->LookupReplica(machine()->machine_id()));
-     LOG(ERROR)<<"LS :"<<path1<<" in "<<config_->LookupMetadataShard(config_->HashFileName(path1), config_->LookupReplica(machine()->machine_id()));
-    for (int j = 0; j < operation_num; j++)
-    {
-    //  BackgroundLS(path2);
-      // BackgroundLS(path2);
-      // BackgroundLS(path3);
-      BackgroundLS(path1);
-      //sleep(1);
-    }
+    // double start = GetTime();
+    // // string path = "/a2/b1/c2/d7/e1/f9/g4/h9/i7/j8/k2/l1/m7/n7/o2/p8/q3/r7/s9";
+    // string path1 = "/0/a0";
+    // string path2 = "/a1";
+    // string path3 = "/a2";
+    // string path4 = "/a3";
+    // // LOG(ERROR)<<path1<<" in "<<config_->LookupMetadataShard(config_->HashFileName(path1), config_->LookupReplica(machine()->machine_id()));
+    // //  LOG(ERROR)<<path2<<" in "<<config_->LookupMetadataShard(config_->HashFileName(path2), config_->LookupReplica(machine()->machine_id()));
+    // //   LOG(ERROR)<<path3<<" in "<<config_->LookupMetadataShard(config_->HashFileName(path3), config_->LookupReplica(machine()->machine_id()));
+    // //    LOG(ERROR)<<path4<<" in "<<config_->LookupMetadataShard(config_->HashFileName(path4), config_->LookupReplica(machine()->machine_id()));
+    // LOG(ERROR)<<"LS :"<<path1<<" in "<<config_->LookupMetadataShard(config_->HashFileName(path1), config_->LookupReplica(machine()->machine_id()));
+    // for (int j = 0; j < operation_num; j++)
+    // {
+    // //  BackgroundLS(path2);
+    //   // BackgroundLS(path2);
+    //   // BackgroundLS(path3);
+    //   BackgroundLS(path1);
+    //   //sleep(1);
+    // }
 
-    while (capacity_.load() < kMaxCapacity)
-    {
-      usleep(10);
-    //  LOG(ERROR)<<capacity_.load();
-    }
-    // Report.
-    double end = GetTime();
-    LOG(ERROR) << "[" << machine()->machine_id() << "] "
-               << "LS " << operation_num << " files. Elapsed time: "
-               << end - start << " seconds";
+    // while (capacity_.load() < kMaxCapacity)
+    // {
+    //   usleep(10);
+    // //  LOG(ERROR)<<capacity_.load();
+    // }
+    // // Report.
+    // double end = GetTime();
+    // LOG(ERROR) << "[" << machine()->machine_id() << "] "
+    //            << "LS " << operation_num << " files. Elapsed time: "
+    //            << end - start << " seconds";
     }
 
   void LatencyExperimentRenameFile()
