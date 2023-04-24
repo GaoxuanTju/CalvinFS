@@ -285,9 +285,9 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
   MetadataEntry entry;
   string str = path.data();
   string front  = ""; 
-  if(str == "/a13")
+  if(str == "/a12")
   {
-    front = "/0/a13";
+    front = "/0/a12";
   }else{
     front = "/0/a14";
   }
