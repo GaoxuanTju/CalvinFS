@@ -294,7 +294,6 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
   {
     front = "/0/a3";
   }
-  LOG(ERROR)<<front;
   uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine()->machine_id()));
   Header *header = new Header();
   header->set_flag(2); 
