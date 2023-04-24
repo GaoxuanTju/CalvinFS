@@ -13,7 +13,7 @@
 #include "leveldb/env.h"
 
 // Replace this with your binary path and config path
-DEFINE_string(calvin_path, "/home/wenxin/calvin_codebase/calvin",
+DEFINE_string(calvin_path, "/home/calvin_codebase/calvin",
               "path to the main calvin directory");
 DEFINE_string(binary, "calvin_server",
               "Calvin binary executable program");
