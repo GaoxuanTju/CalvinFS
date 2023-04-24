@@ -1098,7 +1098,7 @@ public:
     Spin(1);
 
     string path1 = "/a5";
-    string path2 = "/a3";
+    string path2 = "/a6";
     double start = GetTime();
 
 //    LOG(ERROR)<<"LS :"<<path1<<" in "<<config_->LookupMetadataShard(config_->HashFileName(path1), config_->LookupReplica(machine()->machine_id()));
