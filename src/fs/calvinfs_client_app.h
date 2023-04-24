@@ -1097,28 +1097,28 @@ public:
     machine()->GlobalBarrier();
     Spin(1);
 
-    string path1 = "/a6";
-    string path2 = "/a7";
-    double start = GetTime();
+//     string path1 = "/a6";
+//     string path2 = "/a7";
+//     double start = GetTime();
 
-//    LOG(ERROR)<<"LS :"<<path1<<" in "<<config_->LookupMetadataShard(config_->HashFileName(path1), config_->LookupReplica(machine()->machine_id()));
-    for (int j = 0; j < operation_num; j++)
-    {
-      BackgroundLS(path1);
-      //BackgroundLS(path2);
-      //sleep(1);
-    }
+// //    LOG(ERROR)<<"LS :"<<path1<<" in "<<config_->LookupMetadataShard(config_->HashFileName(path1), config_->LookupReplica(machine()->machine_id()));
+//     for (int j = 0; j < operation_num; j++)
+//     {
+//       BackgroundLS(path1);
+//       //BackgroundLS(path2);
+//       //sleep(1);
+//     }
 
-    while (capacity_.load() < kMaxCapacity)
-    {
-      usleep(10);
-    //  LOG(ERROR)<<capacity_.load();
-    }
-    // Report.
-    double end = GetTime();
-    LOG(ERROR) << "[" << machine()->machine_id() << "] "
-               << "LS " << operation_num << " files. Elapsed time: "
-               << end - start << " seconds";
+//     while (capacity_.load() < kMaxCapacity)
+//     {
+//       usleep(10);
+//     //  LOG(ERROR)<<capacity_.load();
+//     }
+//     // Report.
+//     double end = GetTime();
+//     LOG(ERROR) << "[" << machine()->machine_id() << "] "
+//                << "LS " << operation_num << " files. Elapsed time: "
+//                << end - start << " seconds";
     }
 
   void LatencyExperimentRenameFile()
