@@ -289,7 +289,7 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
   {
     front = "/0/a12";
   }else{
-    front = "/0/a14";
+    front = "/0/a11";
   }
 
   uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine()->machine_id()));
