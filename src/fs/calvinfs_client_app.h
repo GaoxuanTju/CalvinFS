@@ -1105,7 +1105,7 @@ public:
     for (int j = 0; j < operation_num; j++)
     {
       BackgroundLS(path1);
-      // BackgroundLS(path2);
+      BackgroundLS(path2);
       //sleep(1);
     }
 
