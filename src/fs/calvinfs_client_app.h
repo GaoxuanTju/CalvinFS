@@ -1096,21 +1096,21 @@ public:
     machine()->GlobalBarrier();
     Spin(1);
     double start = GetTime();
-    // for (int j = 0; j < operation_num; j++)
-    // {
-    //   BackgroundLS("/a12");
-    // }
+    for (int j = 0; j < operation_num; j++)
+    {
+      BackgroundLS("/a13");
+    }
 
-    // while (capacity_.load() < kMaxCapacity)
-    // {
-    //   usleep(10);
-    // //  LOG(ERROR)<<capacity_.load();
-    // }
-    // // Report.
-    // double end = GetTime();
-    // LOG(ERROR) << "[" << machine()->machine_id() << "] "
-    //            << "LS " << operation_num << " files. Elapsed time: "
-    //            << end - start << " seconds";
+    while (capacity_.load() < kMaxCapacity)
+    {
+      usleep(10);
+    //  LOG(ERROR)<<capacity_.load();
+    }
+    // Report.
+    double end = GetTime();
+    LOG(ERROR) << "[" << machine()->machine_id() << "] "
+               << "LS " << operation_num << " files. Elapsed time: "
+               << end - start << " seconds";
     }
 
   void LatencyExperimentRenameFile()
