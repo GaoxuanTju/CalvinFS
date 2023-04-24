@@ -1092,33 +1092,25 @@ public:
   { 
     Spin(1);
     metadata_->Init_from_txt("/home/wenxin/CalvinFS/src/fs/Init.txt");
-
     Spin(1);
     machine()->GlobalBarrier();
     Spin(1);
+    double start = GetTime();
+    for (int j = 0; j < operation_num; j++)
+    {
+      BackgroundLS("/a13");
+    }
 
-    // string path1 = "/a5";
-    // string path2 = "/a6";
-    // double start = GetTime();
-
-    // LOG(ERROR)<<"LS :"<<path1<<" in "<<config_->LookupMetadataShard(config_->HashFileName(path1), config_->LookupReplica(machine()->machine_id()));
-    // for (int j = 0; j < operation_num; j++)
-    // {
-    //   BackgroundLS(path1);
-    //   //BackgroundLS(path2);
-    //   //sleep(1);
-    // }
-
-    // while (capacity_.load() < kMaxCapacity)
-    // {
-    //   usleep(10);
-    // //  LOG(ERROR)<<capacity_.load();
-    // }
-    // // Report.
-    // double end = GetTime();
-    // LOG(ERROR) << "[" << machine()->machine_id() << "] "
-    //            << "LS " << operation_num << " files. Elapsed time: "
-    //            << end - start << " seconds";
+    while (capacity_.load() < kMaxCapacity)
+    {
+      usleep(10);
+    //  LOG(ERROR)<<capacity_.load();
+    }
+    // Report.
+    double end = GetTime();
+    LOG(ERROR) << "[" << machine()->machine_id() << "] "
+               << "LS " << operation_num << " files. Elapsed time: "
+               << end - start << " seconds";
     }
 
   void LatencyExperimentRenameFile()
