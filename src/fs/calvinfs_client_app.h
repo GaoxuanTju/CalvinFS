@@ -1097,15 +1097,15 @@ public:
     machine()->GlobalBarrier();
     Spin(1);
 
-    string path1 = "/a5";
-    string path2 = "/a6";
+    string path1 = "/a6";
+    string path2 = "/a7";
     double start = GetTime();
 
 //    LOG(ERROR)<<"LS :"<<path1<<" in "<<config_->LookupMetadataShard(config_->HashFileName(path1), config_->LookupReplica(machine()->machine_id()));
     for (int j = 0; j < operation_num; j++)
     {
       BackgroundLS(path1);
-      BackgroundLS(path2);
+      //BackgroundLS(path2);
       //sleep(1);
     }
 

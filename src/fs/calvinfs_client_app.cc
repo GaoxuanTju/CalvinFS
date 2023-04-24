@@ -286,13 +286,13 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
   string front  = ""; 
   //下面这段是为了测试模拟hash的代码
   string str = path.data();
-  if(str == "/a5")
+  if(str == "/a6")
   {
-    front = "/0/a5";
+    front = "/0/a6";
   }
   else
   {
-    front = "/0/a6";
+    front = "/0/a7";
   }
   uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine()->machine_id()));
   Header *header = new Header();
