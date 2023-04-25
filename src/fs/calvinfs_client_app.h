@@ -1095,27 +1095,32 @@ public:
     Spin(1);
     machine()->GlobalBarrier();
     Spin(1);
-    // double start = GetTime();
-    // string path1 = "/0/a7";
-    // string path2 = "/0/a7/c9";
-    // string path3 = "/0/a7/c8";
-    // for (int j = 0; j < operation_num; j++)
-    // {
-    //   BackgroundLS(path1);
-    //   BackgroundLS(path2);
-    //   BackgroundLS(path3);
-    // }
-
-    // while (capacity_.load() < kMaxCapacity)
-    // {
-    //   usleep(10);
-    // //  LOG(ERROR)<<capacity_.load();
-    // }
-    // // Report.
-    // double end = GetTime();
-    // LOG(ERROR) << "[" << machine()->machine_id() << "] "
-    //            << "LS " << operation_num << " files. Elapsed time: "
-    //            << end - start << " seconds";
+    double start = GetTime();
+    string path1 = "/0/u0";
+    string path2 = "/0/u0/b1";
+    string path3 = "/0/u0/b6";
+    for (int j = 0; j < operation_num; j++)
+    {
+      BackgroundLS(path1);
+    }
+    for (int j = 0; j < operation_num; j++)
+    {
+      BackgroundLS(path2);
+    }
+    for (int j = 0; j < operation_num; j++)
+    {
+      BackgroundLS(path3);
+    }
+    while (capacity_.load() < kMaxCapacity)
+    {
+      usleep(10);
+    //  LOG(ERROR)<<capacity_.load();
+    }
+    // Report.
+    double end = GetTime();
+    LOG(ERROR) << "[" << machine()->machine_id() << "] "
+               << "LS " << operation_num << " files. Elapsed time: "
+               << end - start << " seconds";
     }
 
   void LatencyExperimentRenameFile()
