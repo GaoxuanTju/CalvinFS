@@ -5,7 +5,7 @@
 #ifndef CALVIN_FS_CALVINFS_CLIENT_APP_H_
 #define CALVIN_FS_CALVINFS_CLIENT_APP_H_
 #define switch_uid 9999
-#define operation_num 3000
+#define operation_num 6000
 #include <leveldb/env.h>
 #include <iomanip>
 
@@ -1096,21 +1096,19 @@ public:
     machine()->GlobalBarrier();
     Spin(1);
     double start = GetTime();
-    string path1 = "/0/a7";
-    string path2 = "/0/a7/c8";
-    string path3 = "/0/a7/c9";
+    string path1 = "/0/u0";
+    string path2 = "/0/u0/b1";
+    string path3 = "/0/u0/b6";
     for (int j = 0; j < operation_num; j++)
     {
       BackgroundLS(path1);
+      if (j < 1500)
+      {
+        BackgroundLS(path2);
+        BackgroundLS(path3);
+      }
     }
-    for (int j = 0; j < operation_num; j++)
-    {
-      BackgroundLS(path2);
-    }
-    for (int j = 0; j < operation_num; j++)
-    {
-      BackgroundLS(path3);
-    }
+
     while (capacity_.load() < kMaxCapacity)
     {
       usleep(10);
