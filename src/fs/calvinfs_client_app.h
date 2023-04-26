@@ -1098,7 +1098,7 @@ public:
     double start = GetTime();
     string path1 = "/0/u0";
     string path2 = "/0/u0/b1";
-    string path3 = "/0/u0/b6"
+    string path3 = "/0/u0/b6";
     for (int j = 0; j < operation_num; j++)
     {
       BackgroundLS(path1);
