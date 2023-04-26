@@ -284,7 +284,7 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
 {
   MetadataEntry entry;
   string str = path.data();
-  string front  = "/0/a4"; 
+  string front  = "/0/a5"; 
   uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine()->machine_id()));
   Header *header = new Header();
   header->set_flag(2); 
