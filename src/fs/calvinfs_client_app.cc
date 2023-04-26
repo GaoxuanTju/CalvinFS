@@ -284,7 +284,7 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
 {
   MetadataEntry entry;
   string str = path.data();
-  string front  = "/0/a5"; 
+  string front  = ""; 
   uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine()->machine_id()));
   Header *header = new Header();
   header->set_flag(2); 
@@ -361,7 +361,7 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
     }
     header->set_long_prefix(prefix);    
   }
-  header->set_depth(1);
+  header->set_depth(0);
   int uid = switch_uid;
   header->set_uid(uid);
   // before this part is split
