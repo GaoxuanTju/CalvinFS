@@ -1096,7 +1096,7 @@ public:
     machine()->GlobalBarrier();
     Spin(1);
     double start = GetTime();
-    string path1 = "/v0";
+    string path1 = "/a4";
     for (int j = 0; j < operation_num; j++)
     {
       BackgroundLS(path1);
