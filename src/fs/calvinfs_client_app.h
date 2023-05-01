@@ -1096,7 +1096,7 @@ public:
     machine()->GlobalBarrier();
     Spin(1);
     double start = GetTime();
-    string path1 = "/p4";
+    string path1 = "/j1";
     LOG(ERROR)<<"LS path: "<<path1;
     for (int j = 0; j < operation_num; j++)
     {
