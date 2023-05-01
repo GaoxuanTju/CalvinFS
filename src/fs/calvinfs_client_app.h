@@ -1095,24 +1095,24 @@ public:
     Spin(1);
     machine()->GlobalBarrier();
     Spin(1);
-    double start = GetTime();
-    string path1 = "/a20/b1";
-    LOG(ERROR)<<"LS path: "<<path1;
-    for (int j = 0; j < operation_num; j++)
-    {
-      BackgroundLS(path1);
-    }
+    // double start = GetTime();
+    // string path1 = "/a20/b1";
+    // LOG(ERROR)<<"LS path: "<<path1;
+    // for (int j = 0; j < operation_num; j++)
+    // {
+    //   BackgroundLS(path1);
+    // }
 
-    while (capacity_.load() < kMaxCapacity)
-    {
-      usleep(10);
-    //  LOG(ERROR)<<capacity_.load();
-    }
-    // Report.
-    double end = GetTime();
-    LOG(ERROR) << "[" << machine()->machine_id() << "] "
-               << "LS " << operation_num << " files. Elapsed time: "
-               << end - start << " seconds";
+    // while (capacity_.load() < kMaxCapacity)
+    // {
+    //   usleep(10);
+    // //  LOG(ERROR)<<capacity_.load();
+    // }
+    // // Report.
+    // double end = GetTime();
+    // LOG(ERROR) << "[" << machine()->machine_id() << "] "
+    //            << "LS " << operation_num << " files. Elapsed time: "
+    //            << end - start << " seconds";
     }
 
   void LatencyExperimentRenameFile()
