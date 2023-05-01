@@ -5,7 +5,7 @@
 #ifndef CALVIN_FS_CALVINFS_CLIENT_APP_H_
 #define CALVIN_FS_CALVINFS_CLIENT_APP_H_
 #define switch_uid 9999
-#define operation_num 5000
+#define operation_num 600
 #include <leveldb/env.h>
 #include <iomanip>
 
@@ -479,7 +479,7 @@ public:
   void FillExperiment()
   {
     Spin(1);
-    metadata_->Init_from_txt("/home/wenxin/CalvinFS/src/fs/Init.txt");
+    metadata_->Init_from_txt("/home/CalvinFS/src/fs/Init.txt");
     Spin(1);
     machine()->GlobalBarrier();
     Spin(1);
@@ -1025,7 +1025,7 @@ public:
     Spin(1);
     // dir_tree = new BTNode;
     // metadata_->Init_tree_20(dir_tree);
-    metadata_->Init_from_txt("/home/wenxin/CalvinFS/src/fs/Init.txt");
+    metadata_->Init_from_txt("/home/CalvinFS/src/fs/Init.txt");
     Spin(1);
     machine()->GlobalBarrier();
     Spin(1);
@@ -1091,16 +1091,32 @@ public:
   void LsExperiment()
   { 
     Spin(1);
+<<<<<<< HEAD
     metadata_->Init_from_txt("/home/wenxin/CalvinFS/src/fs/Init.txt");
+=======
+    // dir_tree = new BTNode;
+    // metadata_->Init_tree_20(dir_tree);
+    metadata_->Init_from_txt("/home/CalvinFS/src/fs/Init.txt");
+>>>>>>> dc52983ae443cbafb06af4024ab8638abd4d1cf9
     Spin(1);
     machine()->GlobalBarrier();
     Spin(1);
     double start = GetTime();
+<<<<<<< HEAD
     string path1 = "/a7";
     LOG(ERROR)<<"LS path: "<<path1;
     for (int j = 0; j < operation_num; j++)
     {
       BackgroundLS(path1);
+=======
+    // string path = "/a2/b1/c1/d4/e3/f3/g2/h9/i1/j8/k8/l4/m4/n4/o4/p4/q9/r8/s9";
+    string path = "";
+      LOG(ERROR)<<"LS :"<<path;
+    for (int j = 0; j < operation_num; j++)
+    {
+      BackgroundLS(path);
+      sleep(1);
+>>>>>>> dc52983ae443cbafb06af4024ab8638abd4d1cf9
     }
 
     while (capacity_.load() < kMaxCapacity)
@@ -1113,7 +1129,11 @@ public:
     LOG(ERROR) << "[" << machine()->machine_id() << "] "
                << "LS " << operation_num << " files. Elapsed time: "
                << end - start << " seconds";
+<<<<<<< HEAD
     }
+=======
+   }
+>>>>>>> dc52983ae443cbafb06af4024ab8638abd4d1cf9
 
   void LatencyExperimentRenameFile()
   {
