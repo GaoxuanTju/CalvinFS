@@ -65,9 +65,8 @@ int main(int argc, char **argv)
   ClusterConfig cc;
   cc.FromFile(FLAGS_config); // gaoxuan --这个地方是获得集群中机器的ip地址，从calvin.conf
 
-  int replicas = (cc.size() >= 3) ? 16 : 1; // gaoxuan --在这里cc.size根据上面的ip地址就能确定是2了,replicas是1
-  //int partitions = cc.size() / replicas;   // gaoxuan --partions是2，就代表划分到两台机器上了
-  int partitions = 6;
+  int replicas = (cc.size() >= 3) ? 16 : 1; 
+  int partitions = 16;
   LOG(ERROR) << "Starting CalvinFS node " << FLAGS_machine_id
              << " (partition " << (FLAGS_machine_id % partitions)
              << "/" << partitions
@@ -78,17 +77,13 @@ int main(int argc, char **argv)
   Spin(1);
 
   string fsconfig;
-  // gaoxuan --MakeCalvinFSConfig有三个函数，想改就得改这里面的函数，他可以影响到hash范围，通过设置mds_count
-  // gaoxuan --一个参数的MakeCalvinFSConfig函数现在代表n台机器，每台机器上一个副本，一个mds，需要改成，只有一台机器上有mds和副本即可
-
-  // MakeCalvinFSConfig().SerializeToString(&fsconfig);//gaoxuan --这个里面就是具体设置，这一台机器的mds，块存储
   MakeCalvinFSConfig(partitions, replicas).SerializeToString(&fsconfig);
-  m.AppData()->Put("calvinfs-config", fsconfig); // gaoxuan --通过machine()->getAppData("calvinfs-config")可以得到刚刚设置的东西
+  m.AppData()->Put("calvinfs-config", fsconfig); 
   Spin(1);
 
   // Start paxos app (maybe).
   if (FLAGS_machine_id % partitions == 0)
-  { // gaoxuan --如果上面改动的话，这里也要改一下逻辑
+  { 
     StartAppProto sap;
     for (int i = 0; i < replicas; i++)
     {
