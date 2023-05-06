@@ -5,7 +5,7 @@
 #ifndef CALVIN_FS_CALVINFS_CLIENT_APP_H_
 #define CALVIN_FS_CALVINFS_CLIENT_APP_H_
 #define switch_uid 9999
-#define operation_num 600
+#define operation_num 5000
 #include <leveldb/env.h>
 #include <iomanip>
 
@@ -156,7 +156,7 @@ public:
           }
         }
         string path = "/" + uid + "/" + new_str; // 要发出的结果
-        MessageBuffer *serialized = GetMetadataEntry(path);      
+        MessageBuffer *serialized = GetMetadataEntry(header, path);      
         if (depth + 1 == header->from_length() || Dir_dep(path) > 2)
         { // 交换机匹配到了，而且一直匹配到最后一段位置
           // 要做的是获取直接获取元数据项，然后返回即可
@@ -227,15 +227,13 @@ public:
           header->set_to(mds_machine);
           header->clear_misc_string();
           header->add_misc_string(LS_path.c_str(), strlen(LS_path.c_str()));
-          Header* h = new Header();
-          h->CopyFrom(*header);
-          machine()->SendMessage(h, new MessageBuffer());         
+          machine()->SendMessage(header, new MessageBuffer());         
         }
       }
       else
       {
         string path;
-        MessageBuffer *serialized = GetMetadataEntry(path = header->misc_string(0));
+        MessageBuffer *serialized = GetMetadataEntry(header, path = header->misc_string(0));
         header->set_data_ptr(header->data_ptr());
         int depth; // 用来记录当前遍历到那个深度了
         if (path == "")
@@ -252,7 +250,7 @@ public:
           machine()->SendReplyMessage(header, serialized);
         }
         else
-        { 
+        {
           Action b;
           b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
           delete serialized;
@@ -301,24 +299,15 @@ public:
           header->set_to(mds_machine);
           header->clear_misc_string();
           header->add_misc_string(LS_path.c_str(), strlen(LS_path.c_str()));
-          Header * h = new Header();
-          h->CopyFrom(*header);
-          delete header;
-          machine()->SendMessage(h, new MessageBuffer());
+          machine()->SendMessage(header, new MessageBuffer());
         }
       }
     }
-    // if (header->rpc() == "LOOKUP")
-    // {
-    //   machine()->SendReplyMessage(
-    //       header,
-    //       GetMetadataEntry(header->misc_string(0)));
-
-    //   // EXTERNAL LS
-    // }    
     else if (header->rpc() == "LS")
     {
+
       machine()->SendReplyMessage(header, LS(header->misc_string(0)));
+
       // EXTERNAL read file
     }
     else if (header->rpc() == "READ_FILE")
@@ -1030,30 +1019,36 @@ public:
     machine()->GlobalBarrier();
     Spin(1);
 
-    // double start = GetTime();
-    // string from_path;
-    // string to_path;
+    std::vector<int> file_suffix;
+    for (int i = 0; i < 20; i++)
+    {
+      file_suffix.push_back(rand() % 2);
+    }
+    double start = GetTime();
+    string from_path;
+    string to_path;
 
-    // from_path = "/a" + IntToString(0);
-    // to_path = "/a" + IntToString(1) + "/b" + IntToString(1) + "/d" + IntToString(machine()->GetGUID());
-    // uint64 from_id = config_->LookupMetadataShard(config_->HashFileName(from_path), config_->LookupReplica(machine()->machine_id()));
-    // uint64 to_id = config_->LookupMetadataShard(config_->HashFileName(to_path), config_->LookupReplica(machine()->machine_id()));
-    // LOG(ERROR) << from_path << " in machine[" << from_id << "]  renamed to   " << to_path << " in machine[" << to_id << "]";
-    // BackgroundRenameFile(from_path, to_path);
+    from_path = "/a" + IntToString(0);
+    to_path = "/a" + IntToString(1) + "/b" + IntToString(1) + "/d" + IntToString(machine()->GetGUID());
+    uint64 from_id = config_->LookupMetadataShard(config_->HashFileName(from_path), config_->LookupReplica(machine()->machine_id()));
+    uint64 to_id = config_->LookupMetadataShard(config_->HashFileName(to_path), config_->LookupReplica(machine()->machine_id()));
+    LOG(ERROR) << from_path << " in machine[" << from_id << "]  renamed to   " << to_path << " in machine[" << to_id << "]";
+    BackgroundRenameFile(from_path, to_path);
 
-    // // Wait for all operations to finish.
-    // while (capacity_.load() < kMaxCapacity)
-    // {
-    //   usleep(10);
-    //   // LOG(ERROR)<<capacity_.load();
-    // }
+    // Wait for all operations to finish.
+    while (capacity_.load() < kMaxCapacity)
+    {
+      usleep(10);
+      // LOG(ERROR)<<capacity_.load();
+    }
 
-    // // Report.
+    // Report.
 
-    // LOG(ERROR) << "Renamed "
-    //            << "1 files. Elapsed time:"
-    //            << (GetTime() - start) << " seconds";
-
+    LOG(ERROR) << "Renamed "
+               << "1 files. Elapsed time:"
+               << (GetTime() - start) << " seconds";
+    Spin(1);
+    metadata_->getLOOKUP("");
   }
   void DeleteExperiment()
   { // gaoxuan --删除文件的实验
@@ -1089,51 +1084,41 @@ public:
     print_dir_tree(dir_tree);
   }
   void LsExperiment()
-  { 
+  { // gaoxuan --删除文件的实验
     Spin(1);
-<<<<<<< HEAD
-    metadata_->Init_from_txt("/home/wenxin/CalvinFS/src/fs/Init.txt");
-=======
     // dir_tree = new BTNode;
     // metadata_->Init_tree_20(dir_tree);
     metadata_->Init_from_txt("/home/CalvinFS/src/fs/Init.txt");
->>>>>>> dc52983ae443cbafb06af4024ab8638abd4d1cf9
     Spin(1);
     machine()->GlobalBarrier();
     Spin(1);
-    double start = GetTime();
-<<<<<<< HEAD
-    string path1 = "/a7";
-    LOG(ERROR)<<"LS path: "<<path1;
-    for (int j = 0; j < operation_num; j++)
-    {
-      BackgroundLS(path1);
-=======
-    // string path = "/a2/b1/c1/d4/e3/f3/g2/h9/i1/j8/k8/l4/m4/n4/o4/p4/q9/r8/s9";
-    string path = "";
-      LOG(ERROR)<<"LS :"<<path;
-    for (int j = 0; j < operation_num; j++)
-    {
-      BackgroundLS(path);
-      sleep(1);
->>>>>>> dc52983ae443cbafb06af4024ab8638abd4d1cf9
-    }
+    // double start = GetTime();
+    // // string path = "/a2/b1/c2/d7/e1/f9/g4/h9/i7/j8/k2/l1/m7/n7/o2/p8/q3/r7/s9";
+    // string path1 = "/a0";
+    // string path2 = "/a1";
+    // string path3 = "/a2";
+    // string path4 = "/a3";
+    // //  LOG(ERROR)<<"LS :"<<path;
+    // for (int j = 0; j < operation_num; j++)
+    // {
+    // //  BackgroundLS(path2);
+    //   // BackgroundLS(path2);
+    //   // BackgroundLS(path3);
+    //   BackgroundLS("/a0");
+    //   //sleep(1);
+    // }
 
-    while (capacity_.load() < kMaxCapacity)
-    {
-      usleep(10);
-    //  LOG(ERROR)<<capacity_.load();
-    }
-    // Report.
-    double end = GetTime();
-    LOG(ERROR) << "[" << machine()->machine_id() << "] "
-               << "LS " << operation_num << " files. Elapsed time: "
-               << end - start << " seconds";
-<<<<<<< HEAD
-    }
-=======
+    // while (capacity_.load() < kMaxCapacity)
+    // {
+    //   usleep(10);
+    // //  LOG(ERROR)<<capacity_.load();
+    // }
+    // // Report.
+    // double end = GetTime();
+    // LOG(ERROR) << "[" << machine()->machine_id() << "] "
+    //            << "LS " << operation_num << " files. Elapsed time: "
+    //            << end - start << " seconds";
    }
->>>>>>> dc52983ae443cbafb06af4024ab8638abd4d1cf9
 
   void LatencyExperimentRenameFile()
   {
@@ -1217,6 +1202,7 @@ public:
   // Caller takes ownership of returned MessageBuffers.
   // Returns serialized MetadataEntry protobuf.
   MessageBuffer *GetMetadataEntry(const Slice &path);
+  MessageBuffer *GetMetadataEntry(Header *header, const Slice &path);
   // Returns client-side printable output.
   MessageBuffer *CreateFile(const Slice &path, FileType type = DATA);
   MessageBuffer *AppendStringToFile(const Slice &data, const Slice &path);

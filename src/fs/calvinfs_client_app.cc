@@ -50,8 +50,8 @@ MessageBuffer *CalvinFSClientApp::GetMetadataEntry(const Slice &path)
     a.set_action_type(MetadataAction::LOOKUP);
     MetadataAction::LookupInput in;
     in.set_path(path.data(), path.size());
-    //a.set_version(1000000000);
-    a.set_version(1000); // gaoxuan --this line is very important for LOOKUP
+
+    a.set_version(1000000000); // gaoxuan --this line is very important for LOOKUP
     in.SerializeToString(a.mutable_input());
     metadata_->GetRWSets(&a);
     metadata_->Run(&a);
@@ -82,6 +82,44 @@ MessageBuffer *CalvinFSClientApp::GetMetadataEntry(const Slice &path)
     return m;
   }
 }
+
+MessageBuffer *CalvinFSClientApp::GetMetadataEntry(Header *header, const Slice &path)
+{
+  // Find out what machine to run this on.
+  uint64 mds_machine =
+      config_->LookupMetadataShard(config_->HashFileName(path), replica_);
+
+  // Run if local.
+  if (mds_machine == machine()->machine_id())
+  {
+    Action a;
+
+    a.set_action_type(MetadataAction::LOOKUP);
+    MetadataAction::LookupInput in;
+    in.set_path(path.data(), path.size());
+
+    a.set_version(1000000000); // gaoxuan --this line is very important for LOOKUP
+    in.SerializeToString(a.mutable_input());
+    metadata_->GetRWSets(&a);
+    metadata_->Run(&a);
+    return new MessageBuffer(a);
+
+    // If not local, get result from the right machine (within this replica).
+  }
+  else
+  {
+    MessageBuffer *m = NULL;
+    header->set_data_ptr(reinterpret_cast<uint64>(&m));
+    machine()->SendMessage(header, new MessageBuffer());
+    while (m == NULL)
+    {
+      usleep(10);
+      Noop<MessageBuffer *>(m);
+    }
+    return m;
+  }
+}
+
 MessageBuffer *CalvinFSClientApp::CreateFile(const Slice &path, FileType type)
 {
   string channel_name = "action-result-" + UInt64ToString(machine()->GetGUID());
@@ -283,7 +321,6 @@ int CalvinFSClientApp::Dir_dep(const string &path)
 MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
 {
   MetadataEntry entry;
-  string str = path.data();
   string front  = ""; 
   uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine()->machine_id()));
   Header *header = new Header();
@@ -367,7 +404,7 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
   // before this part is split
   MessageBuffer *m = NULL;
   header->set_data_ptr(reinterpret_cast<uint64>(&m));
-  double start = GetTime();
+ // double start = GetTime();
   machine()->SendMessage(header, new MessageBuffer());
   while (m == NULL)
   {
@@ -378,8 +415,6 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
   Action b;
   b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
   delete serialized;
-
-
   MetadataAction::LookupOutput out;
   out.ParseFromString(b.output());
   //LOG(ERROR) << path.data() << "'s metadataentry is :";
@@ -393,7 +428,7 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
       result->append(entry.dir_contents(i));
       result->append("\n");
     }
-    LOG(ERROR)<<GetTime() - start;
+  //  LOG(ERROR)<<GetTime() - start;
     return new MessageBuffer(result);
   }
   else
@@ -401,28 +436,6 @@ MessageBuffer *CalvinFSClientApp::LS(const Slice &path)
     return new MessageBuffer(new string("metadata lookup error\n"));
   }
 }
-// MessageBuffer* CalvinFSClientApp::LS(const Slice& path) {
-//   double start = GetTime();
-//   MessageBuffer* serialized = GetMetadataEntry(path);
-//   Action a;
-//   a.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
-//   delete serialized;
-
-//   MetadataAction::LookupOutput out;
-//   out.ParseFromString(a.output());
-//   if (out.success() && out.entry().type() == DIR) {
-//     string* result = new string();
-//     for (int i = 0; i < out.entry().dir_contents_size(); i++) {
-//       result->append(out.entry().dir_contents(i));
-//       result->append("\n");
-//     }
-//  //  LOG(ERROR)<<GetTime() - start;
-//     return new MessageBuffer(result);
-
-//   } else {
-//     return new MessageBuffer(new string("metadata lookup error\n"));
-//   }
-// }
 
 MessageBuffer *CalvinFSClientApp::CopyFile(const Slice &from_path, const Slice &to_path)
 {

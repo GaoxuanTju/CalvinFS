@@ -41,86 +41,113 @@ REGISTER_APP(MetadataStoreApp)
 //            Extend this to be a DISTRIBUTED one.
 // TODO(agt): Generalize and move to components/store/store.{h,cc}.
 //
-class ExecutionContext {
- public:
+class ExecutionContext
+{
+public:
   // Constructor performs all reads.
-  ExecutionContext(VersionedKVStore* store, Action* action)
-      : store_(store), version_(action->version()), aborted_(false) {
-    for (int i = 0; i < action->readset_size(); i++) {
-      if (!store_->Get(action->readset(i),
+  ExecutionContext(VersionedKVStore *store, Action *action)
+      : store_(store), version_(action->version()), aborted_(false)
+  {
+    for (int i = 0; i < action->readset_size(); i++)
+    {
+      string path = action->readset(i);
+      // 判断涉不涉及分层，目前是看有没有b，如果有b就分层
+
+      string hash_name;
+      hash_name = path;
+
+      if (!store_->Get(hash_name,
                        version_,
-                       &reads_[action->readset(i)])) {
+                       &reads_[hash_name]))
+      {
         reads_.erase(action->readset(i));
       }
     }
 
-    if (action->readset_size() > 0) {
+    if (action->readset_size() > 0)
+    {
       reader_ = true;
-    } else {
+    }
+    else
+    {
       reader_ = false;
     }
 
-    if (action->writeset_size() > 0) {
+    if (action->writeset_size() > 0)
+    {
       writer_ = true;
-    } else {
+    }
+    else
+    {
       writer_ = false;
     }
-
   }
 
   // Destructor installs all writes.
-  ~ExecutionContext() {
-    if (!aborted_) {
-      for (auto it = writes_.begin(); it != writes_.end(); ++it) {
+  ~ExecutionContext()
+  {
+    if (!aborted_)
+    {
+      for (auto it = writes_.begin(); it != writes_.end(); ++it)
+      {
         store_->Put(it->first, it->second, version_);
       }
-      for (auto it = deletions_.begin(); it != deletions_.end(); ++it) {
+      for (auto it = deletions_.begin(); it != deletions_.end(); ++it)
+      {
         store_->Delete(*it, version_);
       }
     }
   }
 
-  bool EntryExists(const string& path) {
+  bool EntryExists(const string &path)
+  {
     return reads_.count(path) != 0;
   }
 
-  bool GetEntry(const string& path, MetadataEntry* entry) {
+  bool GetEntry(const string &path, MetadataEntry *entry)
+  {
     entry->Clear();
-    if (reads_.count(path) != 0) {
+    if (reads_.count(path) != 0)
+    {
       entry->ParseFromString(reads_[path]);
       return true;
     }
     return false;
   }
 
-  void PutEntry(const string& path, const MetadataEntry& entry) {
+  void PutEntry(const string &path, const MetadataEntry &entry)
+  {
     deletions_.erase(path);
     entry.SerializeToString(&writes_[path]);
-    if (reads_.count(path) != 0) {
+    if (reads_.count(path) != 0)
+    {
       entry.SerializeToString(&reads_[path]);
     }
   }
 
-  void DeleteEntry(const string& path) {
+  void DeleteEntry(const string &path)
+  {
     reads_.erase(path);
     writes_.erase(path);
     deletions_.insert(path);
   }
 
-  bool IsWriter() {
+  bool IsWriter()
+  {
     if (writer_)
       return true;
     else
       return false;
   }
 
-  void Abort() {
+  void Abort()
+  {
     aborted_ = true;
   }
 
- protected:
+protected:
   ExecutionContext() {}
-  VersionedKVStore* store_;
+  VersionedKVStore *store_;
   uint64 version_;
   bool aborted_;
   map<string, string> reads_;
@@ -138,15 +165,17 @@ class ExecutionContext {
 //
 // TODO(agt): Generalize and move to components/store/store.{h,cc}.
 //
-class DistributedExecutionContext : public ExecutionContext {
- public:
+class DistributedExecutionContext : public ExecutionContext
+{
+public:
   // Constructor performs all reads.
   DistributedExecutionContext(
-      Machine* machine,
-      CalvinFSConfigMap* config,
-      VersionedKVStore* store,
-      Action* action)
-        : machine_(machine), config_(config) {
+      Machine *machine,
+      CalvinFSConfigMap *config,
+      VersionedKVStore *store,
+      Action *action)
+      : machine_(machine), config_(config)
+  {
     // Initialize parent class variables.
     store_ = store;
     version_ = action->version();
@@ -158,18 +187,30 @@ class DistributedExecutionContext : public ExecutionContext {
     // Figure out what machines are readers (and perform local reads).
     reader_ = false;
     set<uint64> remote_readers;
-    for (int i = 0; i < action->readset_size(); i++) {
-      uint64 mds = config_->HashFileName(action->readset(i));
-      uint64 machine = config_->LookupMetadataShard(mds, replica_);
-      if (machine == machine_->machine_id()) {
+    for (int i = 0; i < action->readset_size(); i++)
+    { // gaoxuan --now handle the read/write set passed from GetRWs
+
+      string path = action->readset(i); // 获取这个路径
+      // 判断涉不涉及分层，目前是看有没有b，如果有b就分层
+
+      string hash_name;
+      hash_name = path;
+
+      uint64 mds = config_->HashFileName(hash_name);
+      uint64 machine = config_->LookupMetadataShard(mds, replica_); // gaoxuan --get right machine of the path
+      if (machine == machine_->machine_id())
+      { // gaoxuan --if the path in read/write set is local,put it's metadataentry into map reads_,key is path,value is entry
         // Local read.
-        if (!store_->Get(action->readset(i),
+        if (!store_->Get(hash_name,
                          version_,
-                         &reads_[action->readset(i)])) {
-          reads_.erase(action->readset(i));
+                         &reads_[hash_name]))
+        {
+          reads_.erase(hash_name);
         }
         reader_ = true;
-      } else {
+      }
+      else
+      { // gaoxuan --this machine is that we want to read. Put it into set remote_readers
         remote_readers.insert(machine);
       }
     }
@@ -177,48 +218,67 @@ class DistributedExecutionContext : public ExecutionContext {
     // Figure out what machines are writers.
     writer_ = false;
     set<uint64> remote_writers;
-    for (int i = 0; i < action->writeset_size(); i++) {
-      uint64 mds = config_->HashFileName(action->writeset(i));
+    for (int i = 0; i < action->writeset_size(); i++)
+    {
+
+      string path = action->writeset(i);
+
+      string hash_name;
+
+      hash_name = path;
+
+      uint64 mds = config_->HashFileName(hash_name);
       uint64 machine = config_->LookupMetadataShard(mds, replica_);
-      if (machine == machine_->machine_id()) {
+      if (machine == machine_->machine_id())
+      {
         writer_ = true;
-      } else {
+      }
+      else
+      {
         remote_writers.insert(machine);
       }
     }
 
     // If any reads were performed locally, broadcast them to writers.
-    if (reader_) {
+    if (reader_)
+    {
       MapProto local_reads;
-      for (auto it = reads_.begin(); it != reads_.end(); ++it) {
-        MapProto::Entry* e = local_reads.add_entries();
+      for (auto it = reads_.begin(); it != reads_.end(); ++it)
+      {
+        MapProto::Entry *e = local_reads.add_entries();
         e->set_key(it->first);
         e->set_value(it->second);
       }
-      for (auto it = remote_writers.begin(); it != remote_writers.end(); ++it) {
-        Header* header = new Header();
+      // gaoxuan --why do we want to read but we need to broadcast to writers?
+      for (auto it = remote_writers.begin(); it != remote_writers.end(); ++it)
+      {
+        Header *header = new Header();
         header->set_from(machine_->machine_id());
         header->set_to(*it);
-        header->set_type(Header::DATA);
-        header->set_data_channel("action-" + UInt64ToString(version_));
+        header->set_type(Header::DATA);                                 // gaoxuan --deliver packets directly,and the specific logic refers to lock
+        header->set_data_channel("action-" + UInt64ToString(version_)); // gaoxuan --Can this version make a difference ?
         machine_->SendMessage(header, new MessageBuffer(local_reads));
       }
     }
 
     // If any writes will be performed locally, wait for all remote reads.
-    if (writer_) {
+    if (writer_)
+    {
       // Get channel.
-      AtomicQueue<MessageBuffer*>* channel =
+      AtomicQueue<MessageBuffer *> *channel =
           machine_->DataChannel("action-" + UInt64ToString(version_));
-      for (uint32 i = 0; i < remote_readers.size(); i++) {
-        MessageBuffer* m = NULL;
+      for (uint32 i = 0; i < remote_readers.size(); i++)
+      { // gaoxuan --in this part we get remote entry
+        MessageBuffer *m = NULL;
         // Get results.
-        while (!channel->Pop(&m)) {
+        while (!channel->Pop(&m))
+        {
           usleep(10);
         }
         MapProto remote_read;
         remote_read.ParseFromArray((*m)[0].data(), (*m)[0].size());
-        for (int j = 0; j < remote_read.entries_size(); j++) {
+        for (int j = 0; j < remote_read.entries_size(); j++)
+        {
           CHECK(reads_.count(remote_read.entries(j).key()) == 0);
           reads_[remote_read.entries(j).key()] = remote_read.entries(j).value();
         }
@@ -229,35 +289,43 @@ class DistributedExecutionContext : public ExecutionContext {
   }
 
   // Destructor installs all LOCAL writes.
-  ~DistributedExecutionContext() {
-    if (!aborted_) {
-      for (auto it = writes_.begin(); it != writes_.end(); ++it) {
+  ~DistributedExecutionContext()
+  {
+    LOG(ERROR)<<"context distructor";
+    double start = GetTime();
+    if (!aborted_)
+    {
+      for (auto it = writes_.begin(); it != writes_.end(); ++it)
+      {
         uint64 mds = config_->HashFileName(it->first);
         uint64 machine = config_->LookupMetadataShard(mds, replica_);
-        if (machine == machine_->machine_id()) {
+        if (machine == machine_->machine_id())
+        {
           store_->Put(it->first, it->second, version_);
         }
       }
-      for (auto it = deletions_.begin(); it != deletions_.end(); ++it) {
+      for (auto it = deletions_.begin(); it != deletions_.end(); ++it)
+      {
         uint64 mds = config_->HashFileName(*it);
         uint64 machine = config_->LookupMetadataShard(mds, replica_);
-        if (machine == machine_->machine_id()) {
+        if (machine == machine_->machine_id())
+        {
           store_->Delete(*it, version_);
         }
       }
     }
+    LOG(ERROR)<<"context des : "<<GetTime() - start;
   }
 
- private:
+private:
   // Local machine.
-  Machine* machine_;
+  Machine *machine_;
 
   // Deployment configuration.
-  CalvinFSConfigMap* config_;
+  CalvinFSConfigMap *config_;
 
   // Local replica id.
   uint64 replica_;
-
 };
 
 ///////////////////////          MetadataStore          ///////////////////////
@@ -335,19 +403,24 @@ int RandomSize()
 {
   return 1 + rand() % 2047;
 }
-void MetadataStore::Init() {
+// 最初始的三层Init
+void MetadataStore::Init()
+{
+
   int asize = machine_->config().size();
-  int bsize = 1;
-  int csize = 1;
+  int bsize = 1000;
+  int csize = 500;
 
   double start = GetTime();
 
   // Update root dir.
-  if (IsLocal("")) {
+  if (IsLocal(""))
+  {
     MetadataEntry entry;
     entry.mutable_permissions();
     entry.set_type(DIR);
-    for (int i = 0; i < 1000; i++) {
+    for (int i = 0; i < 1000; i++)
+    {
       entry.add_dir_contents("a" + IntToString(i));
     }
     string serialized_entry;
@@ -356,13 +429,16 @@ void MetadataStore::Init() {
   }
 
   // Add dirs.
-  for (int i = 0; i < asize; i++) {
+  for (int i = 0; i < asize; i++)
+  {
     string dir("/a" + IntToString(i));
-    if (IsLocal(dir)) {
+    if (IsLocal(dir))
+    {
       MetadataEntry entry;
       entry.mutable_permissions();
       entry.set_type(DIR);
-      for (int j = 0; j < bsize; j++) {
+      for (int j = 0; j < bsize; j++)
+      {
         entry.add_dir_contents("b" + IntToString(j));
       }
       string serialized_entry;
@@ -370,13 +446,16 @@ void MetadataStore::Init() {
       store_->Put(dir, serialized_entry, 0);
     }
     // Add subdirs.
-    for (int j = 0; j < bsize; j++) {
+    for (int j = 0; j < bsize; j++)
+    {
       string subdir(dir + "/b" + IntToString(j));
-      if (IsLocal(subdir)) {
+      if (IsLocal(subdir))
+      {
         MetadataEntry entry;
         entry.mutable_permissions();
         entry.set_type(DIR);
-        for (int k = 0; k < csize; k++) {
+        for (int k = 0; k < csize; k++)
+        {
           entry.add_dir_contents("c" + IntToString(k));
         }
         string serialized_entry;
@@ -384,13 +463,15 @@ void MetadataStore::Init() {
         store_->Put(subdir, serialized_entry, 0);
       }
       // Add files.
-      for (int k = 0; k < csize; k++) {
+      for (int k = 0; k < csize; k++)
+      {
         string file(subdir + "/c" + IntToString(k));
-        if (IsLocal(file)) {
+        if (IsLocal(file))
+        {
           MetadataEntry entry;
           entry.mutable_permissions();
           entry.set_type(DATA);
-          FilePart* fp = entry.add_file_parts();
+          FilePart *fp = entry.add_file_parts();
           fp->set_length(RandomSize());
           fp->set_block_id(0);
           fp->set_block_offset(0);
@@ -399,107 +480,19 @@ void MetadataStore::Init() {
           store_->Put(file, serialized_entry, 0);
         }
       }
-      if (j % 100 == 0) {
+      if (j % 100 == 0)
+      {
         LOG(ERROR) << "[" << machine_->machine_id() << "] "
                    << "MDS::Init() progress: " << (i * bsize + j) / 100 + 1
                    << "/" << asize * bsize / 100;
       }
     }
   }
+
   LOG(ERROR) << "[" << machine_->machine_id() << "] "
              << "MDS::Init() complete. Elapsed time: "
              << GetTime() - start << " seconds";
 }
-// 最初始的三层Init
-// void MetadataStore::Init()
-// {
-
-//   int asize = machine_->config().size();
-//   int bsize = 1000;
-//   int csize = 500;
-
-//   double start = GetTime();
-
-//   // Update root dir.
-//   if (IsLocal(""))
-//   {
-//     MetadataEntry entry;
-//     entry.mutable_permissions();
-//     entry.set_type(DIR);
-//     for (int i = 0; i < 1000; i++)
-//     {
-//       entry.add_dir_contents("a" + IntToString(i));
-//     }
-//     string serialized_entry;
-//     entry.SerializeToString(&serialized_entry);
-//     store_->Put("", serialized_entry, 0);
-//   }
-
-//   // Add dirs.
-//   for (int i = 0; i < asize; i++)
-//   {
-//     string dir("/a" + IntToString(i));
-//     if (IsLocal(dir))
-//     {
-//       MetadataEntry entry;
-//       entry.mutable_permissions();
-//       entry.set_type(DIR);
-//       for (int j = 0; j < bsize; j++)
-//       {
-//         entry.add_dir_contents("b" + IntToString(j));
-//       }
-//       string serialized_entry;
-//       entry.SerializeToString(&serialized_entry);
-//       store_->Put(dir, serialized_entry, 0);
-//     }
-//     // Add subdirs.
-//     for (int j = 0; j < bsize; j++)
-//     {
-//       string subdir(dir + "/b" + IntToString(j));
-//       if (IsLocal(subdir))
-//       {
-//         MetadataEntry entry;
-//         entry.mutable_permissions();
-//         entry.set_type(DIR);
-//         for (int k = 0; k < csize; k++)
-//         {
-//           entry.add_dir_contents("c" + IntToString(k));
-//         }
-//         string serialized_entry;
-//         entry.SerializeToString(&serialized_entry);
-//         store_->Put(subdir, serialized_entry, 0);
-//       }
-//       // Add files.
-//       for (int k = 0; k < csize; k++)
-//       {
-//         string file(subdir + "/c" + IntToString(k));
-//         if (IsLocal(file))
-//         {
-//           MetadataEntry entry;
-//           entry.mutable_permissions();
-//           entry.set_type(DATA);
-//           FilePart *fp = entry.add_file_parts();
-//           fp->set_length(RandomSize());
-//           fp->set_block_id(0);
-//           fp->set_block_offset(0);
-//           string serialized_entry;
-//           entry.SerializeToString(&serialized_entry);
-//           store_->Put(file, serialized_entry, 0);
-//         }
-//       }
-//       if (j % 100 == 0)
-//       {
-//         LOG(ERROR) << "[" << machine_->machine_id() << "] "
-//                    << "MDS::Init() progress: " << (i * bsize + j) / 100 + 1
-//                    << "/" << asize * bsize / 100;
-//       }
-//     }
-//   }
-
-//   LOG(ERROR) << "[" << machine_->machine_id() << "] "
-//              << "MDS::Init() complete. Elapsed time: "
-//              << GetTime() - start << " seconds";
-// }
 // 增加了数指针的三层Init
 void MetadataStore::Init(BTNode *dir_tree)
 {
@@ -4285,7 +4278,7 @@ void MetadataStore::Init_from_txt(string filename)
       }
       temp = temp.substr(pos + 1);
       path_type[key] = type;
-     // LOG(ERROR)<<key<<" in "<<config_->LookupMetadataShard(config_->HashFileName(key), config_->LookupReplica(machine_->machine_id()));
+      //LOG(ERROR)<<key<<" in "<<config_->LookupMetadataShard(config_->HashFileName(key), config_->LookupReplica(machine_->machine_id()));
       if (IsLocal(key))
       {
         MetadataEntry entry;
@@ -5463,6 +5456,14 @@ void MetadataStore::Run(Action *action)
     Lookup_Internal(context, in, &out);
     out.SerializeToString(action->mutable_output());
   }
+  else if (type == MetadataAction::TREE_LOOKUP)
+  {
+    MetadataAction::Tree_LookupInput in;
+    MetadataAction::Tree_LookupOutput out;
+    in.ParseFromString(action->input());
+    Tree_Lookup_Internal(context, in, &out);
+    out.SerializeToString(action->mutable_output());
+  }
   else if (type == MetadataAction::RESIZE)
   {
     MetadataAction::ResizeInput in;
@@ -6125,10 +6126,417 @@ void MetadataStore::Lookup_Internal(
     out->add_errors(MetadataAction::FileDoesNotExist);
     return;
   }
+
   // TODO(agt): Check permissions.
+
   // Return entry.
   out->set_path(in.path());
   out->mutable_entry()->CopyFrom(entry);
+}
+
+void MetadataStore::Tree_Lookup_Internal(
+    ExecutionContext *context,
+    const MetadataAction::Tree_LookupInput &in,
+    MetadataAction::Tree_LookupOutput *out)
+{
+
+  // 原本的遍历代码
+
+  MetadataEntry entry;
+  string path = in.path();
+
+  if (path.find("b") != std::string::npos) // 我这里是从b开始才是分层的地方了
+  {
+    // 要分层
+    //   gaoxuan --use BFS to add new metadata entry
+
+    // 先把路径拆分开，根据这个b
+    int p = path.find("b");
+    string tree_name = path.substr(0, p - 1);
+    string hash_name = path.substr(p);
+    //
+    string root = "";
+    string root1 = "";
+    // LOG(ERROR)<<"还没进入循环";
+    while (1)
+    {
+      string front = root;
+      string front1 = root1;
+      uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
+      Header *header = new Header();
+      header->set_from(machine_->machine_id());
+      header->set_to(mds_machine);
+      header->set_type(Header::RPC);
+      header->set_app("client");
+      header->set_rpc("LOOKUP");
+      header->add_misc_string(front.c_str(), strlen(front.c_str()));
+
+      if (front != "")
+      {
+        // gaoxuan --在这里发出消息之前，把from_path.data()和to_path.data()拆分一下
+
+        // 第一步：将from_path.data()拆分放进split_string里面，拆完后，不够八个格子的，使用空格填充上
+        // 拆分的算法，遇到一个/就把之前的字符串放进去
+        // 将拆分后的元素添加去的方法：header->add_split_string(拆分的字符串)
+        int flag = 0;       // 用来标识此时split_string 里面有多少子串
+        char pattern = '/'; // 根据/进行字符串拆分
+
+        string temp_from = front.c_str();
+        temp_from = temp_from.substr(1, temp_from.size()); // 这一行是为了去除最前面的/
+        temp_from = temp_from + pattern;                   // 在最后面添加一个/便于处理
+        int pos = temp_from.find(pattern);                 // 找到第一个/的位置
+        while (pos != std::string::npos)                   // 循环不断找/，找到一个拆分一次
+        {
+          string temp1 = temp_from.substr(0, pos); // temp里面就是拆分出来的第一个子串
+          string temp = temp1;
+          for (int i = temp.size(); i < 5; i++)
+          {
+            temp = temp + " ";
+          }
+          header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+          flag++;                              // 拆分的字符串数量++
+          temp_from = temp_from.substr(pos + 1, temp_from.size());
+          pos = temp_from.find(pattern);
+        }
+        header->set_from_length(flag);
+        while (flag != 8)
+        {
+          string temp = "     ";               // 用五个空格填充一下
+          header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+          flag++;                              // 拆分的字符串数量++
+        }
+      }
+      else
+      {
+
+        int flag = 0; // 用来标识此时split_string 里面有多少子串
+        while (flag != 8)
+        {
+          string temp = "     ";               // 用五个空格填充一下
+          header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+          flag++;                              // 拆分的字符串数量++
+        }
+        header->set_from_length(flag);
+      }
+
+      MessageBuffer *m = NULL;
+      header->set_data_ptr(reinterpret_cast<uint64>(&m));
+      machine_->SendMessage(header, new MessageBuffer());
+      while (m == NULL)
+      {
+        usleep(10);
+        Noop<MessageBuffer *>(m);
+      }
+
+      MessageBuffer *serialized = m;
+      Action b;
+      b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
+      delete serialized;
+      MetadataAction::LookupOutput out;
+      out.ParseFromString(b.output());
+      if (front1 == tree_name) // 判断树部分是否搜索完成
+      {
+        entry = out.entry();
+        break;
+      }
+      else
+      { // gaoxuan --还没有找到
+        for (int i = 0; i < out.entry().dir_contents_size(); i++)
+        {
+
+          string full_path = front1 + "/" + out.entry().dir_contents(i); // 拼接获取全路径
+
+          if (in.path().find(full_path) == 0)
+          { // Todo:这里需要用相对路径
+            // 进入这个分支就代表此时，恰好搜到了，此时i代表的就是所需的相对路径，我们只需要用0位置的id拼一下就好
+            root1 = full_path;
+            root = "/" + out.entry().dir_contents(0) + out.entry().dir_contents(i);
+            break;
+          }
+        }
+      }
+    }
+    // LOG(ERROR)<<"跳出了循环";
+
+    // 现在entry中存放的是分层点的元数据项
+    hash_name = "/" + entry.dir_contents(0) + hash_name; // 获取需要hash的相对路径
+    // 这个路径直接去lookup一下
+    uint64 to_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(hash_name)), config_->LookupReplica(machine_->machine_id()));
+    Header *header = new Header();
+    header->set_from(machine_->machine_id());
+    header->set_to(to_machine);
+    header->set_type(Header::RPC);
+    header->set_app("client");
+    header->set_rpc("LOOKUP");
+    header->add_misc_string(hash_name.c_str(), strlen(hash_name.c_str()));
+
+    int flag = 0;       // 用来标识此时split_string 里面有多少子串
+    char pattern = '/'; // 根据/进行字符串拆分
+
+    string temp_from = hash_name;
+    temp_from = temp_from.substr(1, temp_from.size()); // 这一行是为了去除最前面的/
+    temp_from = temp_from + pattern;                   // 在最后面添加一个/便于处理
+    int pos = temp_from.find(pattern);                 // 找到第一个/的位置
+    while (pos != std::string::npos)                   // 循环不断找/，找到一个拆分一次
+    {
+      string temp1 = temp_from.substr(0, pos); // temp里面就是拆分出来的第一个子串
+      string temp = temp1;
+      for (int i = temp.size(); i < 5; i++)
+      {
+        temp = temp + " ";
+      }
+      header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+      flag++;                              // 拆分的字符串数量++
+      temp_from = temp_from.substr(pos + 1, temp_from.size());
+      pos = temp_from.find(pattern);
+    }
+    header->set_from_length(flag);
+    while (flag != 8)
+    {
+      string temp = "     ";               // 用五个空格填充一下
+      header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+      flag++;                              // 拆分的字符串数量++
+    }
+
+    // 这一行之前是gaoxuan添加的
+
+    MessageBuffer *m = NULL;
+    header->set_data_ptr(reinterpret_cast<uint64>(&m));
+    machine_->SendMessage(header, new MessageBuffer());
+    while (m == NULL)
+    {
+      usleep(10);
+      Noop<MessageBuffer *>(m);
+    }
+    MessageBuffer *serialized = m;
+    Action b;
+    b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
+    delete serialized;
+    MetadataAction::LookupOutput o;
+    o.ParseFromString(b.output());
+    // TODO(agt): Check permissions.
+    MetadataEntry entry1 = o.entry();
+    // Return entry.
+    out->mutable_entry()->CopyFrom(entry1);
+  }
+  else
+  {
+    string root = "";
+    string root1 = "";
+    // LOG(ERROR)<<"还没进入循环";
+    while (1)
+    {
+      string front = root;
+      string front1 = root1;
+      uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
+      if (mds_machine == machine_->machine_id())
+      {
+        mds_machine = (mds_machine + 1) % 2;
+      }
+      Header *header = new Header();
+      header->set_flag(2); // 标识
+      header->set_from(machine_->machine_id());
+      header->set_to(mds_machine);
+      header->set_type(Header::RPC);
+      header->set_app("client");
+      header->set_rpc("LOOKUP");
+      header->add_misc_string(front.c_str(), strlen(front.c_str()));
+
+      if (path != "")
+      {
+        int flag = 0;       // 用来标识此时split_string 里面有多少子串
+        char pattern = '/'; // 根据/进行字符串拆分
+        string temp_from = path.c_str();
+        temp_from = temp_from.substr(1, temp_from.size()); // 这一行是为了去除最前面的/
+        temp_from = temp_from + pattern;                   // 在最后面添加一个/便于处理
+        int pos = temp_from.find(pattern);                 // 找到第一个/的位置
+        while (pos != std::string::npos)                   // 循环不断找/，找到一个拆分一次
+        {
+          string temp1 = temp_from.substr(0, pos); // temp里面就是拆分出来的第一个子串
+          string temp = temp1;
+          for (int i = temp.size(); i < 4; i++)
+          {
+            temp = temp + " ";
+          }
+          header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+          flag++;                              // 拆分的字符串数量++
+          temp_from = temp_from.substr(pos + 1, temp_from.size());
+          pos = temp_from.find(pattern);
+        }
+        header->set_from_length(flag);
+        while (flag != 8)
+        {
+          string temp = "    ";                // 用四个空格填充一下
+          header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+          flag++;                              // 拆分的字符串数量++
+        }
+
+        // 这一行之前是gaoxuan添加的
+      }
+      else
+      {
+        int flag = 0; // 用来标识此时split_string 里面有多少子串
+        while (flag != 8)
+        {
+          string temp = "    ";                // 用四个空格填充一下
+          header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+          flag++;                              // 拆分的字符串数量++
+        }
+        header->set_from_length(flag);
+      }
+      int depth = Dir_depth(path);
+      header->set_depth(depth);
+      int uid = 9999;
+      header->set_uid(uid);
+      MessageBuffer *m = NULL;
+      header->set_data_ptr(reinterpret_cast<uint64>(&m));
+      machine_->SendMessage(header, new MessageBuffer());
+      while (m == NULL)
+      {
+        usleep(10);
+        Noop<MessageBuffer *>(m);
+      }
+
+      MessageBuffer *serialized = m;
+      Action b;
+      b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
+      delete serialized;
+
+      if (b.input() == "switch processed")
+      {
+
+        entry.set_type(DIR);
+        entry.add_dir_contents("gaoxuan");
+
+        break;
+      }
+      MetadataAction::LookupOutput out;
+      out.ParseFromString(b.output());
+      if (front1 == in.path()) // 单独用全路径来判断是否搜索完成,可以肯定是这里没执行，才退不出去
+      {
+        entry = out.entry();
+        break;
+      }
+      else
+      { // gaoxuan --还没有找到
+        for (int i = 0; i < out.entry().dir_contents_size(); i++)
+        {
+          string full_path = front1 + "/" + out.entry().dir_contents(i); // 拼接获取全路径
+          if (in.path().find(full_path) == 0)
+          { // Todo:这里需要用相对路径
+            // 进入这个分支就代表此时，恰好搜到了，此时i代表的就是所需的相对路径，我们只需要用0位置的id拼一下就好
+            root1 = full_path;
+            root = "/" + out.entry().dir_contents(0) + out.entry().dir_contents(i);
+            break;
+          }
+        }
+      }
+    }
+    out->mutable_entry()->CopyFrom(entry);
+  }
+
+  /*
+    MetadataEntry entry;
+    string path = in.path();
+    string full_path = in.path();
+    string front = path;
+    uint64 mds_machine = config_->LookupMetadataShard(config_->HashFileName(Slice(front)), config_->LookupReplica(machine_->machine_id()));
+    if(mds_machine == machine_->machine_id())
+    {
+      mds_machine = (mds_machine+1)%2;
+    }
+    //LOG(ERROR) << path <<"LS: "<<machine_->machine_id() << " to " << mds_machine;
+    Header *header = new Header();
+    header->set_flag(2); // 标识
+    header->set_from(machine_->machine_id());
+    header->set_to(mds_machine);
+    header->set_type(Header::RPC);
+    header->set_app("client");
+    header->set_rpc("LOOKUP");
+    header->add_misc_string(front.c_str(), strlen(front.c_str()));
+    // firstly, we need split full path
+    if (full_path != "")
+    {
+      int flag = 0;       // 用来标识此时split_string 里面有多少子串
+      char pattern = '/'; // 根据/进行字符串拆分
+      string temp_from = full_path;
+      temp_from = temp_from.substr(1, temp_from.size()); // 这一行是为了去除最前面的/
+      temp_from = temp_from + pattern;                   // 在最后面添加一个/便于处理
+      int pos = temp_from.find(pattern);                 // 找到第一个/的位置
+      while (pos != std::string::npos)                   // 循环不断找/，找到一个拆分一次
+      {
+        string temp1 = temp_from.substr(0, pos); // temp里面就是拆分出来的第一个子串
+        string temp = temp1;
+        for (int i = temp.size(); i < 4; i++)
+        {
+          temp = temp + " ";
+        }
+        header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+        flag++;                              // 拆分的字符串数量++
+        temp_from = temp_from.substr(pos + 1, temp_from.size());
+        pos = temp_from.find(pattern);
+      }
+      header->set_from_length(flag);
+      while (flag != 8)
+      {
+        string temp = "    ";                // 用四个空格填充一下
+        header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+        flag++;                              // 拆分的字符串数量++
+      }
+    }
+    else
+    {
+      int flag = 0; // 用来标识此时split_string 里面有多少子串
+      while (flag != 8)
+      {
+        string temp = "    ";               // 用四个空格填充一下
+        header->add_split_string_from(temp); // 将拆出来的子串加到header里面去
+        flag++;                              // 拆分的字符串数量++
+      }
+      header->set_from_length(flag);
+    }
+    // secondly, we need to add depth of full_path;
+    // need a little function :Dir_depth();
+    int depth = Dir_depth(full_path);
+    header->set_depth(depth);
+    // uid which need to be added in switch
+    int uid = 9999;
+    header->set_uid(uid);
+    // metadataentry part , using " " to fill up
+    string empty_str = "0000000000000000";
+    for (int i = 0; i < 8; i++)
+    {
+      header->add_metadatentry(empty_str);
+    }
+    MessageBuffer *m = NULL;
+    header->set_data_ptr(reinterpret_cast<uint64>(&m));
+    machine_->SendMessage(header, new MessageBuffer());
+    while (m == NULL)
+    {
+      usleep(10);
+      Noop<MessageBuffer *>(m);
+    }
+    MessageBuffer *serialized = m;
+    Action b;
+    b.ParseFromArray((*serialized)[0].data(), (*serialized)[0].size());
+    delete serialized;
+
+    if(b.input() == "switch processed")
+    {
+
+      entry.set_type(DIR);
+      entry.add_dir_contents("gaoxuan");
+      //LOG(ERROR) << "switch modified! opreation finished!";
+    }
+    else
+    {
+      MetadataAction::LookupOutput out;
+      out.ParseFromString(b.output());
+      entry = out.entry();
+    }
+    out->mutable_entry()->CopyFrom(entry);
+
+  */
 }
 void MetadataStore::Resize_Internal(
     ExecutionContext *context,
