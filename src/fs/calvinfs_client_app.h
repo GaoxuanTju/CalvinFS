@@ -1047,14 +1047,13 @@ public:
     LOG(ERROR) << "Renamed "
                << "1 files. Elapsed time:"
                << (GetTime() - start) << " seconds";
-    Spin(1);
-    metadata_->getLOOKUP("");
+
   }
   void DeleteExperiment()
   { // gaoxuan --删除文件的实验
     Spin(1);
     dir_tree = new BTNode;
-    metadata_->Init(dir_tree);
+    metadata_->Init_from_txt("/home/CalvinFS/src/fs/Init.txt");
     Spin(1);
     machine()->GlobalBarrier();
     Spin(1);
@@ -1080,14 +1079,11 @@ public:
     LOG(ERROR) << "[" << machine()->machine_id() << "] "
                << "Deleted " << 10 << " files. Elapsed time: "
                << (GetTime() - start) << " seconds";
-    Spin(1);
-    print_dir_tree(dir_tree);
+
   }
   void LsExperiment()
-  { // gaoxuan --删除文件的实验
+  { 
     Spin(1);
-    // dir_tree = new BTNode;
-    // metadata_->Init_tree_20(dir_tree);
     metadata_->Init_from_txt("/home/CalvinFS/src/fs/Init.txt");
     Spin(1);
     machine()->GlobalBarrier();
